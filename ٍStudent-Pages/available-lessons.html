@@ -699,7 +699,7 @@
         async function loadlessons() {
             try {
                 // Fetch payment requests first
-                const paymentRes = await fetch(`http://localhost:3000/api/payment-requests/user/${user._id}/lessons`, {
+                const paymentRes = await fetch(`https://cs-eslamhatem-backend.fly.dev/api/payment-requests/user/${user._id}/lessons`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 
@@ -720,7 +720,7 @@
                 }
 
                 // Fetch available lessons
-                const lessonsRes = await fetch("http://localhost:3000/api/users/lessons/available", {
+                const lessonsRes = await fetch("https://cs-eslamhatem-backend.fly.dev/api/users/lessons/available", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 
@@ -787,7 +787,7 @@
                 lessonCard.style.animationDelay = `${index * 0.1}s`;
                 
                 lessonCard.innerHTML = `
-                    <img src="http://localhost:3000${lesson.thumbnail}" alt="${lesson.title}">
+                    <img src="https://cs-eslamhatem-backend.fly.dev${lesson.thumbnail}" alt="${lesson.title}">
                     <div class="lesson-info">
                         <div class="lesson-header">
                             <h3 class="lesson-title">${lesson.title}</h3>
