@@ -638,6 +638,186 @@
                 justify-content: center;
             }
         }
+        
+    /* Loading State Styles */
+    .loading-state {
+        text-align: center;
+        padding: 40px 20px;
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 4px solid var(--secondary);
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Course Cards Styles */
+    .course-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .course-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        transition: var(--transition);
+        border: 1px solid rgba(0, 204, 255, 0.1);
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        border-color: rgba(0, 204, 255, 0.3);
+    }
+
+    .course-image {
+        height: 160px;
+        background: var(--gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .course-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .course-content {
+        padding: 20px;
+    }
+
+    .course-content h3 {
+        font-family: 'Exo 2', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--light);
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .course-content p {
+        color: rgba(240, 246, 255, 0.7);
+        margin-bottom: 20px;
+        line-height: 1.5;
+        font-size: 0.9rem;
+    }
+
+    .course-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .course-price {
+        font-weight: 600;
+        color: var(--secondary);
+        font-size: 1.1rem;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 30px;
+        font-family: 'Exo 2', sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: var(--gradient);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 102, 255, 0.4);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--secondary);
+        border: 2px solid var(--secondary);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(0, 204, 255, 0.1);
+    }
+
+    .course-status {
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+    
+    .status-pending {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+    }
+    
+    .status-approved {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+    }
+    
+    .status-rejected {
+        background: rgba(248, 113, 113, 0.2);
+        color: #f87171;
+    }
+    
+    .status-not-purchased {
+        background: rgba(0, 102, 255, 0.1);
+        color: var(--primary);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .course-cards {
+            grid-template-columns: 1fr;
+        }
+        
+        .course-meta {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
     </style>
 </head>
 <body>
@@ -658,9 +838,9 @@
             
             <nav class="nav-links">
                 <a href="index.html">Home</a>
-                <a href="Student-Pages/available-lessons.html">Lessons</a>
-                <a href="Student-Pages/available-courses.html">Packages</a>
-                <a href="Student-Pages/Student-Dashboard.html">Dashboard</a>
+                <a href="ٍStudent-Pages/available-lessons.html">Lessons</a>
+                <a href="ٍStudent-Pages/available-courses.html">Packages</a>
+                <a href="ٍStudent-Pages/Student-Dashboard.html">Dashboard</a>
             </nav>
             
 <div class="auth-buttons">
@@ -680,11 +860,18 @@
             <h1>Computer Science Education For IG Students</h1>
             <p>Join Islam Hatem's online classes and master programming with our interactive compiler designed for IG Students, comprehensive lessons, and personalized feedback .</p>
             
-            <div class="hero-buttons">
-                <button class="btn btn-primary">Explore Courses</button>
-                <button class="btn btn-secondary">Live Classes Schedule</button>
-                <button class="btn btn-primary">Try Compiler</button>
-            </div>
+<div class="hero-buttons">
+  <a href="ٍStudent-Pages/available-courses.html">
+    <button class="btn btn-primary">Explore Courses</button>
+  </a>
+  <a href="ٍStudent-Pages/student-streams.html">
+    <button class="btn btn-secondary">Live Classes Schedule</button>
+  </a>
+  <a href="ٍStudent-Pages/compiler.html">
+    <button class="btn btn-primary">Try Compiler</button>
+  </a>
+</div>
+
         </div>
     </section>
 
@@ -742,56 +929,20 @@
     </section>
 
     <!-- Courses Section -->
-    <section class="container courses">
-        <div class="section-header">
-            <h2>Popular Courses & Packages</h2>
-            <p>Explore our comprehensive computer science courses designed specifically for IG Students</p>
+<section class="container courses">
+    <div class="section-header">
+        <h2>Popular Courses & Packages</h2>
+        <p>Explore our comprehensive computer science courses designed specifically for IG Students</p>
+    </div>
+    
+    <div class="course-cards" id="coursesContainer">
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading courses...</p>
         </div>
-        
-        <div class="course-cards">
-            <div class="course-card">
-                <div class="course-image">
-                    <i class="fas fa-code" style="font-size: 4rem; color: white;"></i>
-                </div>
-                <div class="course-content">
-                    <h3>Python Programming Fundamentals</h3>
-                    <p>Master the basics of Python programming with hands-on exercises and projects.</p>
-                    <div class="course-meta">
-                        <span class="course-price">$49.99</span>
-                        <button class="btn btn-primary">Enroll Now</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="course-card">
-                <div class="course-image">
-                    <i class="fas fa-database" style="font-size: 4rem; color: white;"></i>
-                </div>
-                <div class="course-content">
-                    <h3>Database Management Systems</h3>
-                    <p>Learn how to design and implement efficient database systems for applications.</p>
-                    <div class="course-meta">
-                        <span class="course-price">$59.99</span>
-                        <button class="btn btn-primary">Enroll Now</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="course-card">
-                <div class="course-image">
-                    <i class="fas fa-laptop-code" style="font-size: 4rem; color: white;"></i>
-                </div>
-                <div class="course-content">
-                    <h3>Complete IG CS Package</h3>
-                    <p>Everything you need to excel in your IG Computer Science exams and beyond.</p>
-                    <div class="course-meta">
-                        <span class="course-price">$149.99</span>
-                        <button class="btn btn-primary">Enroll Now</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
+</section>
+
 
     <!-- Testimonials Section -->
     <section class="container testimonials">
@@ -850,11 +1001,14 @@
 
     <!-- CTA Section -->
     <section class="container">
-        <div class="cta">
-            <h2>Start Your Computer Science Journey Today</h2>
-            <p>Join thousands of students worldwide who have transformed their programming skills with Islam Hatem's innovative teaching approach.</p>
-            <button class="btn btn-secondary">Explore All Courses</button>
-        </div>
+<div class="cta">
+  <h2>Start Your Computer Science Journey Today</h2>
+  <p>Join thousands of students worldwide who have transformed their programming skills with Islam Hatem's innovative teaching approach.</p>
+  <a href="ٍStudent-Pages/available-courses.html">
+    <button class="btn btn-secondary">Explore All Courses</button>
+  </a>
+</div>
+
     </section>
 
     <!-- Footer -->
@@ -877,9 +1031,9 @@
                     <ul>
                         <li><a href="#">Home</a></li>
                         <li><a href="#">About</a></li>
-                        <li><a href="Student-Pages/available-courses.html">Courses</a></li>
-                        <li><a href="Student-Pages/available-courses.html">Packages</a></li>
-                        <li><a href="Student-Pages/compiler.html">Compiler</a></li>
+                        <li><a href="ٍStudent-Pages/available-courses.html">Courses</a></li>
+                        <li><a href="ٍStudent-Pages/available-courses.html">Packages</a></li>
+                        <li><a href="ٍStudent-Pages/compiler.html">Compiler</a></li>
                     </ul>
                 </div>
                 
@@ -887,10 +1041,10 @@
                     <h3>Resources</h3>
                     <ul>
                         <li><a href="#">Blog</a></li>
-                        <li><a href="Student-Pages/available-lessons.html">Tutorials</a></li>
-                        <li><a href="Student-Pages/user-quizzes.html">Practice Exercises</a></li>
-                        <li><a href="Student-Pages/Student-Dashboard.html">IG Syllabus Guide</a></li>
-                        <li><a href="Student-Pages/student-helpCenter.html">FAQ</a></li>
+                        <li><a href="ٍStudent-Pages/available-lessons.html">Tutorials</a></li>
+                        <li><a href="ٍStudent-Pages/user-quizzes.html">Practice Exercises</a></li>
+                        <li><a href="ٍStudent-Pages/Student-Dashboard.html">IG Syllabus Guide</a></li>
+                        <li><a href="ٍStudent-Pages/student-helpCenter.html">FAQ</a></li>
                     </ul>
                 </div>
                 
@@ -925,6 +1079,257 @@
             });
         });
     </script>
+    <script>
+    // Global variables
+    const API_BASE = "http://localhost:3000/api";
+    let courses = [];
+    let paymentRequests = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check authentication
+        const token = localStorage.getItem("token");
+        const user = JSON.parse(localStorage.getItem("userInfo"));
+        
+        if (!token || !user) {
+            // If not logged in, show public courses
+            loadPublicCourses();
+        } else {
+            // If logged in, load user-specific course data
+            loadUserCourses();
+        }
+    });
+
+    // API Helper Functions
+    async function apiCall(endpoint, options = {}) {
+        const token = localStorage.getItem("token");
+        
+        const defaultOptions = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        };
+        
+        try {
+            const response = await fetch(`${API_BASE}${endpoint}`, { ...defaultOptions, ...options });
+            
+            if (response.status === 401) {
+                // Token expired or invalid
+                localStorage.removeItem("token");
+                localStorage.removeItem("userInfo");
+                window.location.href = "../Login-Pages/login.html";
+                return null;
+            }
+            
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error(`API call failed for ${endpoint}:`, error);
+            return null;
+        }
+    }
+
+    // Load public courses (for non-logged in users)
+    async function loadPublicCourses() {
+        try {
+            const response = await fetch(`${API_BASE}/public/courses`);
+            const data = await response.json();
+            
+            if (data && data.success) {
+                courses = data.data || [];
+                renderCourses();
+            } else {
+                showError("Failed to load courses");
+            }
+        } catch (error) {
+            console.error("Error loading public courses:", error);
+            showError("Error loading courses. Please try again.");
+        }
+    }
+
+    // Load user courses (for logged in users)
+    async function loadUserCourses() {
+        try {
+            const user = JSON.parse(localStorage.getItem("userInfo"));
+            
+            // Fetch payment requests first
+            const paymentRes = await fetch(`${API_BASE}/payment-requests/user/${user._id}`, {
+                headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+            });
+            
+            if (paymentRes.ok) {
+                const paymentData = await paymentRes.json();
+                if (paymentData.success) {
+                    paymentRequests = paymentData.requests || paymentData.data;
+                }
+            }
+
+            // Fetch available courses
+            const coursesRes = await apiCall('/users/courses/available');
+            
+            if (coursesRes && coursesRes.success) {
+                courses = coursesRes.data || [];
+                renderCourses();
+            } else {
+                showError("Failed to load courses");
+            }
+        } catch (error) {
+            console.error("Error loading user courses:", error);
+            showError("Error loading courses. Please try again.");
+        }
+    }
+
+    // Render courses to the page
+    function renderCourses() {
+        const container = document.getElementById('coursesContainer');
+        
+        if (!courses || courses.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <p>No courses available at the moment.</p>
+                    <p>Please check back later for new courses.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Get user info to check if logged in
+        const user = JSON.parse(localStorage.getItem("userInfo"));
+        const isLoggedIn = !!user;
+
+        container.innerHTML = courses.map(course => {
+            // Determine status for logged in users
+            let statusClass = '';
+            let statusText = '';
+            let buttonText = 'Enroll Now';
+            let buttonClass = 'btn-primary';
+            let buttonAction = `enrollCourse('${course._id}')`;
+            
+            if (isLoggedIn) {
+                const paymentRequest = paymentRequests.find(r => r.course === course._id || r.course?._id === course._id);
+                
+                if (paymentRequest) {
+                    statusClass = `status-${paymentRequest.status.toLowerCase()}`;
+                    statusText = paymentRequest.status === 'approved' ? 'Purchased' : 
+                                 paymentRequest.status === 'rejected' ? 'Payment Rejected' : 
+                                 paymentRequest.status === 'pending' ? 'Payment Pending' : paymentRequest.status;
+                    
+                    if (paymentRequest.status === 'approved') {
+                        buttonText = 'Access Course';
+                        buttonAction = `accessCourse('${course._id}')`;
+                    } else if (paymentRequest.status === 'pending') {
+                        buttonText = 'Payment Pending';
+                        buttonClass = 'btn-disabled';
+                        buttonAction = '';
+                    } else if (paymentRequest.status === 'rejected') {
+                        buttonText = 'Try Again';
+                    }
+                } else if (course.isFree) {
+                    buttonText = 'Enroll Free';
+                }
+            }
+
+            // Get course icon based on course title or type
+            const courseIcon = getCourseIcon(course.title || course.type);
+            
+            return `
+                <div class="course-card">
+                    <div class="course-image">
+                        ${course.thumbnail ? 
+                            `<img src="http://localhost:3000/uploads/${course.thumbnail}" alt="${course.title}">` :
+                            `<i class="fas fa-${courseIcon}" style="font-size: 4rem; color: white;"></i>`
+                        }
+                    </div>
+                    <div class="course-content">
+                        ${statusText ? `<span class="course-status ${statusClass}">${statusText}</span>` : ''}
+                        <h3>${course.title}</h3>
+                        <p>${course.description || "No description available."}</p>
+                        <div class="course-meta">
+                            <span class="course-price">${course.isFree ? "FREE" : `$${course.price}`}</span>
+                            <button class="btn ${buttonClass}" onclick="${buttonAction}">
+                                ${buttonText}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Get appropriate icon for course based on title or type
+    function getCourseIcon(title) {
+        const lowerTitle = title.toLowerCase();
+        
+        if (lowerTitle.includes('python')) return 'code';
+        if (lowerTitle.includes('database') || lowerTitle.includes('sql')) return 'database';
+        if (lowerTitle.includes('web') || lowerTitle.includes('html') || lowerTitle.includes('css')) return 'laptop-code';
+        if (lowerTitle.includes('algorithm') || lowerTitle.includes('data structure')) return 'project-diagram';
+        if (lowerTitle.includes('machine learning') || lowerTitle.includes('ai')) return 'brain';
+        if (lowerTitle.includes('package') || lowerTitle.includes('bundle')) return 'cube';
+        
+        return 'book';
+    }
+
+    // Show error message
+    function showError(message) {
+        const container = document.getElementById('coursesContainer');
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${message}</p>
+                <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 15px;">
+                    Try Again
+                </button>
+            </div>
+        `;
+    }
+
+    // Enroll in a course
+    async function enrollCourse(courseId) {
+        try {
+            const user = JSON.parse(localStorage.getItem("userInfo"));
+            
+            if (!user) {
+                // Redirect to login if not authenticated
+                window.location.href = "../Login-Pages/login.html";
+                return;
+            }
+
+            // Check if course is free
+            const course = courses.find(c => c._id === courseId);
+            
+            if (course && course.isFree) {
+                // Enroll directly for free courses
+                const response = await apiCall(`/users/courses/${courseId}/enroll`, {
+                    method: 'POST'
+                });
+                
+                if (response && response.success) {
+                    alert('Successfully enrolled in the course!');
+                    loadUserCourses(); // Refresh the courses list
+                } else {
+                    alert('Failed to enroll in the course. Please try again.');
+                }
+            } else {
+                // Redirect to payment page for paid courses
+                window.location.href =  `ٍStudent-Pages/payment-courses.html?id=${courseId}`;
+            }
+        } catch (error) {
+            console.error('Error enrolling in course:', error);
+            alert('An error occurred. Please try again.');
+        }
+    }
+
+    // Access an already purchased course
+    function accessCourse(courseId) {
+        window.location.href = `ٍStudent-Pages/lessons.html?id=${courseId}`;
+    }
+</script>
 </body>
 
 </html>
