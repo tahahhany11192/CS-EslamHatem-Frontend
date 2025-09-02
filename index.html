@@ -1081,7 +1081,7 @@
     </script>
     <script>
     // Global variables
-    const API_BASE = "http://localhost:3000/api";
+    const API_BASE = "https://cs-eslamhatem-backend.fly.dev/api";
     let courses = [];
     let paymentRequests = [];
 
@@ -1241,7 +1241,7 @@
                 <div class="course-card">
                     <div class="course-image">
                         ${course.thumbnail ? 
-                            `<img src="http://localhost:3000/uploads/${course.thumbnail}" alt="${course.title}">` :
+                            `<img src="https://cs-eslamhatem-backend.fly.dev/uploads/${course.thumbnail}" alt="${course.title}">` :
                             `<i class="fas fa-${courseIcon}" style="font-size: 4rem; color: white;"></i>`
                         }
                     </div>
@@ -1333,3 +1333,4 @@
 </body>
 
 </html>
+
