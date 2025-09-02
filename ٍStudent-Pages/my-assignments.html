@@ -862,7 +862,7 @@
         // Load assignments from API
         async function loadAssignments() {
             try {
-                const API_BASE = "http://localhost:3000/api";
+                const API_BASE = "https://cs-eslamhatem-backend.fly.dev/api";
                 const res = await fetch(`${API_BASE}/users/my-assignments`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
@@ -978,7 +978,7 @@
                         ${assignment.pdf ? `
                             <div class="meta-item">
                                 <i class="fas fa-file-pdf"></i>
-                                <a href="http://localhost:3000/uploads/profile/${assignment.pdf}" target="_blank">Download PDF</a>
+                                <a href="https://cs-eslamhatem-backend.fly.dev/uploads/profile/${assignment.pdf}" target="_blank">Download PDF</a>
                             </div>
                         ` : ''}
                     </div>
@@ -1141,7 +1141,7 @@
             formData.append("assignmentId", assignmentId);
 
             try {
-                const API_BASE = "http://localhost:3000/api";
+                const API_BASE = "https://cs-eslamhatem-backend.fly.dev/api";
                 const res = await fetch(`${API_BASE}/users/submit-assignment`, {
                     method: "POST",
                     headers: { "Authorization": "Bearer " + token },
