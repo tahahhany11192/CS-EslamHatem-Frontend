@@ -1139,7 +1139,7 @@
     let videoEnabled = false;
     let adminName = localStorage.getItem('adminName') || `admin ${adminId.substring(0, 8)}`;
 
-    const socket = io("http://localhost:3000", {
+    const socket = io("https://cs-eslamhatem-backend-whflvw.fly.dev", {
         query: { adminId },
         transports: ['polling'],
         reconnectionAttempts: 5,
