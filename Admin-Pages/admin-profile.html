@@ -602,7 +602,7 @@
   </div>
 
   <script>
-    const API_URL = "http://localhost:3000/api/admin/profile";
+    const API_URL = "https://cs-eslamhatem-backend-whflvw.fly.dev/api/admin/profile";
     const token = localStorage.getItem("adminToken");
 
     if (!token) {
@@ -675,7 +675,7 @@
         
         // Set profile photo
         if (admin.photo) {
-          profilePhoto.src = `http://localhost:3000${admin.photo}`;
+          profilePhoto.src = `https://cs-eslamhatem-backend-whflvw.fly.dev${admin.photo}`;
         } else {
           profilePhoto.src = "https://via.placeholder.com/150";
         }
