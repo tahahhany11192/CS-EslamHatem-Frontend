@@ -1139,7 +1139,7 @@
     let videoEnabled = false;
     let studentName = localStorage.getItem('studentName') || `Student ${studentId.substring(0, 8)}`;
 
-    const socket = io("https://cs-eslamhatem-backend.fly.dev", {
+    const socket = io("https://cs-eslamhatem-backend-whflvw.fly.dev", {
         query: { studentId },
         transports: ['polling'],
         reconnectionAttempts: 5,
