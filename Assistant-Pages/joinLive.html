@@ -1166,7 +1166,7 @@
         let screenStream = null;
         let cameraVideoTrack = null;
 
-        const socket = io("http://localhost:3000", {
+        const socket = io("https://cs-eslamhatem-backend-whflvw.fly.dev", {
             query: { assistantId },
             transports: ['polling'],
             reconnection: true,
@@ -1675,7 +1675,7 @@
         async function loadCourses() {
             try {
                 const token = localStorage.getItem('assistantToken');
-                const res = await fetch( `http://localhost:3000/api/assistant/courses`, {
+                const res = await fetch( `https://cs-eslamhatem-backend-whflvw.fly.dev/api/assistant/courses`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 const data = await res.json();
