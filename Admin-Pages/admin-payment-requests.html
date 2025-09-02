@@ -519,7 +519,7 @@
 
     async function loadRequests() {
       try {
-        const res = await fetch("http://localhost:3000/api/payment-requests/all", {
+        const res = await fetch("https://cs-eslamhatem-backend-whflvw.fly.dev/api/payment-requests/all", {
           headers: { "Authorization": "Bearer " + token }
         });
 
@@ -583,7 +583,7 @@
           // Screenshot
           const screenshotCell = document.createElement("td");
           if (req.screenshotUrl) {
-            const fullUrl = `http://localhost:3000${req.screenshotUrl}`;
+            const fullUrl = `https://cs-eslamhatem-backend-whflvw.fly.dev${req.screenshotUrl}`;
             screenshotCell.innerHTML = `<a href="${fullUrl}" target="_blank"><img src="${fullUrl}" class="screenshot-img" width="100"></a>`;
           } else {
             screenshotCell.textContent = "No screenshot";
@@ -643,7 +643,7 @@
           options.body = JSON.stringify({ reason });
         }
 
-        const res = await fetch(`http://localhost:3000/api/payment-requests/${action}/${id}`, options);
+        const res = await fetch(`https://cs-eslamhatem-backend-whflvw.fly.dev/api/payment-requests/${action}/${id}`, options);
         
         if (res.status === 401) {
           logout();
