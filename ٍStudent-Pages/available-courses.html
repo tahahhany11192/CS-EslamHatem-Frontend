@@ -698,7 +698,7 @@
         async function loadCourses() {
             try {
                 // Fetch payment requests first
-                const paymentRes = await fetch(`https://cs-eslamhatem-backend.fly.dev/api/payment-requests/user/${user._id}`, {
+                const paymentRes = await fetch(`https://cs-eslamhatem-backend-whflvw.fly.dev/api/payment-requests/user/${user._id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 
@@ -719,7 +719,7 @@
                 }
 
                 // Fetch available courses
-                const coursesRes = await fetch("https://cs-eslamhatem-backend.fly.dev/api/users/courses/available", {
+                const coursesRes = await fetch("https://cs-eslamhatem-backend-whflvw.fly.dev/api/users/courses/available", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 
@@ -786,7 +786,7 @@
                 courseCard.style.animationDelay = `${index * 0.1}s`;
                 
                 courseCard.innerHTML = `
-                    <img src="https://cs-eslamhatem-backend.fly.dev/uploads/${course.thumbnail}" alt="${course.title}">
+                    <img src="https://cs-eslamhatem-backend-whflvw.fly.dev/uploads/${course.thumbnail}" alt="${course.title}">
                     <div class="course-info">
                         <div class="course-header">
                             <h3 class="course-title">${course.title}</h3>
