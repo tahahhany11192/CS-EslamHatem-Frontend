@@ -1139,7 +1139,7 @@
     let videoEnabled = false;
     let assistantName = localStorage.getItem('assistantName') || `assistant ${assistantId.substring(0, 8)}`;
 
-    const socket = io("http://localhost:3000", {
+    const socket = io("https://cs-eslamhatem-backend-whflvw.fly.dev", {
         query: { assistantId },
         transports: ['polling'],
         reconnectionAttempts: 5,
