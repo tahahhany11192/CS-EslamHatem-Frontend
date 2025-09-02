@@ -1176,7 +1176,7 @@
 
 
     // Global variables
-    const BASE_URL = "http://localhost:3000/api/users";
+    const BASE_URL = "https://cs-eslamhatem-backend-whflvw.fly.dev/api/users";
     let currentQuizId = null;
     let currentQuiz = null;
     let quizzes = [];
@@ -1755,7 +1755,7 @@ ${q.reviewedAt ? `
         document.getElementById("gradeDisplay").style.display = "none";
 
         if (quiz.pdfFile) {
-          const pdfUrl = `http://localhost:3000/${quiz.pdfFile.replace(/\\/g, "/")}`;
+          const pdfUrl = `https://cs-eslamhatem-backend-whflvw.fly.dev/${quiz.pdfFile.replace(/\\/g, "/")}`;
           const downloadLink = document.getElementById("downloadLink");
           downloadLink.href = pdfUrl;
           downloadLink.style.display = "inline-block";
