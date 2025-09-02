@@ -596,7 +596,7 @@
   </div>
 
  <script>
-const API_BASE = "http://localhost:3000/api/admin";
+const API_BASE = "https://cs-eslamhatem-backend-whflvw.fly.dev/api/admin";
 const token = localStorage.getItem("adminToken");
 let currentSubmissionId = null;
 let currentSubmission = null;
@@ -738,7 +738,7 @@ async function viewSubmission(id) {
       div.className = "answer-block";
       div.innerHTML = `
         <p><strong>PDF Answer File:</strong></p>
-        <a href="http://localhost:3000/${sub.pdfAnswerFile}" target="_blank">Download PDF</a>
+        <a href="https://cs-eslamhatem-backend-whflvw.fly.dev/${sub.pdfAnswerFile}" target="_blank">Download PDF</a>
         <div style="margin-top:15px;">
             <label><strong>Score:</strong></label>
             <input type="number" id="pdfScore" value="${sub.score || 0}" min="0">
