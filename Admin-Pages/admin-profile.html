@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Profile - CS-IslamHatem</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0066ff;
+      --secondary: #00ccff;
+      --accent: #ff00cc;
+      --dark: #0a1128;
+      --light: #f0f6ff;
+      --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+      --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
+      --admin-accent: #ff9900;
+      --admin-gradient: linear-gradient(135deg, var(--primary), var(--admin-accent));
+      --sidebar-width: 250px;
+      --header-height: 70px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background-color: var(--dark);
+      color: var(--light);
+      overflow-x: hidden;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 80%, rgba(255, 0, 204, 0.1) 0%, transparent 20%);
+    }
+
+    /* Dashboard Layout */
+    .dashboard {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: rgba(10, 17, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 153, 0, 0.2);
+      padding: 20px 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255, 153, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--light);
+      text-decoration: none;
+    }
+
+    .sidebar-logo span {
+      color: var(--admin-accent);
+    }
+
+    .admin-badge {
+      background: var(--admin-gradient);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 15px;
+      font-size: 0.7rem;
+      margin-top: 5px;
+      display: inline-block;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 5px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: rgba(240, 246, 255, 0.7);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: rgba(255, 153, 0, 0.1);
+      color: var(--light);
+      border-left-color: var(--admin-accent);
+    }
+
+    .sidebar-nav i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      background: rgba(10, 17, 40, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      background: var(--admin-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-info {
+      text-align: right;
+    }
+
+    .user-name {
+      font-weight: 600;
+    }
+
+    .user-role {
+      font-size: 0.8rem;
+      color: var(--admin-accent);
+    }
+
+    .logout-btn {
+      background: rgba(255, 153, 0, 0.2);
+      color: var(--light);
+      border: none;
+      border-radius: 20px;
+      padding: 8px 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: var(--admin-accent);
+    }
+
+    /* Content Cards */
+    .content-card {
+      background: rgba(10, 17, 40, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .card-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: var(--light);
+    }
+
+    /* Profile Section */
+    .profile-section {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 992px) {
+      .profile-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .profile-info {
+      text-align: center;
+    }
+
+    .profile-avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--admin-accent);
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(255, 153, 0, 0.3);
+    }
+
+    .profile-details {
+      margin-bottom: 25px;
+    }
+
+    .profile-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-label {
+      font-weight: 600;
+      color: var(--admin-accent);
+    }
+
+    .profile-value {
+      color: var(--light);
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--light);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 153, 0, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--light);
+      font-family: 'Exo 2', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 15px rgba(255, 153, 0, 0.3);
+    }
+
+    /* File Input Styling */
+    .file-input {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .file-input input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-label {
+      display: block;
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px dashed rgba(255, 153, 0, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: rgba(240, 246, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .file-input-label:hover {
+      border-color: var(--admin-accent);
+      color: var(--light);
+      background: rgba(255, 153, 0, 0.1);
+    }
+
+    .file-name {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: var(--admin-accent);
+      text-align: center;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 30px;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-admin {
+      background: var(--admin-gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+    }
+
+    .btn-admin:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--light);
+      border: 2px solid var(--admin-accent);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 153, 0, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: #ff4d4d;
+      border: 2px solid #ff4d4d;
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 77, 77, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .alert-success {
+      background: rgba(0, 255, 140, 0.1);
+      border-left: 4px solid #00ff8c;
+      color: #00ff8c;
+    }
+
+    .alert-error {
+      background: rgba(255, 77, 77, 0.1);
+      border-left: 4px solid #ff4d4d;
+      color: #ff4d4d;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 70px;
+        overflow: visible;
+      }
+      
+      .sidebar-logo span, .sidebar-nav span {
+        display: none;
+      }
+      
+      .sidebar-nav i {
+        margin-right: 0;
+        font-size: 1.2rem;
+      }
+      
+      .main-content {
+        margin-left: 70px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 15px;
+      }
+      
+      .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+      
+      .user-menu {
+        flex-direction: column;
+      }
+      
+      .profile-detail {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="width: 280px;">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-code"></i>
+          CS-<span>IslamHatem</span>
+        </div>
+        <div class="admin-badge">
+          <i class="fas fa-shield-alt"></i> ADMIN PORTAL
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="admin-courses.html"><i class="fas fa-book"></i> <span>Courses</span></a></li>
+        <li><a href="admin-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
+        <li><a href="admin-lessons.html"><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
+        <li><a href="admin-lesson-files.html"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
+        <li><a href="admin-quizzes.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="admin-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
+        <li><a href="admin-payment-requests.html" ><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
+        <li><a href="admin-assistants.html"><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
+        <li><a href="admin-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="admin-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="admin-profile.html" class="active"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <h1><i class="fas fa-user-cog"></i> Admin Profile</h1>
+        <div class="user-menu">
+          <div class="user-info">
+            <div class="user-name">Admin User</div>
+            <div class="user-role">Super Administrator</div>
+          </div>
+          <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Alerts -->
+      <div id="alertSuccess" class="alert alert-success"></div>
+      <div id="alertError" class="alert alert-error"></div>
+
+      <div class="profile-section">
+        <!-- Profile Info Card -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2><i class="fas fa-user"></i> Profile Information</h2>
+          </div>
+
+          <div class="profile-info">
+            <img id="profilePhoto" class="profile-avatar" src="https://via.placeholder.com/150" alt="Profile Photo">
+            
+            <div class="profile-details">
+              <div class="profile-detail">
+                <span class="profile-label">Username:</span>
+                <span class="profile-value" id="profileUsername">Loading...</span>
+              </div>
+              <div class="profile-detail">
+                <span class="profile-label">Email:</span>
+                <span class="profile-value" id="profileEmail">Loading...</span>
+              </div>
+              <div class="profile-detail">
+                <span class="profile-label">Role:</span>
+                <span class="profile-value">Super Administrator</span>
+              </div>
+              <div class="profile-detail">
+                <span class="profile-label">Status:</span>
+                <span class="profile-value" style="color: #00ff8c;">Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Update Forms Card -->
+        <div class="content-card">
+          <!-- Update Profile Form -->
+          <div class="card-header">
+            <h2><i class="fas fa-edit"></i> Update Profile</h2>
+          </div>
+
+          <form id="updateProfileForm" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+              <label>Profile Photo</label>
+              <div class="file-input">
+                <input type="file" id="photo" accept="image/*">
+                <div class="file-input-label">
+                  <i class="fas fa-cloud-upload-alt"></i> Choose Profile Photo
+                </div>
+                <div id="photoFileName" class="file-name"></div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-admin">
+              <i class="fas fa-save"></i> Update Profile
+            </button>
+          </form>
+
+          <!-- Change Password Form -->
+          <div class="card-header" style="margin-top: 30px;">
+            <h2><i class="fas fa-key"></i> Change Password</h2>
+          </div>
+
+          <form id="changePasswordForm">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password" required>
+            </div>
+
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" class="form-control" placeholder="Enter new password" required>
+            </div>
+
+            <button type="submit" class="btn btn-admin">
+              <i class="fas fa-lock"></i> Change Password
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:3000/api/admin/profile";
+    const token = localStorage.getItem("adminToken");
+
+    if (!token) {
+      showError("⚠️ Not authorized. Please login as admin.");
+      setTimeout(() => {
+        window.location.href = "../Login-Pages/admin-login.html";
+      }, 2000);
+    }
+
+    // DOM Elements
+    const updateProfileForm = document.getElementById("updateProfileForm");
+    const changePasswordForm = document.getElementById("changePasswordForm");
+    const profileUsername = document.getElementById("profileUsername");
+    const profileEmail = document.getElementById("profileEmail");
+    const profilePhoto = document.getElementById("profilePhoto");
+    const usernameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
+    const photoInput = document.getElementById("photo");
+    const photoFileName = document.getElementById("photoFileName");
+    const alertSuccess = document.getElementById("alertSuccess");
+    const alertError = document.getElementById("alertError");
+
+    // Helper functions
+    function showSuccess(message) {
+      alertSuccess.textContent = message;
+      alertSuccess.style.display = "block";
+      setTimeout(() => {
+        alertSuccess.style.display = "none";
+      }, 5000);
+    }
+
+    function showError(message) {
+      alertError.textContent = message;
+      alertError.style.display = "block";
+      setTimeout(() => {
+        alertError.style.display = "none";
+      }, 5000);
+    }
+
+    function logout() {
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminInfo");
+      window.location.href = "../Login-Pages/admin-login.html";
+    }
+
+    // File name display
+    photoInput.addEventListener("change", function() {
+      photoFileName.textContent = this.files[0] ? this.files[0].name : "";
+    });
+
+    // Load profile
+    async function loadProfile() {
+      try {
+        const res = await fetch(API_URL, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        
+        const data = await res.json();
+        const admin = data.admin;
+        
+        profileUsername.textContent = admin.username;
+        profileEmail.textContent = admin.email;
+        usernameInput.value = admin.username;
+        emailInput.value = admin.email;
+        
+        // Set profile photo
+        if (admin.photo) {
+          profilePhoto.src = `http://localhost:3000${admin.photo}`;
+        } else {
+          profilePhoto.src = "https://via.placeholder.com/150";
+        }
+      } catch (err) {
+        console.error("Error loading profile:", err);
+        showError("Failed to load profile. Please try again.");
+      }
+    }
+
+    // Update profile
+    updateProfileForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = updateProfileForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+      submitBtn.disabled = true;
+
+      const formData = new FormData();
+      formData.append("username", usernameInput.value);
+      formData.append("email", emailInput.value);
+      
+      if (photoInput.files[0]) {
+        formData.append("photo", photoInput.files[0]);
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+
+        const data = await res.json();
+        if (data && data.admin) {
+          showSuccess("✅ Profile updated successfully!");
+          loadProfile();
+          photoFileName.textContent = "";
+        } else {
+          showError("❌ Failed to update profile: " + (data.message || "Unknown error"));
+        }
+      } catch (err) {
+        console.error("Error updating profile:", err);
+        showError("❌ Failed to update profile. Please try again.");
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Change password
+    changePasswordForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = changePasswordForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+      submitBtn.disabled = true;
+
+      const currentPassword = document.getElementById("currentPassword").value;
+      const newPassword = document.getElementById("newPassword").value;
+
+      const body = {
+        currentPassword: currentPassword,
+        newPassword: newPassword
+      };
+
+      try {
+        const res = await fetch(API_URL + "/password", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(body)
+        });
+
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+
+        const data = await res.json();
+        if (data && data.message) {
+          showSuccess("✅ Password changed successfully!");
+          changePasswordForm.reset();
+        } else {
+          showError("❌ Failed to change password: " + (data.message || "Unknown error"));
+        }
+      } catch (err) {
+        console.error("Error changing password:", err);
+        showError("❌ Failed to change password. Please try again.");
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Initial load
+    loadProfile();
+  </script>
+</body>
+</html>

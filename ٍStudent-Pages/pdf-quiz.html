@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    h1 { color: #333; }
+    .quiz-container { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .status { margin-top: 10px; font-size: 14px; }
+    input[type="file"] { margin: 10px 0; }
+    button { padding: 10px 15px; background: #4CAF50; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    a.download-btn {
+      display: inline-block; margin-top: 15px; padding: 10px 15px;
+      background: #2196F3; color: white; border-radius: 5px; text-decoration: none;
+    }
+    a.download-btn:hover { background: #1976D2; }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1 id="quizTitle">Loading...</h1>
+    <p id="quizDescription"></p>
+    <p><strong>Duration:</strong> <span id="quizDuration"></span> minutes</p>
+
+    <h3>Exam PDF:</h3>
+    <p id="noPDF" style="color:red; display:none;">⚠ No exam PDF available for this quiz.</p>
+    <a id="downloadLink" class="download-btn" href="#" download style="display:none;">⬇ Download Exam PDF</a>
+
+    <!-- ✅ Upload form -->
+    <form id="answerUploadForm">
+      <input type="file" id="answerFile" name="answer" accept="application/pdf" required />
+      <button type="submit">Upload Answer</button>
+    </form>
+    <p id="status" class="status"></p>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+    const quizId = new URLSearchParams(window.location.search).get("id");
+
+    // ✅ Load quiz details
+    async function loadQuiz() {
+      try {
+        const res = await fetch(`http://localhost:3000/api/users/quizzes/${quizId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch quiz");
+        const quiz = await res.json();
+
+        document.getElementById("quizTitle").textContent = quiz.title;
+        document.getElementById("quizDescription").textContent = quiz.description;
+        document.getElementById("quizDuration").textContent = quiz.duration || "N/A";
+
+        if (quiz.pdfFile) {
+          const pdfUrl = `http://localhost:3000/${quiz.pdfFile.replace(/\\/g, "/")}`;
+          const downloadLink = document.getElementById("downloadLink");
+          downloadLink.href = pdfUrl;
+          downloadLink.style.display = "inline-block";
+        } else {
+          document.getElementById("noPDF").style.display = "block";
+        }
+      } catch (err) {
+        document.getElementById("quizTitle").textContent = "Error loading quiz";
+        console.error("Error loading quiz:", err);
+      }
+    }
+
+    // ✅ Handle file upload via form
+    document.getElementById("answerUploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const file = document.getElementById("answerFile").files[0];
+      if (!file) {
+        alert("Please select a file first.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("answer", file);
+
+      try {
+        const res = await fetch(`http://localhost:3000/api/users/quizzes/${quizId}/upload`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById("status").textContent = "✅ Answer uploaded successfully!";
+          console.log("Attempt:", data.attempt);
+        } else {
+          document.getElementById("status").textContent = "⚠ Upload failed: " + (data.error || "Unknown error");
+        }
+      } catch (err) {
+        document.getElementById("status").textContent = "❌ Upload error: " + err.message;
+        console.error("Upload error:", err);
+      }
+    });
+
+    loadQuiz();
+  </script>
+</body>
+</html>

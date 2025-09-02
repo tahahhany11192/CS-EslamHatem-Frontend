@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Lesson Files - Admin Dashboard - CS-IslamHatem</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0066ff;
+      --secondary: #00ccff;
+      --accent: #ff00cc;
+      --dark: #0a1128;
+      --light: #f0f6ff;
+      --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+      --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
+      --admin-accent: #ff9900;
+      --admin-gradient: linear-gradient(135deg, var(--primary), var(--admin-accent));
+      --sidebar-width: 250px;
+      --header-height: 70px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background-color: var(--dark);
+      color: var(--light);
+      overflow-x: hidden;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 80%, rgba(255, 0, 204, 0.1) 0%, transparent 20%);
+    }
+
+    /* Dashboard Layout */
+    .dashboard {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: rgba(10, 17, 40, 0.9);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 153, 0, 0.2);
+      padding: 20px 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255, 153, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--light);
+      text-decoration: none;
+    }
+
+    .sidebar-logo span {
+      color: var(--admin-accent);
+    }
+
+    .admin-badge {
+      background: var(--admin-gradient);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 15px;
+      font-size: 0.7rem;
+      margin-top: 5px;
+      display: inline-block;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 5px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: rgba(240, 246, 255, 0.7);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: rgba(255, 153, 0, 0.1);
+      color: var(--light);
+      border-left-color: var(--admin-accent);
+    }
+
+    .sidebar-nav i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      background: rgba(10, 17, 40, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      background: var(--admin-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-info {
+      text-align: right;
+    }
+
+    .user-name {
+      font-weight: 600;
+    }
+
+    .user-role {
+      font-size: 0.8rem;
+      color: var(--admin-accent);
+    }
+
+    .logout-btn {
+      background: rgba(255, 153, 0, 0.2);
+      color: var(--light);
+      border: none;
+      border-radius: 20px;
+      padding: 8px 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: var(--admin-accent);
+    }
+
+    /* Content Cards */
+    .content-card {
+      background: rgba(10, 17, 40, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .card-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: var(--light);
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--light);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 153, 0, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--light);
+      font-family: 'Exo 2', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 15px rgba(255, 153, 0, 0.3);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 30px;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-admin {
+      background: var(--admin-gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+    }
+
+    .btn-admin:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--light);
+      border: 2px solid var(--admin-accent);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 153, 0, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    /* File Input Styling */
+    .file-input {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .file-input input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-label {
+      display: block;
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px dashed rgba(255, 153, 0, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: rgba(240, 246, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .file-input-label:hover {
+      border-color: var(--admin-accent);
+      color: var(--light);
+      background: rgba(255, 153, 0, 0.1);
+    }
+
+    .file-name {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: var(--admin-accent);
+      text-align: center;
+    }
+
+    /* Preview Section */
+    .preview-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .preview-header {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: var(--light);
+    }
+
+    .preview-content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .preview-item {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .preview-item h4 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: var(--admin-accent);
+    }
+
+    .preview-thumbnail {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .preview-video {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .file-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--admin-accent);
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      background: rgba(255, 153, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .file-link:hover {
+      background: rgba(255, 153, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .alert-success {
+      background: rgba(0, 255, 140, 0.1);
+      border-left: 4px solid #00ff8c;
+      color: #00ff8c;
+    }
+
+    .alert-error {
+      background: rgba(255, 77, 77, 0.1);
+      border-left: 4px solid #ff4d4d;
+      color: #ff4d4d;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 70px;
+        overflow: visible;
+      }
+      
+      .sidebar-logo span, .sidebar-nav span {
+        display: none;
+      }
+      
+      .sidebar-nav i {
+        margin-right: 0;
+        font-size: 1.2rem;
+      }
+      
+      .main-content {
+        margin-left: 70px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        padding: 15px;
+      }
+      
+      .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+      
+      .user-menu {
+        flex-direction: column;
+      }
+      
+      .preview-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar"  style="width: 280px;">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-code"></i>
+          CS-<span>IslamHatem</span>
+        </div>
+        <div class="admin-badge">
+          <i class="fas fa-shield-alt"></i> ADMIN PORTAL
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="admin-courses.html"><i class="fas fa-book"></i> <span>Courses</span></a></li>
+        <li><a href="admin-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
+        <li><a href="admin-lessons.html" ><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
+        <li><a href="admin-lesson-files.html"class="active"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
+        <li><a href="admin-quizzes.html" ><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="admin-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
+        <li><a href="admin-payment-requests.html" ><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
+        <li><a href="admin-assistants.html" ><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
+        <li><a href="admin-students.html" ><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="admin-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="admin-profile.html" ><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <h1><i class="fas fa-folder"></i> Manage Lesson Files</h1>
+        <div class="user-menu">
+          <div class="user-info">
+            <div class="user-name">Admin User</div>
+            <div class="user-role">Super Administrator</div>
+          </div>
+          <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Alerts -->
+      <div id="alertSuccess" class="alert alert-success"></div>
+      <div id="alertError" class="alert alert-error"></div>
+
+      <!-- File Upload Form -->
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fas fa-cloud-upload-alt"></i> Upload Lesson Files</h2>
+        </div>
+
+        <div class="form-group">
+          <label for="course">Select Course</label>
+          <select id="course" class="form-control">
+            <option value="">-- Select Course --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="lesson">Select Lesson</label>
+          <select id="lesson" class="form-control">
+            <option value="">-- Select Lesson --</option>
+          </select>
+        </div>
+
+        <form id="fileForm" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>Material (PDF/Docs)</label>
+            <div class="file-input">
+              <input type="file" id="material" name="material" accept=".pdf,.doc,.docx">
+              <div class="file-input-label">
+                <i class="fas fa-file-pdf"></i> Choose Material File
+              </div>
+              <div id="material-file-name" class="file-name"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Video</label>
+            <div class="file-input">
+              <input type="file" id="video" name="video" accept="video/*">
+              <div class="file-input-label">
+                <i class="fas fa-video"></i> Choose Video File
+              </div>
+              <div id="video-file-name" class="file-name"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Thumbnail (Image)</label>
+            <div class="file-input">
+              <input type="file" id="thumbnail" name="thumbnail" accept="image/*">
+              <div class="file-input-label">
+                <i class="fas fa-image"></i> Choose Thumbnail Image
+              </div>
+              <div id="thumbnail-file-name" class="file-name"></div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-admin">
+            <i class="fas fa-upload"></i> Upload Files
+          </button>
+        </form>
+      </div>
+
+      <!-- Preview Section -->
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fas fa-eye"></i> Lesson Preview</h2>
+        </div>
+
+        <div class="preview-section">
+          <div class="preview-header">Current Files</div>
+          <div class="preview-content" id="preview">
+            <div class="preview-item">
+              <h4><i class="fas fa-info-circle"></i> Select a lesson to view files</h4>
+              <p>Choose a course and lesson from the dropdown menus above to see the current files.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const COURSE_API = "http://localhost:3000/api/admin/courses";
+    const LESSON_API = "http://localhost:3000/api/admin/lessons";
+    const UPLOADS_BASE = "http://localhost:3000";
+    const token = localStorage.getItem("adminToken");
+
+    if (!token) {
+      showError("⚠️ Not authorized. Please login as admin.");
+      setTimeout(() => {
+        window.location.href = "../Login-Pages/admin-login.html";
+      }, 2000);
+    }
+
+    const courseSelect = document.getElementById("course");
+    const lessonSelect = document.getElementById("lesson");
+    const previewDiv = document.getElementById("preview");
+    const materialInput = document.getElementById("material");
+    const videoInput = document.getElementById("video");
+    const thumbnailInput = document.getElementById("thumbnail");
+    const materialFileName = document.getElementById("material-file-name");
+    const videoFileName = document.getElementById("video-file-name");
+    const thumbnailFileName = document.getElementById("thumbnail-file-name");
+    const alertSuccess = document.getElementById("alertSuccess");
+    const alertError = document.getElementById("alertError");
+
+    // Helper functions
+    function pickData(json) {
+      if (json && typeof json === "object" && "data" in json) return json.data;
+      if (json && typeof json === "object" && "lesson" in json) return json.lesson;
+      if (json && typeof json === "object" && "lessons" in json) return json.lessons;
+      return json;
+    }
+
+    function withBase(url) {
+      if (!url) return url;
+      return url.startsWith("http") ? url : (UPLOADS_BASE + url);
+    }
+
+    function showSuccess(message) {
+      alertSuccess.textContent = message;
+      alertSuccess.style.display = "block";
+      setTimeout(() => {
+        alertSuccess.style.display = "none";
+      }, 5000);
+    }
+
+    function showError(message) {
+      alertError.textContent = message;
+      alertError.style.display = "block";
+      setTimeout(() => {
+        alertError.style.display = "none";
+      }, 5000);
+    }
+
+    function logout() {
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminInfo");
+      window.location.href = "../Login-Pages/admin-login.html";
+    }
+
+    // File name display
+    materialInput.addEventListener("change", function() {
+      materialFileName.textContent = this.files[0] ? this.files[0].name : "";
+    });
+
+    videoInput.addEventListener("change", function() {
+      videoFileName.textContent = this.files[0] ? this.files[0].name : "";
+    });
+
+    thumbnailInput.addEventListener("change", function() {
+      thumbnailFileName.textContent = this.files[0] ? this.files[0].name : "";
+    });
+
+    // Load courses
+    async function loadCourses() {
+      try {
+        const res = await fetch(COURSE_API, { 
+          headers: { Authorization: "Bearer " + token } 
+        });
+        
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        
+        const json = await res.json();
+        const courses = pickData(json) || [];
+        courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
+        courses.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c._id;
+          opt.textContent = c.title;
+          courseSelect.appendChild(opt);
+        });
+      } catch (e) {
+        console.error("Failed to load courses:", e);
+        showError("Failed to load courses. Please try again.");
+      }
+    }
+
+    // Load lessons when course selected
+    courseSelect.addEventListener("change", async () => {
+      const courseId = courseSelect.value;
+      lessonSelect.innerHTML = `<option value="">-- Select Lesson --</option>`;
+      previewDiv.innerHTML = `
+        <div class="preview-item">
+          <h4><i class="fas fa-info-circle"></i> Select a lesson to view files</h4>
+          <p>Choose a lesson from the dropdown menu to see the current files.</p>
+        </div>
+      `;
+      
+      if (!courseId) return;
+
+      try {
+        const res = await fetch(`${LESSON_API}?course=${encodeURIComponent(courseId)}`, {
+          headers: { Authorization: "Bearer " + token }
+        });
+        
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        
+        const json = await res.json();
+        let lessons = pickData(json);
+
+        // Ensure array
+        if (!Array.isArray(lessons)) lessons = [];
+
+        // Extra safety: filter here in case backend ignores the query
+        lessons = lessons.filter(l => {
+          const cid = (l.course && typeof l.course === "object") ? l.course._id : l.course;
+          return String(cid) === String(courseId);
+        });
+
+        // Populate lesson dropdown
+        if (lessons.length === 0) {
+          lessonSelect.innerHTML = `<option value="">(No lessons for this course)</option>`;
+          return;
+        }
+        
+        lessonSelect.innerHTML = `<option value="">-- Select Lesson --</option>`;
+        lessons.forEach(l => {
+          const opt = document.createElement("option");
+          opt.value = l._id;
+          opt.textContent = l.title;
+          lessonSelect.appendChild(opt);
+        });
+      } catch (e) {
+        console.error("Failed to load lessons:", e);
+        showError("Failed to load lessons. Please try again.");
+      }
+    });
+
+    // Load preview when lesson selected
+    lessonSelect.addEventListener("change", async () => {
+      const lessonId = lessonSelect.value;
+      previewDiv.innerHTML = `
+        <div class="preview-item">
+          <h4><i class="fas fa-spinner fa-spin"></i> Loading lesson files...</h4>
+        </div>
+      `;
+      
+      if (!lessonId) return;
+      
+      try {
+        const res = await fetch(`${LESSON_API}/${lessonId}`, { 
+          headers: { Authorization: "Bearer " + token } 
+        });
+        
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        
+        const json = await res.json();
+        const l = pickData(json) || {};
+
+        previewDiv.innerHTML = "";
+
+        if (l.thumbnail) {
+          const div = document.createElement("div");
+          div.className = "preview-item";
+          div.innerHTML = `
+            <h4><i class="fas fa-image"></i> Thumbnail</h4>
+            <img src="${withBase(l.thumbnail)}" alt="Thumbnail" class="preview-thumbnail">
+          `;
+          previewDiv.appendChild(div);
+        }
+
+        if (l.material) {
+          const div = document.createElement("div");
+          div.className = "preview-item";
+          div.innerHTML = `
+            <h4><i class="fas fa-file-pdf"></i> Material</h4>
+            <a href="${withBase(l.material)}" target="_blank" class="file-link">
+              <i class="fas fa-download"></i> Download Material
+            </a>
+          `;
+          previewDiv.appendChild(div);
+        }
+
+        if (l.video) {
+          const div = document.createElement("div");
+          div.className = "preview-item";
+          div.innerHTML = `
+            <h4><i class="fas fa-video"></i> Video</h4>
+            <video controls class="preview-video">
+              <source src="${withBase(l.video)}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          `;
+          previewDiv.appendChild(div);
+        }
+
+        if (!l.thumbnail && !l.material && !l.video) {
+          previewDiv.innerHTML = `
+            <div class="preview-item">
+              <h4><i class="fas fa-exclamation-circle"></i> No Files Uploaded</h4>
+              <p>This lesson doesn't have any files uploaded yet.</p>
+            </div>
+          `;
+        }
+      } catch (e) {
+        console.error("Failed to load lesson:", e);
+        showError("Failed to load lesson. Please try again.");
+      }
+    });
+
+    // Upload files
+    document.getElementById("fileForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const lessonId = lessonSelect.value;
+      
+      if (!lessonId) {
+        showError("Please select a lesson first.");
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+      submitBtn.disabled = true;
+
+      const formData = new FormData();
+      if (materialInput.files[0]) {
+        formData.append("material", materialInput.files[0]);
+      }
+      if (videoInput.files[0]) {
+        formData.append("video", videoInput.files[0]);
+      }
+      if (thumbnailInput.files[0]) {
+        formData.append("thumbnail", thumbnailInput.files[0]);
+      }
+
+      try {
+        const res = await fetch(`${LESSON_API}/${lessonId}/files`, {
+          method: "PUT",
+          headers: { Authorization: "Bearer " + token },
+          body: formData
+        });
+
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+
+        if (res.ok) {
+          showSuccess("✅ Files uploaded successfully!");
+          // Clear file inputs
+          materialInput.value = "";
+          videoInput.value = "";
+          thumbnailInput.value = "";
+          materialFileName.textContent = "";
+          videoFileName.textContent = "";
+          thumbnailFileName.textContent = "";
+          // Refresh preview
+          lessonSelect.dispatchEvent(new Event("change"));
+        } else {
+          const errorData = await res.json();
+          showError("❌ Failed to upload files: " + (errorData.message || "Unknown error"));
+        }
+      } catch (e) {
+        console.error("Upload error:", e);
+        showError("❌ Failed to upload files. Please try again.");
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Initial load
+    loadCourses();
+  </script>
+</body>
+</html>

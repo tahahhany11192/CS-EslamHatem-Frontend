@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/jpg" href="../uploads/orycomLogo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Class | Cs-EslamHatem</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366F1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --secondary-light: #f472b6;
+            --success: #10b981;
+            --success-light: #34d399;
+            --danger: #ef4444;
+            --danger-light: #f87171;
+            --warning: #f59e0b;
+            --warning-light: #fbbf24;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f1f5f9;
+            --gray: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), #1e1b4b);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+            transform: rotate(0);
+            transition: all 0.5s ease;
+        }
+        
+        .logo:hover .logo-icon {
+            transform: rotate(15deg);
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary-light), var(--secondary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .class-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .class-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--light), var(--gray));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+            padding: 0.4rem 0.8rem;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { 
+                opacity: 1; 
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% { 
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+            100% { 
+                opacity: 0.7; 
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+        
+        /* Main Layout */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: 3fr 1fr;
+            }
+        }
+        
+        /* Video Section */
+        .video-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .video-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+        }
+        
+        .video-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        #localVideo {
+            width: 63%;
+            height: auto;
+            min-height: 400px;
+            background: #000;
+            display: block;
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .video-placeholder {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .video-placeholder i {
+            font-size: 4rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+        }
+        
+        .video-placeholder h3 {
+            margin-bottom: 1rem;
+            color: var(--light);
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        
+        .video-placeholder p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        
+        /* Remote Videos Grid */
+        .remote-videos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .remote-video-wrapper {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+            transform: scale(1);
+        }
+        
+        .remote-video-wrapper:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .remote-video-wrapper video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #000;
+        }
+        
+        .remote-video-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+        }
+        
+        .control-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            min-width: 100px;
+            background: var(--glass-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            color: var(--light);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .control-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .control-btn:active {
+            transform: translateY(2px) scale(0.98);
+        }
+        
+        .control-btn[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        .control-btn[disabled]:hover::before {
+            opacity: 0;
+        }
+        
+        .control-btn i {
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover i {
+            transform: scale(1.2);
+        }
+        
+        .control-btn.leave {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .control-btn.leave:hover {
+            background: var(--danger);
+        }
+        
+        .control-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Notice */
+        #notice {
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(-10px);
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        #notice.show {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 100px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        /* Participants Section */
+        .participants-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .participants-container:hover {
+            transform: translateY(-3px);
+        }
+        
+        .participant-list {
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .participant-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--card-border);
+            transition: all 0.2s ease;
+        }
+        
+        .participant-item:hover {
+            transform: translateX(5px);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .participant-id {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .participant-controls {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .participant-controls button {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .participant-controls button:hover {
+            transform: scale(1.1);
+        }
+        
+        .mute-btn {
+            background: rgba(79, 70, 229, 0.2);
+            color: var(--light);
+        }
+        
+        .mute-btn:hover {
+            background: var(--primary);
+        }
+        
+        .unmute-btn {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--light);
+        }
+        
+        .unmute-btn:hover {
+            background: var(--success);
+        }
+        
+        .kick-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--light);
+        }
+        
+        .kick-btn:hover {
+            background: var(--danger);
+        }
+        
+        /* Chat Section */
+        .chat-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            max-height: 500px;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-container:hover {
+            transform: translateY(-3px);
+        }
+        
+        .chat-header {
+            padding: 1rem 1.5rem;
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--card-border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .chat-box {
+            padding: 1rem 1.25rem;
+            height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .chat-message {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+            word-break: break-word;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--card-border);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chat-message.assistant {
+            background: rgba(79, 70, 229, 0.2);
+            border-left: 3px solid var(--primary);
+            align-self: flex-end;
+        }
+        
+        .chat-message.student {
+            background: rgba(30, 41, 59, 0.6);
+            border-left: 3px solid var(--gray);
+            align-self: flex-start;
+        }
+        
+        .chat-message.system {
+            background: rgba(15, 23, 42, 0.4);
+            border-left: 3px solid var(--warning);
+            align-self: center;
+            text-align: center;
+        }
+
+        /* Enhanced emoji messages */
+        .chat-message.emoji {
+            background: rgba(245, 158, 11, 0.2);
+            border-left: 3px solid var(--warning);
+            text-align: center;
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .chat-message.emoji-self {
+            background: rgba(79, 70, 229, 0.2);
+            border-left: 3px solid var(--primary);
+            text-align: center;
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .chat-sender {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 1rem;
+            background: var(--glass-bg);
+            border-top: 1px solid var(--card-border);
+            gap: 0.75rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--card-border);
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+        
+        #messageInput::placeholder {
+            color: var(--gray);
+        }
+        
+        #sendBtn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        #sendBtn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* Emoji Panel */
+        .emoji-panel {
+            display: flex;
+            justify-content: space-around;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .emoji-panel:hover {
+            transform: translateY(-3px);
+        }
+        
+        .emoji-btn {
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 0.5rem;
+            border-radius: 50%;
+            background: var(--glass-bg);
+        }
+        
+        .emoji-btn:hover {
+            transform: scale(1.5) translateY(-5px);
+            background: rgba(99, 102, 241, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Raised Hands Section */
+        .raised-hands-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .raised-hands-container:hover {
+            transform: translateY(-3px);
+        }
+        
+        .raised-hands-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .raised-hand-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--card-border);
+            transition: all 0.2s ease;
+        }
+        
+        .raised-hand-item:hover {
+            transform: translateX(5px);
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .lower-hand-btn {
+            padding: 0.5rem 0.75rem;
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--light);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .lower-hand-btn:hover {
+            background: var(--warning);
+            transform: scale(1.1);
+        }
+        
+        /* Task Management Section */
+        .task-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .task-container:hover {
+            transform: translateY(-3px);
+        }
+        
+        .task-form {
+            margin-top: 1rem;
+        }
+        
+        #taskText {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--card-border);
+            color: var(--light);
+            min-height: 100px;
+            resize: vertical;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        #taskText:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+        
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(79, 70, 229, 0.2);
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .file-upload-label:hover {
+            background: rgba(79, 70, 229, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        #taskFile {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        #sendTaskBtn {
+            padding: 0.75rem 1.5rem;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        #sendTaskBtn:hover {
+            background: #059669;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* Submissions Section */
+        .submissions-container {
+            margin-top: 1.5rem;
+        }
+        
+        .submission-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--card-border);
+            transition: all 0.2s ease;
+        }
+        
+        .submission-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .submission-header {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .submission-content {
+            margin-top: 0.5rem;
+        }
+        
+        .submission-content img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Course Select */
+        .course-select-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .course-select-container:hover {
+            transform: translateY(-3px);
+        }
+        
+        #courseSelect {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--card-border);
+            color: var(--light);
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        #courseSelect:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
+        
+        #startBtn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #startBtn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+        
+        #startBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        #startBtn:hover::before {
+            left: 100%;
+        }
+        
+        #startBtn[disabled] {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            background: var(--glass-bg);
+        }
+        
+        #startBtn[disabled]:hover::before {
+            display: none;
+        }
+        
+        /* Animations */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+        
+        @keyframes wiggle {
+            0%, 7% {transform: rotateZ(0);}
+            15% {transform: rotateZ(-5deg);}
+            20% {transform: rotateZ(3deg);}
+            25% {transform: rotateZ(-3deg);}
+            30% {transform: rotateZ(2deg);}
+            35% {transform: rotateZ(-1deg);}
+            40%, 100% {transform: rotateZ(0);}
+        }
+        
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        .wiggle {
+            animation: wiggle 1s ease;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .class-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .controls {
+                gap: 0.5rem;
+            }
+            
+            .control-btn {
+                min-width: 80px;
+                padding: 0.75rem;
+            }
+            
+            .remote-videos {
+                grid-template-columns: 1fr;
+            }
+            
+            #localVideo {
+                width: 100%;
+            }
+            
+            .container {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .sidebar {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="logo-text">Cs-EslamHatem</div>
+        </div>
+        
+        <div class="class-info">
+            <div class="class-title">Live Assistant Dashboard</div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Ready</span>
+            </div>
+        </div>
+        
+        <div class="assistant-info">
+            <div class="status-indicator">
+                <i class="fas fa-user-tie"></i>
+                <span>Assistant Mode</span>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Left Column: Video & Controls -->
+        <div class="video-section">
+            <!-- Course Selection -->
+            <div class="course-select-container">
+                <h3>Select Course</h3>
+                <select id="courseSelect">
+                    <option value="">Loading courses...</option>
+                </select>
+                <button id="startBtn" disabled>Start Live Class</button>
+            </div>
+
+            <!-- Video Container -->
+            <div class="video-container">
+                <div id="videoPlaceholder" class="video-placeholder">
+                    <i class="fas fa-video"></i>
+                    <h3>Assistant View</h3>
+                    <p>Your camera will appear here when you start the live class</p>
+                </div>
+                <video id="localVideo" autoplay playsinline muted class="hidden"></video>
+            </div>
+            
+            <!-- Notice -->
+            <div id="notice"></div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <div class="control-btn" id="micBtn" disabled>
+                    <i class="fas fa-microphone-slash"></i>
+                    <span class="control-label">Enable Mic</span>
+                </div>
+                
+                <div class="control-btn" id="camBtn" disabled>
+                    <i class="fas fa-video-slash"></i>
+                    <span class="control-label">Enable Camera</span>
+                </div>
+                
+                <div class="control-btn" id="shareBtn" disabled>
+                    <i class="fas fa-share-square"></i>
+                    <span class="control-label">Share Screen</span>
+                </div>
+                
+                <div class="control-btn leave" id="endClassBtn" disabled>
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="control-label">End Class</span>
+                </div>
+            </div>
+            
+            <!-- Remote Videos -->
+            <div class="remote-videos" id="remoteVideosContainer">
+                <!-- Remote videos will be added here dynamically -->
+            </div>
+            
+            <!-- Task Management -->
+            <div class="task-container">
+                <h3>Task Management</h3>
+                <div class="task-form">
+                    <textarea id="taskText" placeholder="Enter task instructions..."></textarea>
+                    <div class="file-upload">
+                        <label class="file-upload-label">
+                            <i class="fas fa-paperclip"></i>
+                            <span>Attach File</span>
+                            <input type="file" id="taskFile">
+                        </label>
+                    </div>
+                    <button id="sendTaskBtn">Send Task</button>
+                </div>
+                
+                <div class="submissions-container">
+                    <h4>Submitted Tasks</h4>
+                    <div id="submissionsList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Participants & Chat -->
+        <div class="sidebar">
+            <!-- Participants Section -->
+            <div class="participants-container">
+                <h3>Participants <span id="participantCount">(0)</span></h3>
+                <div class="participant-list" id="participantList">
+                    <p>No participants yet</p>
+                </div>
+            </div>
+            
+            <!-- Raised Hands Section -->
+            <div class="raised-hands-container">
+                <h3>Raised Hands <span id="raisedHandsCount">(0)</span></h3>
+                <ul class="raised-hands-list" id="raisedHandsList"></ul>
+            </div>
+            
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    <i class="fas fa-comments"></i>
+                    <span>Class Chat</span>
+                </div>
+                <div class="chat-box" id="chatBox"></div>
+                <div class="chat-input-container">
+                    <input type="text" id="messageInput" placeholder="Type your message...">
+                    <button id="sendBtn">Send</button>
+                </div>
+            </div>
+            
+            <!-- Emoji Panel -->
+            <div class="emoji-panel">
+                <button class="emoji-btn" data-emoji="👍">👍</button>
+                <button class="emoji-btn" data-emoji="👋">👋</button>
+                <button class="emoji-btn" data-emoji="❤️">❤️</button>
+                <button class="emoji-btn" data-emoji="😂">😂</button>
+                <button class="emoji-btn" data-emoji="😮">😮</button>
+                <button class="emoji-btn" data-emoji="🙁">🙁</button>
+                <button class="emoji-btn" data-emoji="❓">❓</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script>
+        // All JavaScript code remains exactly the same as in the original assistant page
+        // Get assistant ID from local storage
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        const assistantId =localStorage.getItem('assistantId') || '';
+        const userNames = new Map(); // studentId → name
+        const courseNames = new Map(); // courseId → courseName
+        
+        // Verify user is logged in
+        if (!assistantId) {
+            alert('Please login as an assistant first');
+            window.location.href = '/login';
+            throw new Error('No assistant ID found');
+        }
+
+        const peerConnections = new Map(); // studentId → RTCPeerConnection
+        const remoteStreams = new Map(); // studentId → MediaStream
+        let localStream;
+        let roomId;
+        let isScreenSharing = false;
+        let screenStream = null;
+        let cameraVideoTrack = null;
+
+        const socket = io("http://localhost:3000", {
+            query: { assistantId },
+            transports: ['polling'],
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            auth: {
+                token: localStorage.getItem('assistantToken') || 'dev-token-bypass'
+            }
+        });
+
+        // DOM elements
+        const startBtn = document.getElementById('startBtn');
+        const micBtn = document.getElementById('micBtn');
+        const camBtn = document.getElementById('camBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const endClassBtn = document.getElementById('endClassBtn');
+        const localVideo = document.getElementById('localVideo');
+        const videoPlaceholder = document.getElementById('videoPlaceholder');
+        const remoteVideosContainer = document.getElementById('remoteVideosContainer');
+        const courseSelect = document.getElementById('courseSelect');
+        const chatBox = document.getElementById('chatBox');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const participantList = document.getElementById('participantList');
+        const participantCount = document.getElementById('participantCount');
+        const raisedHandsList = document.getElementById('raisedHandsList');
+        const raisedHandsCount = document.getElementById('raisedHandsCount');
+        const sendTaskBtn = document.getElementById('sendTaskBtn');
+        const submissionsList = document.getElementById('submissionsList');
+        const classTitle = document.querySelector('.class-title');
+        const notice = document.getElementById('notice');
+
+        // Track participants and raised hands
+        const participants = new Map(); // studentId → {id, name}
+        const raisedHands = new Map(); // studentId → {id, name}
+
+        // Render participant list with names
+        function renderParticipants() {
+            if (participants.size === 0) {
+                participantList.innerHTML = '<p>No participants yet</p>';
+                participantCount.textContent = '(0)';
+                return;
+            }
+
+            participantList.innerHTML = '';
+            participantCount.textContent = `(${participants.size})`;
+            
+            participants.forEach((student, studentId) => {
+                const item = document.createElement('div');
+                item.className = 'participant-item';
+                item.dataset.id = studentId;
+                
+                item.innerHTML = `
+                    <span class="participant-name">${student.name}</span>
+                    <div class="participant-controls">
+                        <button class="mute-btn" data-action="mute">Mute</button>
+                        <button class="unmute-btn" data-action="unmute">Unmute</button>
+                        <button class="kick-btn" data-action="kick">Kick</button>
+                    </div>
+                `;
+                
+                participantList.appendChild(item);
+            });
+        }
+
+        // Render raised hands list with names
+        function renderRaisedHands() {
+            raisedHandsCount.textContent = `(${raisedHands.size})`;
+            
+            if (raisedHands.size === 0) {
+                raisedHandsList.innerHTML = '<li>No raised hands</li>';
+                return;
+            }
+
+            raisedHandsList.innerHTML = '';
+            
+            raisedHands.forEach((student, studentId) => {
+                const li = document.createElement('li');
+                li.className = 'raised-hand-item';
+                li.dataset.id = studentId;
+                li.innerHTML = `
+                    <span>${student.name}</span>
+                    <button class="lower-hand-btn" onclick="lowerHandForStudent('${studentId}')">Lower Hand</button>
+                `;
+                raisedHandsList.appendChild(li);
+            });
+        }
+
+        // Add remote video element with name
+        function addRemoteVideo(studentId, studentName, stream) {
+            if (document.querySelector(`.remote-video-wrapper[data-id="${studentId}"]`)) return;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'remote-video-wrapper';
+            wrapper.dataset.id = studentId;
+            
+            const video = document.createElement('video');
+            video.autoplay = true;
+            video.playsinline = true;
+            video.srcObject = stream;
+            
+            const label = document.createElement('div');
+            label.className = 'remote-video-label';
+            label.textContent = studentName;
+            
+            wrapper.appendChild(video);
+            wrapper.appendChild(label);
+            remoteVideosContainer.appendChild(wrapper);
+        }
+
+        // Remove remote video element
+        function removeRemoteVideo(studentId) {
+            const element = document.querySelector(`.remote-video-wrapper[data-id="${studentId}"]`);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        // Participant controls
+        participantList.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            
+            const item = btn.closest('.participant-item');
+            const studentId = item?.dataset.id;
+            if (!studentId || !roomId) return;
+
+            const action = btn.dataset.action;
+            if (action === 'mute' || action === 'unmute') {
+                socket.emit('instructor-mute-student', { 
+                    roomId: roomId, 
+                    targetId: studentId, 
+                    mute: action === 'mute' 
+                });
+            } else if (action === 'kick') {
+                const student = participants.get(studentId);
+                const ok = confirm(`Kick student ${student.name}?`);
+                if (ok) {
+                    socket.emit('instructor-kick-student', { 
+                        roomId: roomId, 
+                        targetId: studentId 
+                    });
+                }
+            }
+        });
+
+        // Initialize WebRTC connection for a specific student
+        async function initializeWebRTCForStudent(roomId, studentId, studentName) {
+            const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+            const pc = new RTCPeerConnection(rtcConfig);
+            peerConnections.set(studentId, pc);
+
+            // Add local tracks
+            const audioTrack = localStream.getAudioTracks()[0];
+            const videoTrack = localStream.getVideoTracks()[0];
+            pc.addTrack(audioTrack, localStream);
+            pc.addTrack(videoTrack, localStream);
+
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.emit('ice-candidate', {
+                        roomId,
+                        studentId,
+                        candidate: event.candidate
+                    });
+                }
+            };
+
+            pc.ontrack = (event) => {
+                const stream = event.streams[0];
+                remoteStreams.set(studentId, stream);
+                addRemoteVideo(studentId, studentName, stream);
+            };
+
+            pc.onconnectionstatechange = () => {
+                console.log(`Connection state with ${studentId}: ${pc.connectionState}`);
+                if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+                    cleanupStudentConnection(studentId);
+                }
+            };
+
+            // Create and send offer
+            try {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                
+                socket.emit('webrtc-offer', {
+                    roomId,
+                    studentId,
+                    sdp: offer
+                });
+            } catch (err) {
+                console.error('Error creating offer:', err);
+                cleanupStudentConnection(studentId);
+            }
+        }
+
+        // Clean up student connection
+        function cleanupStudentConnection(studentId) {
+            const pc = peerConnections.get(studentId);
+            if (pc) {
+                pc.close();
+                peerConnections.delete(studentId);
+            }
+            
+            remoteStreams.delete(studentId);
+            removeRemoteVideo(studentId);
+            
+            if (participants.has(studentId)) {
+                participants.delete(studentId);
+                renderParticipants();
+            }
+            
+            if (raisedHands.has(studentId)) {
+                raisedHands.delete(studentId);
+                renderRaisedHands();
+            }
+        }
+
+        // Setup chat functionality
+        function setupChat() {
+            // Remove any existing listeners to prevent duplicates
+            socket.off('new-message');
+            
+            // Handle incoming messages
+            socket.on('new-message', (messageData) => {
+                // Check if this message is from the current user (assistant)
+                const isCurrentUser = messageData.isInstructor && 
+                                    (socket.user?.role === 'assistant' || socket.user?.role === 'assistant');
+                
+                const isSystem = messageData.sender === 'system';
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = `chat-message ${isCurrentUser ? 'assistant' : isSystem ? 'system' : 'student'}`;
+                
+                if (isCurrentUser) {
+                    messageElement.innerHTML = `
+                        <div class="chat-sender">You</div>
+                        <div>${messageData.message}</div>
+                    `;
+                } else if (isSystem) {
+                    messageElement.textContent = messageData.message;
+                } else {
+                    messageElement.innerHTML = `
+                        <div class="chat-sender">${messageData.sender}</div>
+                        <div>${messageData.message}</div>
+                    `;
+                }
+                
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+
+            // Send message with debounce to prevent duplicates
+            let lastSendTime = 0;
+            function sendMessage() {
+                // Check if we have a room and connection
+                if (!roomId) {
+                    showNotice('Please start a class session first', 'error');
+                    return;
+                }
+                
+                if (socket.disconnected) {
+                    showNotice('Please wait for connection to establish', 'error');
+                    return;
+                }
+                
+                const now = Date.now();
+                if (now - lastSendTime < 1000) return;
+                
+                const message = messageInput.value.trim();
+                if (message && roomId) {
+                    socket.emit('send-message', roomId, message);
+                    messageInput.value = '';
+                    lastSendTime = now;
+                }
+            }   
+
+            // Event listeners for sending messages
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+
+        // Socket event handlers
+        socket.on('connect', () => {
+            console.log('✅ Connected to server with ID:', socket.id);
+            startBtn.disabled = false;
+            setupChat();
+            showNotice('Connected to server', 'success');
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error('❌ Connection error:', err.message);
+            startBtn.disabled = true;
+            micBtn.disabled = camBtn.disabled = shareBtn.disabled = endClassBtn.disabled = true;
+            showNotice('Connection error: ' + err.message, 'error');
+
+            if (err.message.includes('Authentication')) {
+                alert('Please login again');
+                window.location.href = '/login';
+            }
+        });
+
+        socket.on('disconnect', () => {
+            showNotice('Disconnected from server', 'error');
+        });
+
+        socket.on('reconnect', () => {
+            showNotice('Reconnected to server', 'success');
+        });
+
+        socket.on('room-created', (data) => {
+            console.log('Room created:', data);
+            
+            // Add welcome message with instructor name
+            addChatMessage({ 
+                sender: 'system', 
+                message: `Class session started by ${data.instructorName}. Waiting for students...` 
+            });
+            
+            showNotice('Class session started', 'success');
+            
+            // Enable controls
+            micBtn.disabled = false;
+            camBtn.disabled = false;
+            shareBtn.disabled = false;
+            endClassBtn.disabled = false;
+            
+            // Update UI
+            startBtn.textContent = 'Class in Progress';
+            startBtn.disabled = true;
+            document.querySelector('.status-indicator span').textContent = 'Live';
+            
+            // Update class title to include instructor name
+            classTitle.textContent = `${data.courseTitle} - Hosted by ${data.instructorName}`;
+        });
+
+        socket.on('user-joined', (userData) => {
+            console.log('Student joined:', userData);
+            if (userData && userData.id) {
+                participants.set(userData.id, userData);
+                renderParticipants();
+                initializeWebRTCForStudent(roomId, userData.id, userData.name);
+                addChatMessage({ sender: 'system', message: `${userData.name} joined the class` });
+            }
+        });
+
+        socket.on('user-left', (userData) => {
+            console.log('Student left:', userData);
+            cleanupStudentConnection(userData.id);
+            addChatMessage({ sender: 'system', message: `${userData.name} left the class` });
+        });
+
+        socket.on('webrtc-answer', async (data) => {
+            if (data.roomId === roomId && data.student) {
+                const pc = peerConnections.get(data.student.id);
+                if (pc) {
+                    await pc.setRemoteDescription(data.sdp);
+                }
+            }
+        });
+
+        socket.on('ice-candidate', async (data) => {
+            if (data.roomId === roomId && data.studentId) {
+                const pc = peerConnections.get(data.studentId);
+                if (pc && data.candidate) {
+                    try {
+                        await pc.addIceCandidate(data.candidate);
+                    } catch (err) {
+                        console.error('Error adding ICE candidate:', err);
+                    }
+                }
+            }
+        });
+
+        // Handle received emojis
+        socket.on('receive-emoji', (senderName, emoji) => {
+            const msg = document.createElement('div');
+            
+            // Check if this emoji is from the current user (assistant)
+            const isCurrentUser = senderName !== "Anonymous" && 
+                                (senderName.includes("assistant") || senderName === "Instructor");
+            
+            msg.className = isCurrentUser ? 'chat-message emoji-self' : 'chat-message emoji';
+            msg.innerHTML = `<span>${senderName} reacted with ${emoji}</span>`;
+            
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        // Handle raised hands
+        socket.on('student-raised-hand', (userData) => {
+            if (!raisedHands.has(userData.id)) {
+                raisedHands.set(userData.id, userData);
+                renderRaisedHands();
+                
+                // Show notification
+                const notification = document.createElement('div');
+                notification.className = 'chat-message system';
+                notification.textContent = `${userData.name} raised their hand`;
+                chatBox.appendChild(notification);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                // Add animation to the hand icon in the header
+                const handIcon = document.querySelector('.fa-comments');
+                if (handIcon) {
+                    handIcon.classList.add('bounce');
+                    setTimeout(() => handIcon.classList.remove('bounce'), 2000);
+                }
+            }
+        });
+
+        socket.on('student-lowered-hand', (userData) => {
+            if (raisedHands.has(userData.id)) {
+                raisedHands.delete(userData.id);
+                renderRaisedHands();
+            }
+        });
+
+        // Lower hand function
+        window.lowerHandForStudent = (studentId) => {
+            if (roomId) {
+                socket.emit('lower-hand', { roomId: roomId, studentId });
+            }
+        };
+
+        // Handle task submissions
+        socket.on('task-submitted', async ({ studentId, submission }) => {
+            const student = participants.get(studentId) || { id: studentId, name: `Student ${studentId.substring(0, 6)}` };
+            const submissionItem = document.createElement('div');
+            submissionItem.className = 'submission-item';
+            
+            let content = '';
+            if (submission.text) {
+                content += `<p>${submission.text}</p>`;
+            }
+            if (submission.file) {
+                if (submission.file.type.startsWith('image/')) {
+                    content += `<img src="${submission.file.data}" alt="Submission">`;
+                } else {
+                    content += `<a href="${submission.file.data}" download="${submission.file.name}">
+                        <i class="fas fa-file-download"></i> Download ${submission.file.name}
+                    </a>`;
+                }
+            }
+            
+            submissionItem.innerHTML = `
+                <div class="submission-header">${student.name}</div>
+                <div class="submission-content">${content}</div>
+            `;
+            
+            submissionsList.prepend(submissionItem);
+            addChatMessage({ sender: 'system', message: `${student.name} submitted a task` });
+        });
+
+        // Helper function to show notices
+        function showNotice(message, type = 'info') {
+            notice.textContent = message;
+            
+            // Set color based on type
+            if (type === 'error') {
+                notice.style.background = 'rgba(239, 68, 68, 0.2)';
+                notice.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+            } else if (type === 'success') {
+                notice.style.background = 'rgba(16, 185, 129, 0.2)';
+                notice.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+            } else {
+                notice.style.background = 'rgba(59, 130, 246, 0.2)';
+                notice.style.border = '1px solid rgba(59, 130, 246, 0.3)';
+            }
+            
+            notice.classList.add('show');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                notice.classList.remove('show');
+            }, 5000);
+        }
+
+        // Helper function to add chat messages
+        function addChatMessage(messageData) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `chat-message ${messageData.sender === 'assistant' ? 'assistant' : messageData.sender === 'system' ? 'system' : 'student'}`;
+            
+            if (messageData.sender === 'assistant') {
+                messageElement.innerHTML = `
+                    <div class="chat-sender">You</div>
+                    <div>${messageData.message}</div>
+                `;
+            } else if (messageData.sender === 'system') {
+                messageElement.textContent = messageData.message;
+            } else {
+                messageElement.innerHTML = `
+                    <div class="chat-sender">${messageData.sender}</div>
+                    <div>${messageData.message}</div>
+                `;
+            }
+            
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Load assistant courses
+        async function loadCourses() {
+            try {
+                const token = localStorage.getItem('assistantToken');
+                const res = await fetch( `http://localhost:3000/api/assistant/courses`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                const data = await res.json();
+                courseSelect.innerHTML = data.data?.length
+                    ? data.data.map(course => `<option value="${course._id}">${course.title}</option>`).join('')
+                    : '<option value="">No courses available</option>';
+            } catch (err) {
+                console.error("Error fetching courses:", err);
+                courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+                showNotice('Error loading courses', 'error');
+            }
+        }
+
+        // Start stream handler
+        startBtn.addEventListener('click', async () => {
+            const selectedCourseId = courseSelect.value;
+            if (!selectedCourseId) {
+                showNotice("Please select a course first", 'error');
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: {
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 60 }
+                    }, 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+                
+                // Show local video
+                localVideo.srcObject = stream;
+                localVideo.classList.remove('hidden');
+                videoPlaceholder.classList.add('hidden');
+                localStream = stream;
+                roomId = selectedCourseId;
+                cameraVideoTrack = localStream.getVideoTracks()[0];
+
+                socket.emit("create-room", {
+                    roomId: selectedCourseId,
+                    courseId: selectedCourseId,
+                    assistantId: assistantId,
+                    role: 'assistant'
+                }, (response) => {
+                    if (response.error) throw new Error(response.error);
+                    
+                    // Add welcome message
+                    addChatMessage({ sender: 'system', message: 'Class session started. Waiting for students...' });
+                    
+                    // Update controls
+                    micBtn.querySelector('.control-label').textContent = 'Mute';
+                    micBtn.querySelector('i').className = 'fas fa-microphone';
+                    camBtn.querySelector('.control-label').textContent = 'Turn Camera Off';
+                    camBtn.querySelector('i').className = 'fas fa-video';
+                });
+            } catch (err) {
+                console.error("Stream error:", err);
+                showNotice("Error: " + err.message, 'error');
+                
+                // Clean up on error
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
+            }
+        });
+
+        // Media controls
+        micBtn.addEventListener('click', () => {
+            if (!localStream) return;
+            const track = localStream.getAudioTracks()[0];
+            if (!track) return;
+            track.enabled = !track.enabled;
+            
+            // Update UI
+            const isMuted = !track.enabled;
+            micBtn.querySelector('.control-label').textContent = isMuted ? 'Unmute' : 'Mute';
+            micBtn.querySelector('i').className = isMuted ? 'fas fa-microphone-slash' : 'fas fa-microphone';
+            
+            // Add animation
+            micBtn.classList.add('wiggle');
+            setTimeout(() => micBtn.classList.remove('wiggle'), 1000);
+            
+            // Update all peer connections
+            peerConnections.forEach(pc => {
+                const senders = pc.getSenders();
+                const audioSender = senders.find(s => s.track?.kind === 'audio');
+                if (audioSender) {
+                    audioSender.replaceTrack(track);
+                }
+            });
+        });
+
+        camBtn.addEventListener('click', () => {
+            if (!localStream) return;
+            const track = localStream.getVideoTracks()[0];
+            if (!track) return;
+            track.enabled = !track.enabled;
+            
+            // Update UI
+            const isCameraOff = !track.enabled;
+            camBtn.querySelector('.control-label').textContent = isCameraOff ? 'Turn Camera On' : 'Turn Camera Off';
+            camBtn.querySelector('i').className = isCameraOff ? 'fas fa-video-slash' : 'fas fa-video';
+            
+            // Add animation
+            camBtn.classList.add('wiggle');
+            setTimeout(() => camBtn.classList.remove('wiggle'), 1000);
+        
+            // Update all peer connections (except screen sharing)
+            if (!isScreenSharing) {
+                peerConnections.forEach(pc => {
+                    const senders = pc.getSenders();
+                    const videoSender = senders.find(s => s.track?.kind === 'video');
+                    if (videoSender) {
+                        videoSender.replaceTrack(track);
+                    }
+                });
+            }
+        });
+    
+        shareBtn.addEventListener('click', async () => {
+            if (!localStream) return;
+
+            try {
+                if (!isScreenSharing) {
+                    screenStream = await navigator.mediaDevices.getDisplayMedia({ 
+                        video: {
+                            displaySurface: 'monitor',
+                            frameRate: { ideal: 60 }
+                        },
+                        audio: false 
+                    });
+                    const screenTrack = screenStream.getVideoTracks()[0];
+                    
+                    // Replace video track in all peer connections
+                    peerConnections.forEach(pc => {
+                        const senders = pc.getSenders();
+                        const videoSender = senders.find(s => s.track?.kind === 'video');
+                        if (videoSender) {
+                            videoSender.replaceTrack(screenTrack);
+                        }
+                    });
+                    
+                    localVideo.srcObject = screenStream;
+                    isScreenSharing = true;
+                    shareBtn.querySelector('.control-label').textContent = 'Stop Share';
+                    shareBtn.querySelector('i').className = 'fas fa-stop-circle';
+                    addChatMessage({ sender: 'system', message: 'Assistant started screen sharing' });
+
+                    screenTrack.onended = async () => {
+                        await stopScreenShare();
+                        addChatMessage({ sender: 'system', message: 'Assistant stopped screen sharing' });
+                    };
+                } else {
+                    await stopScreenShare();
+                    addChatMessage({ sender: 'system', message: 'Assistant stopped screen sharing' });
+                }
+            } catch (err) {
+                console.error('Screen share error:', err);
+                showNotice('Screen share failed: ' + err.message, 'error');
+            }
+        });
+
+        async function stopScreenShare() {
+            if (screenStream) {
+                screenStream.getTracks().forEach(t => t.stop());
+            }
+            
+            // Restore camera track in all peer connections
+            if (localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                peerConnections.forEach(pc => {
+                    const senders = pc.getSenders();
+                    const videoSender = senders.find(s => s.track?.kind === 'video');
+                    if (videoSender && videoTrack) {
+                        videoSender.replaceTrack(videoTrack);
+                    }
+                });
+                
+                localVideo.srcObject = localStream;
+            }
+            
+            isScreenSharing = false;
+            shareBtn.querySelector('.control-label').textContent = 'Share Screen';
+            shareBtn.querySelector('i').className = 'fas fa-share-square';
+            screenStream = null;
+        }
+
+        // End class handler
+        endClassBtn.addEventListener('click', () => {
+            const ok = confirm('Are you sure you want to end the class session?');
+            if (ok) {
+                endClass();
+            }
+        });
+
+        function endClass() {
+            try {
+                // Close all peer connections
+                peerConnections.forEach(pc => pc.close());
+                peerConnections.clear();
+                
+                // Stop all media tracks
+                if (screenStream) screenStream.getTracks().forEach(t => t.stop());
+                if (localStream) localStream.getTracks().forEach(t => t.stop());
+                
+                // Notify server we're leaving
+                if (roomId) {
+                    socket.emit('leave-room', roomId);
+                    addChatMessage({ sender: 'system', message: 'Class session ended' });
+                }
+                
+                // Reset UI
+                localVideo.srcObject = null;
+                localVideo.classList.add('hidden');
+                videoPlaceholder.classList.remove('hidden');
+                remoteVideosContainer.innerHTML = '';
+                participants.clear();
+                raisedHands.clear();
+                renderParticipants();
+                renderRaisedHands();
+                
+                // Disable controls
+                micBtn.disabled = true;
+                camBtn.disabled = true;
+                shareBtn.disabled = true;
+                endClassBtn.disabled = true;
+                
+                // Reset buttons
+                micBtn.querySelector('.control-label').textContent = 'Enable Mic';
+                micBtn.querySelector('i').className = 'fas fa-microphone-slash';
+                camBtn.querySelector('.control-label').textContent = 'Enable Camera';
+                camBtn.querySelector('i').className = 'fas fa-video-slash';
+                shareBtn.querySelector('.control-label').textContent = 'Share Screen';
+                shareBtn.querySelector('i').className = 'fas fa-share-square';
+                
+                // Enable start button
+                startBtn.disabled = false;
+                startBtn.textContent = 'Start Live Class';
+                
+                // Update status
+                document.querySelector('.status-indicator span').textContent = 'Ready';
+                showNotice('Class session ended', 'success');
+                
+                // Reset class title
+                classTitle.textContent = 'Live Assistant Dashboard';
+                
+                roomId = null;
+                localStream = null;
+            } catch (e) {
+                console.error('Error ending class:', e);
+                showNotice('Error ending class: ' + e.message, 'error');
+            }
+        }
+
+        // Emoji button handlers
+        document.querySelectorAll('.emoji-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const emoji = btn.dataset.emoji;
+                if (roomId) {
+                    // Add a small delay to show the emoji immediately from the sender's perspective
+                    const tempMsg = document.createElement('div');
+                    tempMsg.className = 'chat-message system';
+                    tempMsg.textContent = `You reacted with ${emoji}`;
+                    chatBox.appendChild(tempMsg);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                    
+                    // Send to server
+                    socket.emit('send-emoji', { roomId, emoji });
+                } else {
+                    showNotice('Please start a class session first', 'error');
+                }
+            });
+        });
+
+        // Task management
+        sendTaskBtn.addEventListener('click', () => {
+            if (!roomId) {
+                showNotice('Please start a class session first', 'error');
+                return;
+            }
+            
+            const taskText = document.getElementById('taskText').value;
+            const taskFile = document.getElementById('taskFile').files[0];
+            
+            if (!taskText && !taskFile) {
+                showNotice('Please enter a task or attach a file', 'error');
+                return;
+            }
+            
+            const taskData = { text: taskText };
+            
+            if (taskFile) {
+                const reader = FileReader();
+                reader.onload = (e) => {
+                    taskData.file = {
+                        name: taskFile.name,
+                        type: taskFile.type,
+                        data: e.target.result
+                    };
+                    socket.emit('send-task', { roomId, taskData });
+                    showNotice('Task sent to students', 'success');
+                };
+                reader.readAsDataURL(taskFile);
+            } else {
+                socket.emit('send-task', { roomId, taskData });
+                showNotice('Task sent to students', 'success');
+            }
+            
+            // Clear form
+            document.getElementById('taskText').value = '';
+            document.getElementById('taskFile').value = '';
+        });
+
+        // Clean up when the page is closed/refreshed
+        window.addEventListener('beforeunload', () => {
+            try {
+                // Close all peer connections
+                peerConnections.forEach(pc => pc.close());
+                
+                // Stop all media tracks
+                if (screenStream) screenStream.getTracks().forEach(t => t.stop());
+                if (localStream) localStream.getTracks().forEach(t => t.stop());
+                
+                // Notify server we're leaving
+                if (roomId) {
+                    socket.emit('leave-room', roomId);
+                }
+            } catch (e) {
+                console.error('Cleanup error:', e);
+            }
+        });
+
+        // Initial load
+        loadCourses();
+    </script>
+</body>
+</html>

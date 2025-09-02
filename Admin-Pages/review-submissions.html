@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Submissions</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .submission-card {
+      border: 1px solid #ccc; padding: 15px; margin-bottom: 15px;
+      border-radius: 8px; background: #fff;
+    }
+    select, button { margin-top: 8px; padding: 6px 10px; }
+  </style>
+</head>
+<body>
+  <h1>Task Submissions</h1>
+  <div id="submissions"></div>
+
+  <script>
+    const token = localStorage.getItem("adminToken");
+    const API_URL = "http://localhost:3000/api/task-submissions";
+
+    // ✅ Fetch all submissions
+    async function fetchSubmissions() {
+  try {
+    const token = localStorage.getItem("adminToken");
+    const res = await fetch("http://localhost:3000/api/tasks/submissions", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+    const submissions = await res.json();
+
+    submissions.forEach(sub => {
+      console.log(sub.task.title, sub.student.name);
+      // render table
+    });
+  } catch (err) {
+    console.error("Error fetching submissions:", err.message);
+  }
+}
+
+
+    // ✅ Update review
+    async function reviewSubmission(submissionId) {
+      const status = document.getElementById(`status-${submissionId}`).value;
+
+      const res = await fetch(`${API_URL}/${submissionId}/review`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ status })
+      });
+
+      const data = await res.json();
+      alert(data.message || "Updated!");
+      fetchSubmissions();
+    }
+
+    fetchSubmissions();
+  </script>
+</body>
+</html>

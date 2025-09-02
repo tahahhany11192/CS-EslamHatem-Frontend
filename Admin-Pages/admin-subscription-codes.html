@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Subscription Codes</title>
+</head>
+<body>
+  <h2>Generate Subscription Codes</h2>
+  <form id="codeForm">
+    <label>Select Package:</label>
+    <select id="packageSelect"></select>
+
+    <label>Number of Codes:</label>
+    <input type="number" id="numberOfCodes" value="1" min="1" />
+
+    <button type="submit">Generate Codes</button>
+  </form>
+
+  <h3>Generated Codes</h3>
+  <ul id="codesList"></ul>
+
+  <script>
+    const token = localStorage.getItem("adminToken");
+
+    async function loadPackages() {
+      const res = await fetch("http://localhost:3000/api/admin/packages", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const select = document.getElementById("packageSelect");
+      data.data.forEach(pkg => {
+        const option = document.createElement("option");
+        option.value = pkg._id;
+        option.textContent = pkg.name;
+        select.appendChild(option);
+      });
+    }
+
+    document.getElementById("codeForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const packageId = document.getElementById("packageSelect").value;
+      const numberOfCodes = document.getElementById("numberOfCodes").value;
+
+      const res = await fetch("http://localhost:3000/api/admin/subscription-codes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ packageId, numberOfCodes })
+      });
+
+      const data = await res.json();
+      const list = document.getElementById("codesList");
+      list.innerHTML = "";
+      data.codes.forEach(code => {
+        const li = document.createElement("li");
+        li.textContent = code.code;
+        list.appendChild(li);
+      });
+    });
+
+    loadPackages();
+  </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<div style="max-width: 900px; margin: auto;">
+  <!-- Toolbar -->
+  <div id="pdf-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #222; color: white; border-radius: 8px;">
+    <div>
+      <button id="prevPage">⬅ Prev</button>
+      <button id="nextPage">Next ➡</button>
+      <span style="margin-left: 10px;">Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+    </div>
+    <div>
+      <button id="zoomIn">➕ Zoom In</button>
+      <button id="zoomOut">➖ Zoom Out</button>
+    </div>
+  </div>
+
+  <!-- PDF Canvas -->
+  <canvas id="pdf-canvas" style="width: 100%; border: 1px solid #ccc; margin-top: 10px; border-radius: 8px;"></canvas>
+</div>
+
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.min.js"></script>
+<script>
+  const url = "http://localhost:3000/api/users/68abb166c15d7bd9ca641ae1/material"; // 👈 replace with lessonId dynamically
+
+  let pdfDoc = null,
+      pageNum = 1,
+      pageRendering = false,
+      pageNumPending = null,
+      scale = 1.2,
+      canvas = document.getElementById("pdf-canvas"),
+      ctx = canvas.getContext("2d");
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.13.216/pdf.worker.min.js";
+
+  // Render page
+  function renderPage(num) {
+    pageRendering = true;
+    pdfDoc.getPage(num).then(function(page) {
+      const viewport = page.getViewport({ scale: scale });
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      const renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      };
+      const renderTask = page.render(renderContext);
+
+      renderTask.promise.then(function() {
+        pageRendering = false;
+        document.getElementById("page_num").textContent = num;
+
+        if (pageNumPending !== null) {
+          renderPage(pageNumPending);
+          pageNumPending = null;
+        }
+      });
+    });
+  }
+
+  // Queue render if busy
+  function queueRenderPage(num) {
+    if (pageRendering) {
+      pageNumPending = num;
+    } else {
+      renderPage(num);
+    }
+  }
+
+  // Prev page
+  document.getElementById("prevPage").addEventListener("click", function() {
+    if (pageNum <= 1) return;
+    pageNum--;
+    queueRenderPage(pageNum);
+  });
+
+  // Next page
+  document.getElementById("nextPage").addEventListener("click", function() {
+    if (pageNum >= pdfDoc.numPages) return;
+    pageNum++;
+    queueRenderPage(pageNum);
+  });
+
+  // Zoom In
+  document.getElementById("zoomIn").addEventListener("click", function() {
+    scale += 0.2;
+    queueRenderPage(pageNum);
+  });
+
+  // Zoom Out
+  document.getElementById("zoomOut").addEventListener("click", function() {
+    if (scale <= 0.4) return; // prevent too small
+    scale -= 0.2;
+    queueRenderPage(pageNum);
+  });
+
+  // Load PDF
+  pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+    pdfDoc = pdfDoc_;
+    document.getElementById("page_count").textContent = pdfDoc.numPages;
+    renderPage(pageNum);
+  });
+</script>

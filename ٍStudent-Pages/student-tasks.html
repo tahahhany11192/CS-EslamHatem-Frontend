@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Tasks</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .task-card {
+      border: 1px solid #ddd; padding: 15px; margin-bottom: 15px;
+      border-radius: 8px; background: #f9f9f9;
+    }
+    textarea { width: 100%; min-height: 80px; margin-top: 8px; }
+    button { margin-top: 8px; padding: 8px 12px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Assigned Tasks</h1>
+  <div id="tasks"></div>
+
+  <script>
+    const token = localStorage.getItem("token"); // JWT from login
+    const API_URL = "http://localhost:3000/api/task-submissions";
+
+    // ✅ Fetch available tasks (from DB)
+    async function fetchTasks() {
+  try {
+    const token = localStorage.getItem("token"); // wherever you store it
+    const res = await fetch("http://localhost:3000/api/tasks", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+    const tasks = await res.json();
+
+    tasks.forEach(task => {
+      console.log(task.title);
+      // render to DOM
+    });
+  } catch (err) {
+    console.error("Error fetching tasks:", err.message);
+  }
+}
+
+
+    // ✅ Submit task
+    async function submitTask(taskId) {
+      const answer = document.getElementById(`submission-${taskId}`).value;
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ taskId, content: answer })
+      });
+
+      const data = await res.json();
+      alert(data.message || "Task submitted!");
+    }
+
+    fetchTasks();
+  </script>
+</body>
+</html>

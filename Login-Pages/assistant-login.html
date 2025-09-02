@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistant Login - CS-IslamHatem</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0066ff;
+      --secondary: #00ccff;
+      --accent: #ff00cc;
+      --dark: #0a1128;
+      --light: #f0f6ff;
+      --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+      --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
+      --assistant-accent: #00d9ff;
+      --assistant-gradient: linear-gradient(135deg, var(--primary), var(--assistant-accent));
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background-color: var(--dark);
+      color: var(--light);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 80%, rgba(255, 0, 204, 0.1) 0%, transparent 20%);
+      position: relative;
+    }
+
+    /* Animated Background Elements */
+    .floating-shapes {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 15s infinite linear;
+    }
+
+    .shape-1 {
+      width: 300px;
+      height: 300px;
+      background: var(--primary);
+      top: -150px;
+      left: -150px;
+      animation-delay: 0s;
+    }
+
+    .shape-2 {
+      width: 200px;
+      height: 200px;
+      background: var(--assistant-accent);
+      bottom: -100px;
+      right: 20%;
+      animation-delay: -5s;
+    }
+
+    .shape-3 {
+      width: 150px;
+      height: 150px;
+      background: var(--secondary);
+      top: 30%;
+      right: -75px;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+      50% {
+        transform: translate(20px, 20px) rotate(180deg);
+      }
+      100% {
+        transform: translate(0, 0) rotate(360deg);
+      }
+    }
+
+    /* Assistant Login Container */
+    .login-container {
+      background: rgba(10, 17, 40, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 450px;
+      border: 1px solid rgba(0, 217, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: var(--assistant-gradient);
+      opacity: 0.05;
+      transform: rotate(45deg);
+      z-index: -1;
+    }
+
+    .assistant-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--assistant-gradient);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--light);
+      text-decoration: none;
+      margin-bottom: 30px;
+    }
+
+    .logo span {
+      color: var(--secondary);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      background: var(--assistant-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+      }
+      to {
+        text-shadow: 0 0 20px rgba(0, 217, 255, 0.8), 0 0 30px rgba(0, 217, 255, 0.6);
+      }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--assistant-accent);
+      font-size: 1.2rem;
+    }
+
+    input {
+      padding: 15px 15px 15px 45px;
+      border-radius: 30px;
+      border: 2px solid rgba(0, 217, 255, 0.3);
+      font-size: 16px;
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--light);
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--assistant-accent);
+      box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+    }
+
+    input::placeholder {
+      color: rgba(240, 246, 255, 0.6);
+    }
+
+    /* Motion Button */
+    .btn {
+      padding: 15px;
+      border: none;
+      border-radius: 30px;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      outline: none;
+      margin-top: 10px;
+    }
+
+    .btn-assistant {
+      background: var(--assistant-gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+    }
+
+    .btn-assistant:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 217, 255, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .error {
+      color: #ff4d4d;
+      margin-bottom: 15px;
+      text-align: center;
+      background: rgba(255, 77, 77, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid #ff4d4d;
+    }
+
+    .success {
+      color: #00ff8c;
+      margin-bottom: 15px;
+      text-align: center;
+      background: rgba(0, 255, 140, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 3px solid #00ff8c;
+    }
+
+    .role-notice {
+      margin-top: 20px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      border-left: 3px solid var(--assistant-accent);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .role-notice i {
+      color: var(--assistant-accent);
+      margin-right: 5px;
+    }
+
+    .additional-links {
+      margin-top: 20px;
+      text-align: center;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .additional-links a {
+      color: var(--assistant-accent);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .additional-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 30px 20px;
+        margin: 0 15px;
+      }
+      
+      h2 {
+        font-size: 1.8rem;
+      }
+      
+      .additional-links {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    /* Assistant access animation */
+    @keyframes assistant-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 217, 255, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(0, 217, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 217, 255, 0); }
+    }
+    
+    .assistant-access {
+      animation: assistant-pulse 3s infinite;
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background Elements -->
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <div class="login-container assistant-access">
+    <div class="assistant-badge">
+      <i class="fas fa-hands-helping"></i> TEACHING ASSISTANT
+    </div>
+    
+    <a href="/Frontend/Assistant-Pages/assistant-profile.html" class="logo">
+      <i class="fas fa-code"></i>
+      CS-<span>IslamHatem</span>
+    </a>
+    
+    <h2>Assistant Portal</h2>
+    
+    <div id="error" class="error"></div>
+    <div id="success" class="success"></div>
+
+    <form id="assistantLoginForm">
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" placeholder="Assistant Email" required>
+      </div>
+      
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="Assistant Password" required>
+      </div>
+      
+      <button type="submit" class="btn btn-assistant">
+        <i class="fas fa-sign-in-alt"></i> Assistant Login
+      </button>
+    </form>
+    
+    <div class="role-notice">
+      <i class="fas fa-info-circle"></i> 
+      Teaching assistant access for course management and student support.
+    </div>
+    
+    <div class="additional-links">
+      <a href="login.html"><i class="fas fa-user"></i> Student Login</a>
+      <a href="admin-login.html"><i class="fas fa-shield-alt"></i> Admin Login</a>
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById("assistantLoginForm");
+    const errorDiv = document.getElementById("error");
+    const successDiv = document.getElementById("success");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      errorDiv.textContent = "";
+      successDiv.textContent = "";
+      
+      // Add a loading animation to the button
+      const submitBtn = loginForm.querySelector('button');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+      submitBtn.disabled = true;
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        const response = await fetch("http://localhost:3000/api/assistant/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          errorDiv.textContent = data.message || "Login failed";
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+          return;
+        }
+
+        successDiv.textContent = "Login successful! Redirecting...";
+        localStorage.setItem("assistantToken", data.token); // save token
+        localStorage.setItem("assistantInfo", JSON.stringify(data.assistant));
+        localStorage.setItem("role", "assistant");
+        localStorage.setItem("assistantId", data.assistant._id);
+        localStorage.setItem("assistantName", data.assistant.name);
+        localStorage.setItem("userName", data.assistant.name);
+        localStorage.setItem("userId", data.assistant._id);
+        localStorage.setItem("token", data.token); // save token
+
+
+        // Redirect to assistant dashboard after a brief delay
+        setTimeout(() => {
+          window.location.href = "/frontend/Assistant-Pages/assistant-profile.html";
+        }, 1500);
+
+      } catch (err) {
+        console.error(err);
+        errorDiv.textContent = "Server error, please try again later";
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Add animation to inputs on focus
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-5px)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Assistant notice animation
+    const assistantNotice = document.querySelector('.assistant-access');
+    setInterval(() => {
+      assistantNotice.classList.toggle('assistant-access');
+      setTimeout(() => {
+        assistantNotice.classList.toggle('assistant-access');
+      }, 2000);
+    }, 8000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/jpg" href="../../uploads/orycomLogo.png">
+  <meta charset="UTF-8" />
+  <title>Complete Your Payment | Learning Platform</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Secure payment portal for course enrollment">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3a0ca3;
+      --secondary: #f72585;
+      --success: #4cc9f0;
+      --warning: #f8961e;
+      --error: #ef233c;
+      --dark: #2b2d42;
+      --light: #f8f9fa;
+      --gray: #adb5bd;
+      --gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--light);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      position: relative;
+    }
+
+    /* Animated background particles */
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(67, 97, 238, 0.15);
+      animation: float 15s infinite ease-in-out;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(10px, -15px) rotate(5deg); }
+      50% { transform: translate(-5px, -10px) rotate(-5deg); }
+      75% { transform: translate(-10px, 5px) rotate(3deg); }
+    }
+
+    /* Page container */
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header styles */
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 1rem;
+    }
+
+    .page-header p {
+      color: #94a3b8;
+      max-width: 700px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+    }
+
+    /* Card styles */
+    .card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      transition: var(--transition);
+      border: 1px solid rgba(79, 70, 229, 0.2);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      padding: 1.5rem;
+      background: var(--gradient);
+      color: white;
+      position: relative;
+    }
+
+    .card-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    /* Course card specific styles */
+    .course-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .course-thumbnail {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .course-card:hover .course-thumbnail {
+      transform: scale(1.02);
+    }
+
+    .course-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--light);
+      margin: 1rem 0 0.5rem;
+    }
+
+
+
+    .course-description {
+      margin-bottom: 1.5rem;
+      color: #94a3b8;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-primary {
+      background-color: rgba(67, 97, 238, 0.2);
+      color: var(--primary-light);
+    }
+
+    .badge-secondary {
+      background-color: rgba(248, 37, 133, 0.2);
+      color: var(--secondary);
+    }
+
+    .course-price {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary-light);
+      margin-top: 1rem;
+    }
+
+    /* Payment methods */
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      transition: var(--transition);
+      background: rgba(15, 23, 42, 0.5);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+    }
+
+    .wallet-option:hover {
+      transform: translateX(5px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    .wallet-option.active {
+      border: 2px solid var(--primary);
+      background-color: rgba(67, 97, 238, 0.3);
+    }
+
+    .wallet-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-right: 1rem;
+      background: rgba(15, 23, 42, 0.7);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .wallet-icon img {
+      width: 50px;
+      height: 56px;
+      object-fit: contain;
+    }
+
+    .wallet-info {
+      flex: 1;
+    }
+
+    .wallet-label {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--light);
+    }
+
+    .wallet-id {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      font-family: monospace;
+    }
+
+    /* Telda QR Code styles */
+    .Wallet-QR-image {
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .wallet-option[data-method="telda"].active .Wallet-QR-image {
+      display: block;
+    }
+
+    .Wallet-QR-image img {
+      max-width: 150px;
+      height: auto;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-sm);
+      margin-top: 0.5rem;
+    }
+
+    /* Form elements */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--light);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      transition: var(--transition);
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--light);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .form-control[readonly] {
+      background-color: rgba(15, 23, 42, 0.3);
+    }
+
+    /* File upload */
+    .file-input {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .file-input input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+    }
+
+    .file-input-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      background-color: rgba(15, 23, 42, 0.3);
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .file-input-label:hover {
+      border-color: var(--primary);
+      background-color: rgba(67, 97, 238, 0.2);
+    }
+
+    .file-input-icon {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .file-input-text {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    .file-input-text strong {
+      color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(67, 97, 238, 0.6);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-block {
+      display: flex;
+      width: 100%;
+    }
+
+    /* Status messages */
+    .status {
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      display: none;
+    }
+
+    .status i {
+      font-size: 1.25rem;
+    }
+
+    .status-success {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(76, 201, 240, 0.3);
+      display: flex;
+    }
+
+    .status-error {
+      background-color: rgba(239, 35, 60, 0.1);
+      color: var(--error);
+      border: 1px solid rgba(239, 35, 60, 0.3);
+      display: flex;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background-color: #1e293b;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      width: 100%;
+      max-width: 500px;
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(79, 70, 229, 0.2);
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+      background: var(--gradient);
+      color: white;
+      text-align: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .modal-icon {
+      font-size: 4rem;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      animation: bounceIn 0.8s;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    .modal-message {
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+      color: #94a3b8;
+    }
+
+    .modal-footer {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Layout */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Utility classes */
+    .text-primary { color: var(--primary-light); }
+    .text-center { text-align: center; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+    .mb-3 { margin-bottom: 1.5rem; }
+    .mb-4 { margin-bottom: 2rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-4 { gap: 1rem; }
+
+
+    .logo {
+  display: flex;
+  align-items: center;
+  animation: logoFloat 4s ease-in-out infinite;
+}
+
+.logo img {
+  height: 162px; /* Adjust as needed */
+  width: 310px;
+  margin-right: 10px; /* Space between logo and text */
+}
+
+    .back-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: #4a6cf7;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin: 15px;
+}
+
+.back-button:hover {
+  background-color: #3a5cd8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.back-button i {
+  margin-right: 8px;
+}
+  </style>
+</head>
+<body>
+  <!-- Animated particles will be added by JavaScript -->
+  
+  <div class="page-container">
+   <div class="logo">
+  <img src="../../uploads/orycomLogo.png" alt="Orycom Logo">
+</div>
+<a href="javascript:history.back()" class="back-button">
+  <i class="fas fa-arrow-left"></i>
+  Back
+</a>
+    <div class="page-header">
+      <h1><i class="fas fa-lock"></i> Secure Payment Portal</h1>
+      <p>Complete your course enrollment by selecting a payment method and submitting your payment receipt</p>
+    </div>
+
+    <div class="container">
+      <!-- Course Info Section -->
+      <div class="card course-card" style="animation: fadeInDown 0.8s ease-out;">
+        <div class="card-header">
+          <h2><i class="fas fa-book-open"></i> Course Details</h2>
+        </div>
+        <div class="card-body">
+          <img id="courseThumbnail" src="" alt="Course thumbnail" class="course-thumbnail">
+          
+          <h3 id="courseTitle" class="course-title">Loading course...</h3>
+          
+          <p id="courseDesc" class="course-description"></p>
+          
+          <div class="mb-3">
+            <span id="categoryBadge" class="badge badge-primary"></span>
+            <span id="levelBadge" class="badge badge-secondary"></span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="form-label">Duration</p>
+              <p id="durationText" class="font-medium"></p>
+            </div>
+            <div>
+              <p class="form-label">Price</p>
+              <p id="priceText" class="course-price"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Request Form -->
+      <div class="card" style="animation: slideInRight 0.8s ease-out;">
+        <div class="card-header">
+          <h2><i class="fas fa-credit-card"></i> Payment Request</h2>
+        </div>
+        <div class="card-body">
+          <div id="formStatus" class="status"></div>
+          
+          <form id="paymentForm" enctype="multipart/form-data">
+            <input type="hidden" name="courseId" id="courseIdInput">
+            
+            <div class="form-group">
+              <label class="form-label">Selected Course</label>
+              <div id="selectedCourseName" class="font-medium text-primary"></div>
+            </div>
+            
+            <div class="form-group">
+              <label for="amountInput" class="form-label">Amount (EGP)</label>
+              <input type="number" name="amount" id="amountInput" class="form-control" required readonly>
+            </div>
+            
+            <h3 class="form-label mb-2"><i class="fas fa-wallet"></i> Step 1: Choose Payment Method</h3>
+            
+            <div class="mb-4">
+              <div class="wallet-option" data-method="instapay">
+                <div class="wallet-icon">
+                  <img src="../uploads/instapay.png" alt="Instapay" >
+                </div>
+                <div class="wallet-info">
+                  <div class="wallet-label">Instapay</div>
+                  <div class="wallet-id" id="instapayId">01001209763</div>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm copy-btn" data-copy-target="instapayId">
+                  <i class="fas fa-copy"></i> Copy
+                </button>
+              </div>
+              
+              <div class="wallet-option" data-method="vodafone_cash">
+                <div class="wallet-icon">
+                  <img src="../uploads/vodafone.png" alt="Vodafone Cash">
+                </div>
+                <div class="wallet-info">
+                  <div class="wallet-label">Vodafone Cash</div>
+                  <div class="wallet-id" id="vodafoneId">01001209763</div>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm copy-btn" data-copy-target="vodafoneId">
+                  <i class="fas fa-copy"></i> Copy
+                </button>
+              </div>
+              
+              <div class="wallet-option" data-method="etisalat_cash">
+                <div class="wallet-icon">
+                  <img src="../uploads/etisalat.png" alt="Etisalat Cash">
+                </div>
+                <div class="wallet-info">
+                  <div class="wallet-label">Etisalat Cash</div>
+                  <div class="wallet-id" id="etisalatId">01001209763</div>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm copy-btn" data-copy-target="etisalatId">
+                  <i class="fas fa-copy"></i> Copy
+                </button>
+              </div>
+              
+              <div class="wallet-option" data-method="orange_cash">
+                <div class="wallet-icon">
+                  <img src="../uploads/orange.png" alt="Orange Cash">
+                </div>
+                <div class="wallet-info">
+                  <div class="wallet-label">Orange Cash</div>
+                  <div class="wallet-id" id="orangeId">01001209763</div>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm copy-btn" data-copy-target="orangeId">
+                  <i class="fas fa-copy"></i> Copy
+                </button>
+              </div>
+            </div>
+            
+            <h3 class="form-label mb-2"><i class="fas fa-paper-plane"></i> Step 2: Submit Payment Details</h3>
+            
+            <div class="form-group">
+              <label for="paymentMethod" class="form-label">Payment Method</label>
+              <select name="method" id="paymentMethod" class="form-control" required>
+                <option value="">Select payment method</option>
+                <option value="instapay">Instapay</option>
+                <option value="vodafone_cash">Vodafone Cash</option>
+                <option value="etisalat_cash">Etisalat Cash</option>
+                <option value="orange_cash">Orange Cash</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Recipient Wallet ID</label>
+              <div class="flex gap-2">
+                <input type="text" name="walletId" id="walletIdInput" class="form-control" readonly required>
+                <button type="button" id="copyWalletDynamic" class="btn btn-primary">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="payerPhone" class="form-label"></label>Wallet Phone Number</label>
+              <input type="text" name="PhoneNumber" id="payerPhone" class="form-control" placeholder="Enter your wallet number" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Payment Receipt (Screenshot)</label>
+              <div class="file-input">
+                <label class="file-input-label">
+                  <div class="file-input-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                  </div>
+                  <div class="file-input-text">
+                    <strong>Click to upload</strong> or drag and drop
+                  </div>
+                  <div class="file-input-text" id="fileName">
+                    PNG, JPG up to 5MB
+                  </div>
+                  <input type="file" name="screenshot" accept="image/*" required>
+                </label>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+              <span id="submitText">Submit Payment Request</span>
+              <span id="submitSpinner" class="spinner" style="display: none;"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirmationModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Payment Request Submitted!</h3>
+      </div>
+      <div class="modal-body">
+        <div class="modal-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="modal-message">
+          <p>Your payment request has been successfully submitted for approval.</p>
+          <p>The course will be confirmed within 24 hours. If you don't receive confirmation, please contact our <a href="help.html" style="color: var(--primary-light); font-weight:600;">help center</a>.</p>
+          <p class="mt-3"><strong>Status:</strong> <span class="badge badge-primary">Pending Approval</span></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="modalCloseBtn">
+          <i class="fas fa-check"></i> Continue
+        </button>
+      </div>
+    </div>
+  </div>
+   <script>
+// Create animated background particles
+document.addEventListener('DOMContentLoaded', function() {
+  const body = document.querySelector('body');
+  
+  // Create large background particles
+  for (let i = 0; i < 12; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 100 + 20;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.top = `${Math.random() * 100}%`;
+    particle.style.animationDelay = `${Math.random() * 5}s`;
+    particle.style.animationDuration = `${Math.random() * 10 + 15}s`;
+    
+    // Randomize colors between primary and secondary
+    const colors = ['rgba(67, 97, 238, 0.15)', 'rgba(247, 37, 133, 0.15)'];
+    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    
+    body.appendChild(particle);
+  }
+});
+
+const API_URL = 'http://localhost:3000'; // Change to your backend URL
+const params = new URLSearchParams(window.location.search);
+const courseId = params.get('id');
+const token = localStorage.getItem('token');
+
+// DOM elements
+const courseTitleEl = document.getElementById('courseTitle');
+const courseDescEl = document.getElementById('courseDesc');
+const priceTextEl = document.getElementById('priceText');
+const durationTextEl = document.getElementById('durationText');
+const categoryBadge = document.getElementById('categoryBadge');
+const levelBadge = document.getElementById('levelBadge');
+const courseThumbnail = document.getElementById('courseThumbnail');
+const selectedCourseName = document.getElementById('selectedCourseName');
+const amountInput = document.getElementById('amountInput');
+const courseIdInput = document.getElementById('courseIdInput');
+const walletIdInput = document.getElementById('walletIdInput');
+const payerPhoneInput = document.getElementById('payerPhone');
+const formStatus = document.getElementById('formStatus');
+const paymentMethodSelect = document.getElementById('paymentMethod');
+const submitBtn = document.getElementById('submitBtn');
+const submitText = document.getElementById('submitText');
+const submitSpinner = document.getElementById('submitSpinner');
+const confirmationModal = document.getElementById('confirmationModal');
+const modalCloseBtn = document.getElementById('modalCloseBtn');
+const fileNameEl = document.getElementById('fileName');
+
+// Payment provider data with icons
+const walletTargets = {
+  instapay: {
+    id: document.getElementById('instapayId').textContent.trim(),
+    icon: 'https://cdn-icons-png.flaticon.com/512/196/196566.png'
+  },
+  vodafone_cash: {
+    id: document.getElementById('vodafoneId').textContent.trim(),
+    icon: 'https://cdn-icons-png.flaticon.com/512/732/732244.png'
+  },
+  etisalat_cash: {
+    id: document.getElementById('etisalatId').textContent.trim(),
+    icon: 'https://cdn-icons-png.flaticon.com/512/888/888882.png'
+  },
+  orange_cash: {
+    id: document.getElementById('orangeId').textContent.trim(),
+    icon: 'https://cdn-icons-png.flaticon.com/512/888/888883.png'
+  },
+
+};
+
+// Initialize the page
+function initPage() {
+  if (!courseId) {
+    showError('Missing course ID in URL parameters');
+    return;
+  }
+  
+  loadCourse();
+  setupEventListeners();
+}
+
+// Fetch course details from API
+async function loadCourse() {
+  try {
+    showLoading(true);
+    const res = await fetch(`${API_URL}/api/courses/${courseId}`);
+    const payload = await res.json();
+    
+    if (!res.ok) {
+      throw new Error(payload.error || 'Failed to fetch course');
+    }
+
+    const course = payload.data || payload.course || payload;
+    updateCourseUI(course);
+    
+
+
+  } catch (err) {
+    console.error('Course loading error:', err);
+    showError('Failed to load course details. Please try again later.');
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Update course information in the UI
+function updateCourseUI(course) {
+  courseTitleEl.textContent = course.title;
+  courseDescEl.textContent = course.description || 'No description available';
+  priceTextEl.textContent = course.price?.toFixed(2) || '0.00';
+  durationTextEl.textContent = course.duration ? `${course.duration} hours` : 'N/A';
+  categoryBadge.textContent = course.category || 'General';
+  levelBadge.textContent = course.level || 'All Levels';
+  
+  selectedCourseName.textContent = course.title;
+  amountInput.value = course.price || 0;
+  courseIdInput.value = course._id || courseId;
+  
+  // Set course thumbnail
+  if (course.thumbnail) {
+    courseThumbnail.src = course.thumbnail.startsWith('http') 
+      ? course.thumbnail 
+      : `${API_URL}/uploads/${course.thumbnail}`;
+  } else {
+    courseThumbnail.src = 'https://via.placeholder.com/400x225?text=No+Image';
+  }
+  
+}
+
+
+
+
+// Set up all event listeners
+function setupEventListeners() {
+  // Copy buttons for wallet IDs
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(btn => {
+    btn.addEventListener('click', handleCopyClick);
+  });
+
+  // Dynamic wallet ID copy button
+  document.getElementById('copyWalletDynamic').addEventListener('click', () => {
+    if (walletIdInput.value) {
+      navigator.clipboard.writeText(walletIdInput.value);
+      showTooltip('Copied to clipboard!', document.getElementById('copyWalletDynamic'));
+    }
+  });
+
+  // Payment method selection
+  paymentMethodSelect.addEventListener('change', (e) => {
+    const method = e.target.value;
+    updateWalletSelection(method);
+  });
+
+  // Wallet option click (alternative to dropdown)
+  document.querySelectorAll('.wallet-option').forEach(option => {
+    option.addEventListener('click', () => {
+      const method = option.dataset.method;
+      paymentMethodSelect.value = method;
+      updateWalletSelection(method);
+    });
+  });
+
+  // File input change
+  document.querySelector('input[type="file"]').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      fileNameEl.textContent = file.name;
+    } else {
+      fileNameEl.textContent = 'PNG, JPG up to 5MB';
+    }
+  });
+// phone number input validation
+  payerPhoneInput.addEventListener('input', (e) => {
+    const cleaned = e.target.value.replace(/\D/g, '');
+    e.target.value = cleaned;
+  });
+// phone number change validation
+  payerPhoneInput.addEventListener('change', (e) => {
+    const phone = e.target.value;
+    if (phone.length < 10 || phone.length > 15) {
+      showError('Please enter a valid phone number with 10 to 15 digits.');
+      e.target.focus();
+    } else {
+      formStatus.style.display = 'none';
+    }
+  });
+
+  // Form submission
+  document.getElementById('paymentForm').addEventListener('submit', handleFormSubmit);
+
+  // Modal close button
+  modalCloseBtn.addEventListener('click', () => {
+    confirmationModal.classList.remove('active');
+    // Redirect to dashboard after successful submission
+    window.location.href = 'Student-Dashboard.html';
+  });
+}
+
+// Update wallet selection in UI
+function updateWalletSelection(method) {
+  if (!method) return;
+  
+  // Update all wallet options active state
+  document.querySelectorAll('.wallet-option').forEach(option => {
+    option.classList.toggle('active', option.dataset.method === method);
+  });
+  
+  // Update wallet ID input
+  walletIdInput.value = walletTargets[method]?.id || '';
+}
+
+// Handle copy button clicks
+function handleCopyClick(e) {
+  e.stopPropagation();
+  const targetId = this.dataset.copyTarget;
+  const text = document.getElementById(targetId).textContent.trim();
+  
+  navigator.clipboard.writeText(text).then(() => {
+    this.innerHTML = '<i class="fas fa-check"></i> Copied';
+    setTimeout(() => {
+      this.innerHTML = '<i class="fas fa-copy"></i> Copy';
+    }, 2000);
+  }).catch(err => {
+    console.error('Copy failed:', err);
+  });
+}
+
+// Handle form submission
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  // Validate user is logged in
+  if (!token) {
+    showError('You must be logged in to submit a payment request. Please log in and try again.');
+    return;
+  }
+  
+  // Validate form
+  if (!paymentMethodSelect.value) {
+    showError('Please select a payment method');
+    return;
+  }
+  
+  // Show loading state
+  submitText.textContent = 'Processing...';
+  submitSpinner.style.display = 'inline-block';
+  submitBtn.disabled = true;
+  
+  // Prepare form data
+  const form = e.target;
+  const formData = new FormData(form);
+  
+  try {
+    const res = await fetch(`${API_URL}/api/payment-requests/submit`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    });
+    
+    const result = await res.json();
+    
+    if (!res.ok) {
+      throw new Error(result.error || 'Payment request submission failed');
+    }
+    
+    // Show success modal
+    showConfirmationModal();
+    
+    // Reset form
+    form.reset();
+    fileNameEl.textContent = 'PNG, JPG up to 5MB';
+    walletIdInput.value = '';
+    payerPhoneInput.value = '';
+    
+  } catch (err) {
+    console.error('Submission error:', err);
+    showError(err.message || 'Failed to submit payment request. Please try again.');
+  } finally {
+    // Reset button state
+    submitText.textContent = 'Submit Payment Request';
+    submitSpinner.style.display = 'none';
+    submitBtn.disabled = false;
+  }
+}
+
+// Show confirmation modal
+function showConfirmationModal() {
+  confirmationModal.classList.add('active');
+}
+
+// Show error message
+function showError(message) {
+  formStatus.className = 'status status-error';
+  formStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+  formStatus.style.display = 'flex';
+}
+
+// Show loading state
+function showLoading(isLoading) {
+  if (isLoading) {
+    courseTitleEl.textContent = 'Loading course...';
+    courseThumbnail.src = '';
+  }
+}
+
+// Show tooltip (for copy confirmation)
+function showTooltip(message, element) {
+  const tooltip = document.createElement('div');
+  tooltip.className = 'tooltip';
+  tooltip.textContent = message;
+  tooltip.style.position = 'absolute';
+  tooltip.style.backgroundColor = 'rgba(0,0,0,0.7)';
+  tooltip.style.color = 'white';
+  tooltip.style.padding = '5px 10px';
+  tooltip.style.borderRadius = '4px';
+  tooltip.style.fontSize = '12px';
+  tooltip.style.zIndex = '100';
+  
+  const rect = element.getBoundingClientRect();
+  tooltip.style.top = `${rect.top - 35}px`;
+  tooltip.style.left = `${rect.left + rect.width / 2 - 50}px`;
+  
+  document.body.appendChild(tooltip); 
+  
+  setTimeout(() => {
+    tooltip.remove();
+  }, 2000);
+}
+
+// Initialize the page when DOM is loaded
+document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>
