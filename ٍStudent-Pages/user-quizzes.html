@@ -870,7 +870,7 @@
       }
     }
 
-                   .profile-img {
+    .profile-img {
       width: 60px;
       height: 60px;
       border-radius: 50%;
@@ -926,6 +926,43 @@
       opacity: 1;
       pointer-events: auto;
     }
+    
+    /* Improved status indicators */
+    .quiz-status {
+      display: flex;
+      align-items: center;
+      margin-top: 15px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .status-not-started {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+    }
+    
+    .status-in-progress {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+    }
+    
+    .status-submitted {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+    
+    .status-graded {
+      background-color: rgba(139, 92, 246, 0.15);
+      color: #8b5cf6;
+    }
+    
+    .attempt-info {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: rgba(240, 246, 255, 0.7);
+    }
   </style>
 </head>
 <body>
@@ -940,77 +977,77 @@
     </div>
 
     <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar" >
-            <div class="sidebar-header">
-                <a href="../../index.html" class="sidebar-logo">
-                    <i class="fas fa-code"></i>
-                    CS-<span>IslamHatem</span>
-                </a>
-            </div>
-            
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="Student-Dashboard.html" class="nav-link">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="available-courses.html" class="nav-link">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Available Course Packages</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="available-lessons.html" class="nav-link">
-                        <i class="fas fa-book-open"></i>
-                        <span>Available Lessons</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="my-learning.html" class="nav-link">
-                        <i class="fas fa-tasks"></i>
-                        <span>My Learning</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="my-assignments.html" class="nav-link">
-                        <i class="fas fa-clipboard-list"></i>
-                        <span>My Assignments</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="user-quizzes.html" class="nav-link active">
-                        <i class="fas fa-question-circle"></i>
-                        <span>My Quizzes</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="student-streams.html" class="nav-link">
-                        <i class="fas fa-video"></i>
-                        <span>Online Meetings</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="student-profile.html" class="nav-link">
-                        <i class="fas fa-user"></i>
-                        <span>Profile</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="student-helpCenter.html" class="nav-link">
-                        <i class="fas fa-life-ring"></i>
-                        <span>Help Center</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="compiler.html" class="nav-link">
-                        <i class="fas fa-code"></i>
-                        <span>Compiler</span>
-                    </a>
-                </li>
-            </ul>
-        </aside>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../../index.html" class="sidebar-logo">
+          <i class="fas fa-code"></i>
+          CS-<span>IslamHatem</span>
+        </a>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="Student-Dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="available-courses.html" class="nav-link">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Available Course Packages</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="available-lessons.html" class="nav-link">
+            <i class="fas fa-book-open"></i>
+            <span>Available Lessons</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="my-learning.html" class="nav-link">
+            <i class="fas fa-tasks"></i>
+            <span>My Learning</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="my-assignments.html" class="nav-link">
+            <i class="fas fa-clipboard-list"></i>
+            <span>My Assignments</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="user-quizzes.html" class="nav-link active">
+            <i class="fas fa-question-circle"></i>
+            <span>My Quizzes</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="student-streams.html" class="nav-link">
+            <i class="fas fa-video"></i>
+            <span>Online Meetings</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="student-profile.html" class="nav-link">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="student-helpCenter.html" class="nav-link">
+            <i class="fas fa-life-ring"></i>
+            <span>Help Center</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="compiler.html" class="nav-link">
+            <i class="fas fa-code"></i>
+            <span>Compiler</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -1023,14 +1060,14 @@
         <button class="menu-toggle" id="menuToggle">
           <i class="fas fa-bars"></i>
         </button>
-         <div class="user-profile" id="userMenu">
-    <div class="profile-img">
-      <i class="fas fa-user"></i>
-    </div>
-    <a href="student-profile.html" class="ball profile">Profile</a>
-    <a onclick="logout()" class="ball logout">Logout</a>
-  </div>
-            </div>
+        <div class="user-profile" id="userMenu">
+          <div class="profile-img">
+            <i class="fas fa-user"></i>
+          </div>
+          <a href="student-profile.html" class="ball profile">Profile</a>
+          <a onclick="logout()" class="ball logout">Logout</a>
+        </div>
+      </div>
 
       <!-- Page Title -->
       <div>
@@ -1077,24 +1114,24 @@
     </main>
 
     <!-- Bottom Navigation - Mobile -->
-        <nav class="bottom-nav">
-            <a href="Student-Dashboard.html" class="nav-btn">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
-            </a>
-            <a href="available-courses.html" class="nav-btn" >
-                <i class="fas fa-graduation-cap"></i>
-                <span>Courses</span>
-            </a>
-            <a href="my-learning.html" class="nav-btn">
-                <i class="fas fa-book-open"></i>
-                <span>Lessons</span>
-            </a>
-            <a href="student-profile.html" class="nav-btn">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </a>
-        </nav>
+    <nav class="bottom-nav">
+      <a href="Student-Dashboard.html" class="nav-btn">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="available-courses.html" class="nav-btn">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Courses</span>
+      </a>
+      <a href="my-learning.html" class="nav-btn">
+        <i class="fas fa-book-open"></i>
+        <span>Lessons</span>
+      </a>
+      <a href="student-profile.html" class="nav-btn">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </a>
+    </nav>
 
     <!-- Exam Modal -->
     <div class="exam-modal" id="examModal">
@@ -1159,22 +1196,8 @@
       </div>
     </div>
   </div>
-<script>
-   const userMenu = document.getElementById("userMenu");
-                function logout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userInfo");
-      window.location.href = "../Login-Pages/login.html";
-    }
 
-    userMenu.addEventListener("click", () => {
-      userMenu.classList.toggle("active");
-    });
-</script>
   <script>
-
-
-
     // Global variables
     const BASE_URL = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/users";
     let currentQuizId = null;
@@ -1205,6 +1228,7 @@
       const examModal = document.getElementById('examModal');
       const submitQuizBtn = document.getElementById('submitQuizBtn');
       const loadingState = document.getElementById('loadingState');
+      const answerUploadForm = document.getElementById('answerUploadForm');
       
       // Show loading state initially
       loadingState.style.display = 'flex';
@@ -1231,12 +1255,24 @@
         submitAnswers();
       });
       
+      // PDF upload form submission
+      answerUploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        uploadPdfAnswer();
+      });
+      
       // Handle window resize
       window.addEventListener('resize', function() {
         if (window.innerWidth > 768) {
           sidebar.classList.remove('active');
           overlay.style.display = 'none';
         }
+      });
+
+      // User menu functionality
+      const userMenu = document.getElementById("userMenu");
+      userMenu.addEventListener("click", () => {
+        userMenu.classList.toggle("active");
       });
 
       // Load quizzes
@@ -1427,23 +1463,27 @@
           const type = quizTypeOf(q);
           
           // Determine status based on the QuizAttempt model structure
-          let statusClass, statusText;
+          let statusClass, statusText, statusDescription;
 
           if (q.reviewedAt) {
             statusClass = 'status-graded';
             statusText = 'Graded';
+            statusDescription = 'Your quiz has been graded';
           } 
           else if (q.attempted && q.submittedAt) {
             statusClass = 'status-completed';
             statusText = 'Submitted';
+            statusDescription = 'Your answers have been submitted';
           } 
           else if (q.attempted) {
             statusClass = 'status-pending';
             statusText = 'In Progress';
+            statusDescription = 'You have started this quiz';
           } 
           else {
             statusClass = 'status-pending';
             statusText = 'Not Started';
+            statusDescription = 'You have not started this quiz yet';
           }
 
           // Get grade class for styling
@@ -1475,23 +1515,36 @@
               </div>
             </div>
             
+            <div class="quiz-status ${statusClass.replace('status-', 'status-')}">
+              <i class="fas fa-${statusText === 'Graded' ? 'check-circle' : 
+                                statusText === 'Submitted' ? 'paper-plane' : 
+                                statusText === 'In Progress' ? 'spinner' : 'play-circle'}"></i>
+              <span style="margin-left: 8px;">${statusDescription}</span>
+            </div>
+            
+            ${q.submittedAt ? `
+              <div class="attempt-info">
+                <i class="fas fa-calendar"></i>
+                Submitted on: ${new Date(q.submittedAt).toLocaleDateString()}
+              </div>
+            ` : ''}
+            
             <div style="margin-top: 15px;">
-  ${
-    q.reviewedAt || (q.attempted && q.submittedAt)
-      ? `<button class="btn btn-primary" onclick="viewQuizResults('${encodeURIComponent(q.quizId)}')">
-          <i class="fas fa-chart-bar"></i> View Results
+  ${q.reviewedAt || (q.attempted && q.submittedAt)
+    ? `<button class="btn btn-primary" onclick="viewQuizResults('${encodeURIComponent(id)}')">
+        <i class="fas fa-chart-bar"></i> View Results
+       </button>`
+    : q.attempted
+      ? `<button class="btn btn-secondary" onclick="continueQuiz('${encodeURIComponent(id)}')">
+          <i class="fas fa-play-circle"></i> Continue Quiz
          </button>`
-      : q.attempted
-        ? `<button class="btn btn-secondary" onclick="continueQuiz('${encodeURIComponent(q.quizId)}')">
-            <i class="fas fa-play-circle"></i> Continue Quiz
+      : type === "structured"
+        ? `<button class="btn btn-primary" onclick="openStructuredQuiz('${encodeURIComponent(id)}')">
+            <i class="fas fa-play-circle"></i> Start Quiz
            </button>`
-        : q.type === "structured"
-          ? `<button class="btn btn-primary" onclick="openStructuredQuiz('${encodeURIComponent(q.quizId)}')">
-              <i class="fas fa-play-circle"></i> Start Quiz
-             </button>`
-          : `<button class="btn btn-secondary" onclick="openPdfQuiz('${encodeURIComponent(q.quizId)}')">
-              <i class="fas fa-upload"></i> Upload Answers
-             </button>`
+        : `<button class="btn btn-secondary" onclick="openPdfQuiz('${encodeURIComponent(id)}')">
+            <i class="fas fa-upload"></i> Upload Answers
+           </button>`
   }
 </div>
 
@@ -1788,6 +1841,9 @@ ${q.reviewedAt ? `
             return;
           } else if (attempt.submittedAt) {
             uploadStatus.textContent = "⚠ Your submission is pending grading";
+            // Disable the upload form if already submitted
+            document.getElementById("answerFile").disabled = true;
+            document.querySelector(".btn-pdf-upload").disabled = true;
           }
         } else {
           uploadStatus.textContent = "";
@@ -1891,6 +1947,13 @@ ${q.reviewedAt ? `
         console.error("Error fetching results:", err);
         alert("Error loading results. Please try again.");
       }
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userInfo");
+      window.location.href = "../Login-Pages/login.html";
     }
   </script>
 </body>
