@@ -262,7 +262,7 @@
 
     .btn-admin:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.4);
+      box-shadow: 0 8px 20px rgba(255, 153, 0, 极速4);
     }
 
     .btn-secondary {
@@ -417,6 +417,40 @@
       color: #ff4d4d;
     }
 
+    /* Upload Progress Styling */
+    .upload-progress {
+      margin-top: 15px;
+      display: none;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--admin-gradient);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .remaining-time {
+      color: var(--admin-accent);
+      font-size: 0.85rem;
+      margin-top: 5px;
+    }
+
     /* Responsive Design */
     @media (max-width: 992px) {
       .sidebar {
@@ -543,6 +577,16 @@
                 <i class="fas fa-file-pdf"></i> Choose Material File
               </div>
               <div id="material-file-name" class="file-name"></div>
+              <div id="material-progress" class="upload-progress">
+                <div class="progress-info">
+                  <span class="progress-percentage">0%</span>
+                  <span class="progress-speed">0 MB/s</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <div class="remaining-time">Remaining: Calculating...</div>
+              </div>
             </div>
           </div>
 
@@ -554,6 +598,16 @@
                 <i class="fas fa-video"></i> Choose Video File
               </div>
               <div id="video-file-name" class="file-name"></div>
+              <div id="video-progress" class="upload-progress">
+                <div class="progress-info">
+                  <span class="progress-percentage">0%</span>
+                  <span class="progress-speed">0 MB/s</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <div class="remaining-time">Remaining: Calculating...</div>
+              </div>
             </div>
           </div>
 
@@ -565,6 +619,16 @@
                 <i class="fas fa-image"></i> Choose Thumbnail Image
               </div>
               <div id="thumbnail-file-name" class="file-name"></div>
+              <div id="thumbnail-progress" class="upload-progress">
+                <div class="progress-info">
+                  <span class="progress-percentage">0%</span>
+                  <span class="progress-speed">0 MB/s</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <div class="remaining-time">Remaining: Calculating...</div>
+              </div>
             </div>
           </div>
 
@@ -618,6 +682,11 @@
     const alertSuccess = document.getElementById("alertSuccess");
     const alertError = document.getElementById("alertError");
 
+    // Upload progress elements
+    const materialProgress = document.getElementById("material-progress");
+    const videoProgress = document.getElementById("video-progress");
+    const thumbnailProgress = document.getElementById("thumbnail-progress");
+
     // Helper functions
     function pickData(json) {
       if (json && typeof json === "object" && "data" in json) return json.data;
@@ -651,6 +720,23 @@
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminInfo");
       window.location.href = "../Login-Pages/admin-login.html";
+    }
+
+    // Format file size to human readable format
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Format time to human readable format
+    function formatTime(seconds) {
+      if (seconds < 60) return `${Math.ceil(seconds)} seconds`;
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.ceil(seconds % 60);
+      return `${minutes}m ${remainingSeconds}s`;
     }
 
     // File name display
@@ -822,7 +908,7 @@
       }
     });
 
-    // Upload files
+    // Upload files with progress tracking
     document.getElementById("fileForm").addEventListener("submit", async e => {
       e.preventDefault();
       const lessonId = lessonSelect.value;
@@ -837,52 +923,145 @@
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
       submitBtn.disabled = true;
 
+      // Reset progress bars
+      resetProgressBars();
+
       const formData = new FormData();
+      let hasFiles = false;
+      
       if (materialInput.files[0]) {
         formData.append("material", materialInput.files[0]);
+        hasFiles = true;
+        materialProgress.style.display = "block";
       }
       if (videoInput.files[0]) {
         formData.append("video", videoInput.files[0]);
+        hasFiles = true;
+        videoProgress.style.display = "block";
       }
       if (thumbnailInput.files[0]) {
         formData.append("thumbnail", thumbnailInput.files[0]);
+        hasFiles = true;
+        thumbnailProgress.style.display = "block";
+      }
+
+      if (!hasFiles) {
+        showError("Please select at least one file to upload.");
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        return;
       }
 
       try {
-        const res = await fetch(`${LESSON_API}/${lessonId}/files`, {
-          method: "PUT",
-          headers: { Authorization: "Bearer " + token },
-          body: formData
+        const xhr = new XMLHttpRequest();
+        
+        // Track upload progress
+        xhr.upload.addEventListener("progress", function(event) {
+          if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            updateProgressBars(percentComplete, event.loaded, event.total, event.timeStamp);
+          }
         });
-
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-
-        if (res.ok) {
-          showSuccess("✅ Files uploaded successfully!");
-          // Clear file inputs
-          materialInput.value = "";
-          videoInput.value = "";
-          thumbnailInput.value = "";
-          materialFileName.textContent = "";
-          videoFileName.textContent = "";
-          thumbnailFileName.textContent = "";
-          // Refresh preview
-          lessonSelect.dispatchEvent(new Event("change"));
-        } else {
-          const errorData = await res.json();
-          showError("❌ Failed to upload files: " + (errorData.message || "Unknown error"));
-        }
+        
+        xhr.addEventListener("load", function() {
+          if (xhr.status === 200 || xhr.status === 201) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              showSuccess("✅ Files uploaded successfully!");
+              // Clear file inputs
+              materialInput.value = "";
+              videoInput.value = "";
+              thumbnailInput.value = "";
+              materialFileName.textContent = "";
+              videoFileName.textContent = "";
+              thumbnailFileName.textContent = "";
+              // Hide progress bars
+              materialProgress.style.display = "none";
+              videoProgress.style.display = "none";
+              thumbnailProgress.style.display = "none";
+              // Refresh preview
+              lessonSelect.dispatchEvent(new Event("change"));
+            } catch (e) {
+              showError("❌ Failed to parse server response.");
+            }
+          } else {
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              showError("❌ Failed to upload files: " + (errorData.message || "Unknown error"));
+            } catch (e) {
+              showError("❌ Failed to upload files. Server returned status: " + xhr.status);
+            }
+          }
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        });
+        
+        xhr.addEventListener("error", function() {
+          showError("❌ Network error. Please check your connection and try again.");
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        });
+        
+        xhr.open("PUT", `${LESSON_API}/${lessonId}/files`);
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+        xhr.send(formData);
+        
       } catch (e) {
         console.error("Upload error:", e);
         showError("❌ Failed to upload files. Please try again.");
-      } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
       }
     });
+
+    // Progress tracking variables
+    let uploadStartTime = 0;
+    let lastLoaded = 0;
+    let lastTime = 0;
+    
+    function resetProgressBars() {
+      uploadStartTime = Date.now();
+      lastLoaded = 0;
+      lastTime = uploadStartTime;
+      
+      const progressBars = document.querySelectorAll('.progress-fill');
+      const percentages = document.querySelectorAll('.progress-percentage');
+      const speeds = document.querySelectorAll('.progress-speed');
+      const times = document.querySelectorAll('.remaining-time');
+      
+      progressBars.forEach(bar => bar.style.width = '0%');
+      percentages.forEach(el => el.textContent = '0%');
+      speeds.forEach(el => el.textContent = '0 MB/s');
+      times.forEach(el => el.textContent = 'Remaining: Calculating...');
+    }
+    
+    function updateProgressBars(percentComplete, loaded, total, timestamp) {
+      const currentTime = Date.now();
+      const elapsedTime = (currentTime - uploadStartTime) / 1000; // in seconds
+      
+      // Calculate upload speed
+      const speed = (loaded - lastLoaded) / (currentTime - lastTime) * 1000; // bytes per second
+      const speedMB = (speed / (1024 * 1024)).toFixed(2);
+      
+      // Calculate remaining time
+      const remainingBytes = total - loaded;
+      const remainingTime = speed > 0 ? remainingBytes / speed : 0;
+      
+      // Update all progress bars
+      const progressBars = document.querySelectorAll('.progress-fill');
+      const percentages = document.querySelectorAll('.progress-percentage');
+      const speeds = document.querySelectorAll('.progress-speed');
+      const times = document.querySelectorAll('.remaining-time');
+      
+      progressBars.forEach(bar => bar.style.width = percentComplete + '%');
+      percentages.forEach(el => el.textContent = Math.round(percentComplete) + '%');
+      speeds.forEach(el => el.textContent = speedMB + ' MB/s');
+      times.forEach(el => el.textContent = 'Remaining: ' + formatTime(remainingTime));
+      
+      // Update tracking variables
+      lastLoaded = loaded;
+      lastTime = currentTime;
+    }
 
     // Initial load
     loadCourses();
