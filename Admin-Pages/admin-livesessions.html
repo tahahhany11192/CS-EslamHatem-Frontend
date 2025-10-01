@@ -720,6 +720,7 @@
           const tr = document.createElement("tr");
           const now = new Date();
           const scheduledTime = new Date(session.scheduledAt);
+          scheduledTime=scheduledTime-3;
           const isUpcoming = scheduledTime > now;
           const isLive = scheduledTime <= now && scheduledTime.getTime() + (session.duration * 60000) > now.getTime();
           
