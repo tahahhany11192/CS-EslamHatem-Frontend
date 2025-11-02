@@ -19,13 +19,13 @@
 
   <script>
     const token = localStorage.getItem("adminToken");
-    const API_URL = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/task-submissions";
+    const API_URL = "https://cs-eslam-hatem.fly.dev/api/task-submissions";
 
     // ✅ Fetch all submissions
     async function fetchSubmissions() {
   try {
     const token = localStorage.getItem("adminToken");
-    const res = await fetch("https://cs-eslamhatem-backend-1i25nw.fly.dev/api/tasks/submissions", {
+    const res = await fetch("https://cs-eslam-hatem.fly.dev/api/tasks/submissions", {
       headers: {
         "Authorization": `Bearer ${token}`
       }
