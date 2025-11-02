@@ -602,7 +602,7 @@
   </div>
 
   <script>
-    const API_URL = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/profile";
+    const API_URL = "https://cs-eslam-hatem.fly.dev/api/admin/profile";
     const token = localStorage.getItem("adminToken");
 
     if (!token) {
@@ -675,7 +675,7 @@
         
         // Set profile photo
         if (admin.photo) {
-          profilePhoto.src = `https://cs-eslamhatem-backend-1i25nw.fly.dev${admin.photo}`;
+          profilePhoto.src = `https://cs-eslam-hatem.fly.dev${admin.photo}`;
         } else {
           profilePhoto.src = "https://via.placeholder.com/150";
         }
