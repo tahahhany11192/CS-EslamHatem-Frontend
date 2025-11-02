@@ -1166,7 +1166,7 @@
         let screenStream = null;
         let cameraVideoTrack = null;
 
-        const socket = io("https://cs-eslamhatem-backend-1i25nw.fly.dev", {
+        const socket = io("https://cs-eslam-hatem.fly.dev", {
             query: { adminId },
             transports: ['polling'],
             reconnection: true,
@@ -1675,7 +1675,7 @@
         async function loadCourses() {
             try {
                 const token = localStorage.getItem('adminToken');
-                const res = await fetch( `https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/courses`, {
+                const res = await fetch( `https://cs-eslam-hatem.fly.dev/api/admin/courses`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 const data = await res.json();
