@@ -1139,7 +1139,7 @@
     let videoEnabled = false;
     let assistantName = localStorage.getItem('assistantName') || `assistant ${assistantId.substring(0, 8)}`;
 
-    const socket = io("https://cs-eslam-hatem.fly.dev", {
+    const socket = io("https://cs-eslamhatem-backend-1i25nw.fly.dev", {
         query: { assistantId },
         transports: ['polling'],
         reconnectionAttempts: 5,
