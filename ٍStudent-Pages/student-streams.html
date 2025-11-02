@@ -677,7 +677,7 @@
       });
 
       // Load streams
-      loadStreams();
+      loadLiveSessions();
     });
 
     function logout() {
@@ -686,95 +686,106 @@
       window.location.href = "../Login-Pages/login.html";
     }
 
-    async function loadStreams() {
-      const streamsContainer = document.getElementById('streamsContainer');
-      const alertError = document.getElementById('alertError');
-      
-      // Show loading state
-      streamsContainer.innerHTML = `
-        <div class="loading">
-          <div class="loading-spinner"></div>
-          <p>Loading available streams...</p>
-        </div>
-      `;
-      
-      // Hide any previous errors
-      alertError.style.display = 'none';
-      
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          window.location.href = '../Login-Pages/login.html';
-          return;
-        }
+    // ✅ Backend endpoint (correct)
+    const backendURL = "https://cs-eslam-hatem.fly.dev/api/users/my-live-sessions";
 
-        const response = await fetch('https://cs-eslamhatem-backend-1i25nw.fly.dev/api/users/available-live-sessions', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-
-        if (response.status === 401) {
-          localStorage.removeItem('token');
-          window.location.href = '../Login-Pages/login.html';
-          return;
-        }
-
-        const data = await response.json();
+    async function loadLiveSessions() {
+        const streamsContainer = document.getElementById('streamsContainer');
+        const alertError = document.getElementById('alertError');
         
-        if (!data.data || data.data.length === 0) {
-          streamsContainer.innerHTML = `
-            <div class="no-streams animate__animated animate__fadeIn">
-              <i class="fas fa-video-slash"></i>
-              <h3>No Live Sessions Available</h3>
-              <p>There are no live streams available for your courses right now.</p>
-              <p>Check back later or contact your instructors for schedule updates.</p>
-            </div>
-          `;
-          return;
-        }
-
-        streamsContainer.innerHTML = data.data.map(stream => `
-          <div class="stream-card animate__animated animate__fadeInUp">
-            <div class="stream-header">
-              <span class="live-badge"><i class="fas fa-circle"></i> LIVE NOW</span>
-              <h3 class="stream-title">${stream.courseTitle}</h3>
-              <p class="stream-instructor">
-                <i class="fas fa-chalkboard-teacher"></i>
-                Instructor: ${stream.instructorName}
-              </p>
-            </div>
-            <div class="stream-body">
-              <div class="stream-meta">
-                <span>${stream.subject || 'General Session'}</span>
-                <span class="stream-participants">
-                  <i class="fas fa-users"></i>
-                  ${stream.studentCount} participants
-                </span>
-              </div>
-              <a href="student-live.html?roomId=${stream.roomId}" class="join-btn">
-                <i class="fas fa-sign-in-alt"></i> Join Live Session
-              </a>
-            </div>
-          </div>
-        `).join('');
-      } catch (error) {
-        console.error('Error loading streams:', error);
+        // Show loading state
         streamsContainer.innerHTML = `
-          <div class="no-streams animate__animated animate__fadeIn">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Connection Error</h3>
-            <p>We couldn't load the available streams.</p>
-            <p>Please check your connection and try again.</p>
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading available streams...</p>
           </div>
         `;
         
-        // Show error alert
-        alertError.textContent = 'Error: Could not connect to the server. Please check your internet connection.';
-        alertError.style.display = 'block';
-      }
+        // Hide any previous errors
+        alertError.style.display = 'none';
+        
+        try {
+            // ✅ OPTIONAL: If you store token in localStorage instead of cookies
+            let headers = {};
+            if (localStorage.getItem("token")) {
+              headers["Authorization"] = "Bearer " + localStorage.getItem("token");
+            }
+
+            const res = await fetch(backendURL, {
+              credentials: "include",  // ✅ sends cookies
+              headers                  // ✅ sends Authorization if available
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = '../Login-Pages/login.html';
+                return;
+            }
+
+            const data = await res.json();
+            console.log('API response data:', data);
+
+            const container = document.getElementById("streamsContainer");
+            container.innerHTML = "";
+
+            if (!data.sessions || data.sessions.length === 0) {
+                container.innerHTML = `
+                  <div class="no-streams animate__animated animate__fadeIn">
+                    <i class="fas fa-video-slash"></i>
+                    <h3>No Live Sessions Available</h3>
+                    <p>There are no live sessions scheduled for your enrolled courses.</p>
+                  </div>
+                `;
+                return;
+            }
+
+            // Render sessions with the original design
+            container.innerHTML = data.sessions.map(session => {
+              const sessionTime = new Date(session.scheduledAt);
+              const now = new Date();
+              const isLive = now >= sessionTime && now <= new Date(sessionTime.getTime() + session.duration * 60000);
+              
+              return `
+                <div class="stream-card animate__animated animate__fadeInUp">
+                  <div class="stream-header">
+                    ${isLive ? '<span class="live-badge"><i class="fas fa-circle"></i> LIVE NOW</span>' : ''}
+                    <h3 class="stream-title">${session.title}</h3>
+                    <p class="stream-instructor">
+                      <i class="fas fa-book"></i>
+                      Course: ${session.course?.title || "Unknown"}
+                    </p>
+                  </div>
+                  <div class="stream-body">
+                    <div class="stream-meta">
+                      <span><i class="far fa-calendar"></i> ${sessionTime.toLocaleDateString()}</span>
+                      <span><i class="far fa-clock"></i> ${sessionTime.toLocaleTimeString()}</span>
+                    </div>
+                    <div class="stream-meta">
+                      <span><i class="fas fa-clock"></i> Duration: ${session.duration} mins</span>
+                    </div>
+                    
+                    <a href="https://easy-videoconf-1939.app.100ms.live/meeting/cut-whqh-nbo" class="join-btn" target="_blank">
+                      <i class="fas fa-sign-in-alt"></i> Join Session
+                    </a>
+                  </div>
+                </div>
+              `;
+            }).join('');
+            
+        } catch (err) {
+            console.error("Error loading sessions:", err);
+            streamsContainer.innerHTML = `
+              <div class="no-streams animate__animated animate__fadeIn">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Connection Error</h3>
+                <p>We couldn't load the available streams.</p>
+                <p>Error: ${err.message}</p>
+              </div>
+            `;
+            
+            alertError.textContent = `Error: ${err.message}`;
+            alertError.style.display = 'block';
+        }
     }
   </script>
 </body>
