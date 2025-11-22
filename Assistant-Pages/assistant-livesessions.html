@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    /* Your existing CSS styles remain the same */
     :root {
       --primary: #0066ff;
       --secondary: #00ccff;
@@ -767,16 +768,24 @@
         data.data.forEach(session => {
           const now = new Date();
           
-          // Handle timezone offset properly - FIXED: Use the date as is for display
+          // FIXED: Proper timezone handling
           let scheduledTime;
-          if (typeof session.scheduledAt === 'string' && session.scheduledAt.includes('Z')) {
-            // If it's already in ISO format with UTC, use it directly
-            scheduledTime = new Date(session.scheduledAt);
+          if (typeof session.scheduledAt === 'string') {
+            // If it's a string, check if it has timezone info
+            if (session.scheduledAt.includes('Z')) {
+              // UTC time - convert to local time for display
+              scheduledTime = new Date(session.scheduledAt);
+            } else {
+              // Local time string - add timezone offset to get correct UTC time
+              const localTime = new Date(session.scheduledAt);
+              // Convert to UTC by adding the timezone offset
+              scheduledTime = new Date(localTime.getTime() + (localTime.getTimezoneOffset() * 60000));
+            }
           } else if (typeof session.scheduledAt === 'number') {
             // If it's a timestamp
             scheduledTime = new Date(session.scheduledAt);
           } else {
-            // If it's a string without timezone, assume it's already in local time
+            // Fallback
             scheduledTime = new Date(session.scheduledAt);
           }
           
@@ -826,7 +835,7 @@
       }
     }
 
-    // Create session with proper time handling
+    // Create session with proper timezone handling
     document.getElementById("createSessionForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       
@@ -835,13 +844,16 @@
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
       submitBtn.disabled = true;
       
-      // Use the datetime-local value directly (it's already in local time)
+      // FIXED: Convert local datetime to UTC for storage
       const localDateTime = document.getElementById("scheduledAt").value;
+      const localDate = new Date(localDateTime);
+      // Convert to UTC by subtracting the timezone offset
+      const utcDateTime = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000));
       
       const body = {
         title: document.getElementById("title").value,
         description: document.getElementById("description").value,
-        scheduledAt: localDateTime, // Use local time directly
+        scheduledAt: utcDateTime.toISOString(), // Store as UTC
         duration: document.getElementById("duration").value,
         courseId: document.getElementById("courseId").value
       };
@@ -907,15 +919,20 @@
 
     // Open edit modal with proper timezone handling
     function openModal(id, title, description, scheduledAt, duration) {
-      // Handle timezone in modal - FIXED: Use the date as is
-      let displayTime = scheduledAt;
-      if (typeof scheduledAt === 'string' && scheduledAt.includes('Z')) {
-        // If it has timezone info, remove the 'Z' for datetime-local input
-        const time = new Date(scheduledAt);
-        displayTime = time.toISOString().slice(0, 16);
+      // FIXED: Proper timezone handling for modal
+      let displayTime;
+      if (typeof scheduledAt === 'string') {
+        if (scheduledAt.includes('Z')) {
+          // UTC time - convert to local for display in datetime-local input
+          const utcTime = new Date(scheduledAt);
+          // Convert UTC to local time for the input
+          displayTime = new Date(utcTime.getTime() - (utcTime.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+        } else {
+          // Local time - use as is
+          displayTime = scheduledAt.slice(0, 16);
+        }
       } else {
-        // If it doesn't have timezone info, use as is
-        displayTime = scheduledAt.slice(0, 16);
+        displayTime = new Date(scheduledAt).toISOString().slice(0, 16);
       }
 
       document.getElementById("editSessionId").value = id;
@@ -938,7 +955,7 @@
       document.getElementById("modalOverlay").onclick = null;
     }
 
-    // Handle edit form submit with proper time handling
+    // Handle edit form submit with proper timezone handling
     document.getElementById("editSessionForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       
@@ -949,13 +966,16 @@
       
       const id = document.getElementById("editSessionId").value;
       
-      // Use the datetime-local value directly (it's already in local time)
+      // FIXED: Convert local datetime to UTC for storage
       const localDateTime = document.getElementById("editScheduledAt").value;
+      const localDate = new Date(localDateTime);
+      // Convert to UTC by subtracting the timezone offset
+      const utcDateTime = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000));
       
       const body = {
         title: document.getElementById("editTitle").value,
         description: document.getElementById("editDescription").value,
-        scheduledAt: localDateTime, // Use local time directly
+        scheduledAt: utcDateTime.toISOString(), // Store as UTC
         duration: document.getElementById("editDuration").value
       };
       
