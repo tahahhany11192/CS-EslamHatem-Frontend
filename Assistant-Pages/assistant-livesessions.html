@@ -736,7 +736,7 @@
       }
     }
 
-    // Load sessions
+    // Load sessions with proper timezone handling
     async function loadSessions() {
       try {
         const res = await fetch(API_URL, {
@@ -766,7 +766,23 @@
         
         data.data.forEach(session => {
           const now = new Date();
-          const scheduledTime = new Date(session.scheduledAt);
+          
+          // Handle timezone offset properly
+          let scheduledTime;
+          if (typeof session.scheduledAt === 'string' && session.scheduledAt.includes('Z')) {
+            // If it's already in ISO format with UTC
+            scheduledTime = new Date(session.scheduledAt);
+          } else if (typeof session.scheduledAt === 'number') {
+            // If it's a timestamp
+            scheduledTime = new Date(session.scheduledAt);
+          } else {
+            // If it's a string without timezone, assume UTC and add 'Z'
+            scheduledTime = new Date(session.scheduledAt + 'Z');
+          }
+          
+          // Adjust for local timezone display
+          const localScheduledTime = new Date(scheduledTime.getTime() - (scheduledTime.getTimezoneOffset() * 60000));
+          
           const isUpcoming = scheduledTime > now;
           const isLive = scheduledTime <= now && scheduledTime.getTime() + (session.duration * 60000) > now.getTime();
           
@@ -790,7 +806,7 @@
                 <span class="course-badge">${session.course?.title || "N/A"}</span>
                 <span class="status-badge ${statusClass}">${statusText}</span>
               </div>
-              <div class="session-time">${new Date(session.scheduledAt).toLocaleString()}</div>
+              <div class="session-time">${localScheduledTime.toLocaleString()}</div>
             </div>
             <p class="session-description">${session.description || "No description provided."}</p>
             <div class="session-actions">
@@ -813,7 +829,7 @@
       }
     }
 
-    // Create session
+    // Create session with proper UTC conversion
     document.getElementById("createSessionForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       
@@ -822,10 +838,14 @@
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
       submitBtn.disabled = true;
       
+      // Convert local datetime to ISO string for UTC storage
+      const localDateTime = document.getElementById("scheduledAt").value;
+      const utcDateTime = new Date(localDateTime).toISOString();
+      
       const body = {
         title: document.getElementById("title").value,
         description: document.getElementById("description").value,
-        scheduledAt: document.getElementById("scheduledAt").value,
+        scheduledAt: utcDateTime, // Use UTC time
         duration: document.getElementById("duration").value,
         courseId: document.getElementById("courseId").value
       };
@@ -889,12 +909,24 @@
       }
     }
 
-    // Open edit modal
+    // Open edit modal with proper timezone handling
     function openModal(id, title, description, scheduledAt, duration) {
+      // Handle timezone in modal too
+      let displayTime = scheduledAt;
+      if (typeof scheduledAt === 'string' && !scheduledAt.includes('Z')) {
+        // If it doesn't have timezone info, assume it's UTC and convert
+        const utcTime = new Date(scheduledAt + 'Z');
+        displayTime = utcTime.toISOString().slice(0, 16);
+      } else {
+        // If it already has timezone info, use as is
+        const time = new Date(scheduledAt);
+        displayTime = time.toISOString().slice(0, 16);
+      }
+
       document.getElementById("editSessionId").value = id;
       document.getElementById("editTitle").value = title;
       document.getElementById("editDescription").value = description;
-      document.getElementById("editScheduledAt").value = scheduledAt.slice(0,16);
+      document.getElementById("editScheduledAt").value = displayTime;
       document.getElementById("editDuration").value = duration;
 
       document.getElementById("modalOverlay").style.display = "block";
@@ -911,7 +943,7 @@
       document.getElementById("modalOverlay").onclick = null;
     }
 
-    // Handle edit form submit
+    // Handle edit form submit with proper UTC conversion
     document.getElementById("editSessionForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       
@@ -921,10 +953,15 @@
       submitBtn.disabled = true;
       
       const id = document.getElementById("editSessionId").value;
+      
+      // Convert local datetime to ISO string for UTC storage
+      const localDateTime = document.getElementById("editScheduledAt").value;
+      const utcDateTime = new Date(localDateTime).toISOString();
+      
       const body = {
         title: document.getElementById("editTitle").value,
         description: document.getElementById("editDescription").value,
-        scheduledAt: document.getElementById("editScheduledAt").value,
+        scheduledAt: utcDateTime, // Use UTC time
         duration: document.getElementById("editDuration").value
       };
       
