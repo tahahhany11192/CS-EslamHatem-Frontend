@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Streams | CS-IslamHatem</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Join Live Session - CS-IslamHatem</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #0066ff;
       --secondary: #00ccff;
       --accent: #ff00cc;
-      --admin-accent: #ff9900;
       --dark: #0a1128;
       --light: #f0f6ff;
       --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+      --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
+      --admin-accent: #ff9900;
       --admin-gradient: linear-gradient(135deg, var(--primary), var(--admin-accent));
       --sidebar-width: 250px;
       --header-height: 70px;
+      --live-color: #ff3366;
+      --live-gradient: linear-gradient(135deg, var(--live-color), #ff66a3);
     }
 
     * {
@@ -124,6 +126,9 @@
       flex: 1;
       margin-left: var(--sidebar-width);
       padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     /* Header */
@@ -180,190 +185,90 @@
       background: var(--admin-accent);
     }
 
-    /* Content Cards */
-    .content-card {
+    /* Maintenance Content */
+    .maintenance-container {
+      text-align: center;
+      max-width: 600px;
+      padding: 40px;
       background: rgba(10, 17, 40, 0.8);
       backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 30px;
+      border-radius: 20px;
       border: 1px solid rgba(255, 153, 0, 0.2);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
     }
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .maintenance-icon {
+      font-size: 5rem;
+      color: var(--admin-accent);
       margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid rgba(255, 153, 0, 0.2);
     }
 
-    .card-header h2 {
+    .maintenance-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
-      color: var(--light);
-    }
-
-    /* Streams Grid */
-    .streams-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 25px;
-    }
-
-    .stream-card {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      animation: fadeInUp 0.8s ease;
-      position: relative;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .stream-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 35px rgba(0, 204, 255, 0.3);
-    }
-
-    .stream-header {
-      padding: 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      background: linear-gradient(45deg, rgba(0, 102, 255, 0.3), rgba(0, 204, 255, 0.2));
-    }
-
-    .stream-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: white;
-      font-family: 'Orbitron', sans-serif;
-    }
-
-    .stream-instructor {
-      color: rgba(255,255,255,0.7);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stream-body {
-      padding: 20px;
-    }
-
-    .stream-meta {
-      display: flex;
-      justify-content: space-between;
+      font-size: 2.5rem;
       margin-bottom: 20px;
-      color: rgba(255,255,255,0.7);
-      font-size: 0.9rem;
+      background: var(--admin-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .stream-participants {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .maintenance-message {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .arabic-message {
+      direction: rtl;
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      line-height: 1.8;
       color: var(--secondary);
     }
 
-    .live-badge {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background-color: #ff4d4d;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 0.75rem;
+    /* Buttons */
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 30px;
+      font-family: 'Exo 2', sans-serif;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.9; }
-      50% { opacity: 1; }
-      100% { opacity: 0.9; }
-    }
-
-    .join-btn {
-      display: flex;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      outline: none;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      width: 100%;
-      padding: 12px;
+    }
+
+    .btn-admin {
       background: var(--admin-gradient);
       color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      box-shadow: 0 5px 15px rgba(255, 153, 0, 0.3);
+      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
     }
 
-    .join-btn:hover {
+    .btn-admin:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.5);
+      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.4);
     }
 
-    .no-streams {
-      text-align: center;
-      padding: 60px 40px;
-      color: rgba(255,255,255,0.7);
-      grid-column: 1 / -1;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-      border: 1px solid rgba(255, 153, 0, 0.2);
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
     }
 
-    .no-streams i {
-      font-size: 3rem;
-      color: var(--admin-accent);
-      margin-bottom: 20px;
-      opacity: 0.7;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 60px;
-      grid-column: 1 / -1;
-    }
-
-    .loading-spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(0, 102, 255, 0.1);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Alerts */
-    .alert {
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .alert-error {
-      background: rgba(255, 77, 77, 0.1);
-      border-left: 4px solid #ff4d4d;
-      color: #ff4d4d;
+    .btn:hover::before {
+      left: 100%;
     }
 
     /* Responsive Design */
@@ -384,10 +289,6 @@
       
       .main-content {
         margin-left: 70px;
-      }
-      
-      .streams-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       }
     }
 
@@ -411,8 +312,16 @@
         flex-direction: column;
       }
       
-      .streams-grid {
-        grid-template-columns: 1fr;
+      .maintenance-container {
+        padding: 20px;
+      }
+      
+      .maintenance-title {
+        font-size: 2rem;
+      }
+      
+      .maintenance-message, .arabic-message {
+        font-size: 1rem;
       }
     }
   </style>
@@ -441,154 +350,40 @@
         <li><a href="admin-payment-requests.html" ><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
         <li><a href="admin-assistants.html"><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
         <li><a href="admin-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="admin-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="admin-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
         <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
         <li><a href="shareLive.html" class="active"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
       </ul>
     </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
-      <!-- Header -->
-      <header class="header">
-        <h1><i class="fas fa-video"></i> Live Streams</h1>
-        <div class="user-menu">
-          <div class="user-info">
-            <div class="user-name">Admin User</div>
-            <div class="user-role">Super Administrator</div>
-          </div>
-          <button class="logout-btn" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i> Logout
-          </button>
+    <main class="main-content">
+      <div class="maintenance-container">
+        <div class="maintenance-icon">
+          <i class="fas fa-tools"></i>
         </div>
-      </header>
-
-      <!-- Alerts -->
-      <div id="alertError" class="alert alert-error"></div>
-      
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-broadcast-tower"></i> Active Live Sessions</h2>
-          <button class="btn-admin" onclick="loadStreams()">
-            <i class="fas fa-sync-alt"></i> Refresh
-          </button>
+        <h1 class="maintenance-title">Under Maintenance</h1>
+        
+        <div class="arabic-message">
+          هذه الصفحة قيد الصيانة وغير متاحة حالياً، يمكنك الانضمام لأي بث مباشر من خلال تبويب الجلسات المباشرة
         </div>
         
-        <div class="streams-grid" id="streamsContainer">
-          <div class="loading">
-            <div class="loading-spinner"></div>
-            <p>Loading available streams...</p>
-          </div>
+        <div class="maintenance-message">
+          This page is under maintenance and it's not available right now, you can join any live session from the Live Sessions Tab
         </div>
+        
+        <button class="btn btn-admin" onclick="redirectToLiveSessions()">
+          <i class="fas fa-video"></i> Go to Live Sessions
+        </button>
       </div>
-    </div>
+    </main>
   </div>
 
   <script>
-    // Mock data for demonstration (remove this in production)
-
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadStreams();
-    });
-
-    async function loadStreams() {
-      const streamsContainer = document.getElementById('streamsContainer');
-      const alertError = document.getElementById('alertError');
-      
-      // Show loading state
-      streamsContainer.innerHTML = `
-        <div class="loading">
-          <div class="loading-spinner"></div>
-          <p>Loading available streams...</p>
-        </div>
-      `;
-      
-      // Hide any previous errors
-      alertError.style.display = 'none';
-      
-      try {
-        const token = localStorage.getItem('adminToken');
-        if (!token) {
-          window.location.href = '../Login-Pages/admin-login.html';
-          return;
-        }
-
-      
-        const response = await fetch('https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/available-live-sessions', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-
-        if (response.status === 401) {
-          localStorage.removeItem('adminToken');
-          window.location.href = '../Login-Pages/admin-login.html';
-          return;
-        }
-
-        const data = await response.json();
-      
-        
-        // For demo purposes, we'll use mock data with a delay to simulate network request
-        await new Promise(resolve => setTimeout(resolve, 1500));
-       
-        
-        if (!data.data || data.data.length === 0) {
-          streamsContainer.innerHTML = `
-            <div class="no-streams animate__animated animate__fadeIn">
-              <i class="fas fa-video-slash"></i>
-              <h3>No Live Sessions Available</h3>
-              <p>There are no live streams available for your courses right now.</p>
-              <p>Check back later or contact your instructors for schedule updates.</p>
-            </div>
-          `;
-          return;
-        }
-
-        streamsContainer.innerHTML = data.data.map(stream => `
-          <div class="stream-card animate__animated animate__fadeInUp">
-            <div class="stream-header">
-              <span class="live-badge"><i class="fas fa-circle"></i> LIVE NOW</span>
-              <h3 class="stream-title">${stream.courseTitle}</h3>
-              <p class="stream-instructor">
-                <i class="fas fa-chalkboard-teacher"></i>
-                Instructor: ${stream.instructorName}
-              </p>
-            </div>
-            <div class="stream-body">
-              <div class="stream-meta">
-                <span>${stream.subject || 'General Session'}</span>
-                <span class="stream-participants">
-                  <i class="fas fa-users"></i>
-                  ${stream.studentCount} participants
-                </span>
-              </div>
-              <a href="admin-live.html?roomId=${stream.roomId}" class="join-btn">
-                <i class="fas fa-sign-in-alt"></i> Join Live Session
-              </a>
-            </div>
-          </div>
-        `).join('');
-      } catch (error) {
-        console.error('Error loading streams:', error);
-        streamsContainer.innerHTML = `
-          <div class="no-streams animate__animated animate__fadeIn">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Connection Error</h3>
-            <p>We couldn't load the available streams.</p>
-            <p>Please check your connection and try again.</p>
-          </div>
-        `;
-        
-        // Show error alert
-        alertError.textContent = 'Error: Could not connect to the server. Please check your internet connection.';
-        alertError.style.display = 'block';
-      }
+    function redirectToLiveSessions() {
+      window.location.href = "admin-livesessions.html";
     }
-
+    
     function logout() {
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminInfo");
