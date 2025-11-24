@@ -773,7 +773,7 @@
           
           // If the time is showing +2 hours, subtract 2 hours to correct it
           // This is the core fix for the display issue
-          const correctedTime = new Date(scheduledTime.getTime());
+          const correctedTime = new Date(scheduledTime.getTime()- (2 * 60 * 60 * 1000);
           
           const isUpcoming = scheduledTime > now;
           const isLive = scheduledTime <= now && scheduledTime.getTime() + (session.duration * 60000) > now.getTime();
