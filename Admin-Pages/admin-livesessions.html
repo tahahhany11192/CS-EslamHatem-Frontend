@@ -720,6 +720,7 @@
           const tr = document.createElement("tr");
           const now = new Date();
           const scheduledTime = new Date(session.scheduledAt );
+          const correctedTime = new Date(scheduledTime.getTime()- (2 * 60 * 60 * 1000));
           const isUpcoming = scheduledTime > now;
           const isLive = true;
           
@@ -737,7 +738,7 @@
           tr.innerHTML = `
             <td>${session.title}</td>
             <td>${session.course?.title || "N/A"}</td>
-            <td>${scheduledTime.toLocaleString()}</td>
+            <td>${correctedTime.toLocaleString()}</td>
             <td>${session.duration || "-"} mins</td>
             <td><span class="${statusClass}">${statusText}</span></td>
             <td>
