@@ -756,10 +756,10 @@
                     </p>
                   </div>
                   <div class="stream-body">
-                    <div class="stream-meta">
-                      <span><i class="far fa-calendar"></i> ${sessionTime.toLocaleDateString()}</span>
-                      <span><i class="far fa-clock"></i> ${sessionTime.toLocaleTimeString()}</span>
-                    </div>
+<div class="stream-meta">
+  <span><i class="far fa-calendar"></i> ${sessionTime.toLocaleDateString('en-US', { timeZone: 'UTC' })}</span>
+  <span><i class="far fa-clock"></i> ${sessionTime.toLocaleTimeString('en-US', { timeZone: 'UTC', hour12: true, hour: 'numeric', minute: '2-digit', second: '2-digit' })}</span>
+</div>
                     <div class="stream-meta">
                       <span><i class="fas fa-clock"></i> Duration: ${session.duration} mins</span>
                     </div>
