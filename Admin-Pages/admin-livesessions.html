@@ -722,7 +722,7 @@
           const scheduledTime = new Date(session.scheduledAt );
           const correctedTime = new Date(scheduledTime.getTime()- (2 * 60 * 60 * 1000));
           const isUpcoming = scheduledTime > now;
-          const isLive = true;
+          const isLive = correctedTime <= now && correctedTime.getTime() + (session.duration * 60000) > now.getTime();
           
           let statusText = "Completed";
           let statusClass = "status-completed";
