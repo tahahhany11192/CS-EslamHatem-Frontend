@@ -505,6 +505,36 @@
             margin-bottom: 25px;
             color: rgba(240, 246, 255, 0.7);
         }
+
+        .examples-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 204, 255, 0.2);
+        }
+
+        .examples-section h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .example-btn {
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--light);
+            border: 1px solid var(--primary);
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .example-btn:hover {
+            background: rgba(0, 102, 255, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -687,32 +717,31 @@
         }
 
         // Function to check compiler access
-async function checkCompilerAccess() {
-    try {
-        // Get user and token from localStorage
-        const user = JSON.parse(localStorage.getItem("user"));
-        const token = localStorage.getItem("token");
+        async function checkCompilerAccess() {
+            try {
+                // Get user and token from localStorage
+                const user = JSON.parse(localStorage.getItem("user"));
+                const token = localStorage.getItem("token");
 
-        // Check if user or token is missing
-        if (!user || !token) {
-            // Not logged in → redirect to login
-            window.location.href = '../Login-Pages/login.html';
-            return;
+                // Check if user or token is missing
+                if (!user || !token) {
+                    // Not logged in → redirect to login
+                    window.location.href = '../Login-Pages/login.html';
+                    return;
+                }
+
+                // ✅ Simple access check based on user info
+                // Example: you can check a role or a paidCourses array here
+                if (user.role === "student" && user.hasCompilerAccess === true) {
+                    renderCompiler();
+                } else {
+                    showAccessDenied();
+                }
+            } catch (err) {
+                console.error("Error checking compiler access:", err);
+                showAccessDenied();
+            }
         }
-
-        // ✅ Simple access check based on user info
-        // Example: you can check a role or a paidCourses array here
-        if (user.role === "student" && user.hasCompilerAccess === true) {
-            renderCompiler();
-        } else {
-            showAccessDenied();
-        }
-    } catch (err) {
-        console.error("Error checking compiler access:", err);
-        showAccessDenied();
-    }
-}
-
 
         // Show access denied message
         function showAccessDenied() {
@@ -733,14 +762,13 @@ async function checkCompilerAccess() {
             compilerContent.innerHTML = `
                 <div class="compiler-container">
                     <div class="compiler-header">
-                        
                         <h2 class="compiler-title">Pseudocode Compiler</h2>
                     </div>
                     
                     <label for="codeInput"><strong>Enter your pseudocode:</strong></label>
                     <textarea id="codeInput" class="code-input" placeholder="Example:
-Declare x : INTEGER   
 x <- 5
+OUTPUT \"Islam\"
 OUTPUT x"></textarea>
                     
                     <div class="compiler-btn-group">
@@ -753,11 +781,61 @@ OUTPUT x"></textarea>
                     
                     <div class="output-panel" id="outputBox"></div>
                     <div class="explanation-panel" id="explanationBox"></div>
+                    
+                    <div class="examples-section">
+                        <h3>Try These Examples:</h3>
+                        <button class="example-btn" onclick="loadExample('forLoop')">For Loop Example</button>
+                        <button class="example-btn" onclick="loadExample('outputExample')">Output Example</button>
+                        <button class="example-btn" onclick="loadExample('whileLoop')">While Loop Example</button>
+                    </div>
                 </div>
             `;
 
             // Initialize the compiler functionality
             initCompiler();
+        }
+
+        // Example code snippets
+        const examples = {
+            forLoop: `// For Loop Example
+// Can end with 'next' or 'next variable'
+FOR count <- 1 TO 5
+    OUTPUT "Iteration: ", count
+NEXT count
+
+// Another example with variable name
+FOR i <- 1 TO 3
+    OUTPUT "Hello ", i
+NEXT i`,
+
+            outputExample: `// Output Example
+// Strings need quotes, variables don't
+x <- 5
+name <- "Islam"
+OUTPUT "Name: ", name
+OUTPUT "Value: ", x
+OUTPUT "Combined: ", name, " has value ", x`,
+
+            whileLoop: `// While Loop Example
+count <- 0
+WHILE count <= 5
+    OUTPUT "Count is: ", count
+    count <- count + 1
+ENDWHILE
+
+// Another while example
+total <- 0
+num <- 1
+WHILE num <= 10
+    total <- total + num
+    num <- num + 1
+ENDWHILE
+OUTPUT "Sum of 1 to 10: ", total`
+        };
+
+        function loadExample(exampleName) {
+            document.getElementById('codeInput').value = examples[exampleName];
+            resetCompiler();
         }
 
         // Compiler functionality
@@ -784,47 +862,6 @@ OUTPUT x"></textarea>
                 autoRunInterval: null,
                 rawLines: []
             };
-        }
-
-        function getBlockEnd(startLine) {
-            const startLineText = executionState.rawLines[startLine];
-            const startIndent = startLineText.search(/\S/);
-            let depth = 0;
-            
-            for (let i = startLine + 1; i < executionState.rawLines.length; i++) {
-                const currentLine = executionState.rawLines[i];
-                const currentIndent = currentLine.search(/\S/);
-                
-                if (currentIndent === -1) continue; // Skip empty lines
-                
-                // Check for block starters
-                if (/^\s*(IF|FOR|WHILE|REPEAT)\b/i.test(currentLine)) {
-                    depth++;
-                    continue;
-                }
-                
-                // Check for block terminators
-                if (/^\s*(END IF|NEXT|ENDWHILE|UNTIL)\b/i.test(currentLine)) {
-                    if (depth > 0) {
-                        depth--;
-                        continue;
-                    }
-                    // Special case: END IF must match IF indentation
-                    if (/^\s*END IF\b/i.test(currentLine)) {
-                        const endIfIndent = currentLine.search(/\S/);
-                        if (endIfIndent !== startIndent) {
-                            continue; // Keep searching for properly indented END IF
-                        }
-                    }
-                    return i;
-                }
-                
-                // Base case for same-level termination
-                if (currentIndent <= startIndent && depth === 0) {
-                    return i;
-                }
-            }
-            return executionState.rawLines.length;
         }
 
         function prepareExecution() {
@@ -936,8 +973,8 @@ OUTPUT x"></textarea>
             
             try {
                 const exBox = document.getElementById('explanationBox');
-                if (line === '') {
-                    exBox.textContent = 'Skipping empty line.';
+                if (line === '' || line.startsWith('//')) {
+                    exBox.textContent = line.startsWith('//') ? 'Comment: ' + line : 'Skipping empty line.';
                     executionState.currentLine++;
                     return true;
                 }
@@ -994,16 +1031,19 @@ OUTPUT x"></textarea>
                     return true;
                 }
 
-                // OUTPUT
+                // OUTPUT - Enhanced to handle both strings and variables
                 if (/^OUTPUT\s+(.+)$/i.test(line)) {
                     const expressions = line.match(/^OUTPUT\s+(.+)$/i)[1].split(',').map(e => e.trim());
                     const values = expressions.map(e => {
+                        // If it's a quoted string, return the string without quotes
                         if (/^".*"$/.test(e)) {
                             return e.slice(1, -1);
                         }
+                        // Otherwise, try to evaluate as variable or expression
                         try {
                             return evalInScope(replaceVars(e), executionState.variables);
                         } catch (err) {
+                            // If evaluation fails, return the original expression
                             return e;
                         }
                     });
@@ -1012,6 +1052,121 @@ OUTPUT x"></textarea>
                     document.getElementById('outputBox').textContent = executionState.output;
                     exBox.textContent = `Outputting: ${combined}`;
                     executionState.currentLine++;
+                    return true;
+                }
+
+                // FOR loop - Enhanced to handle both 'next' and 'next variable'
+                if (/^FOR\s+(\w+)\s*<-\s*(\w+|\d+)\s+TO\s+(\w+|\d+)$/i.test(line)) {
+                    const [, varName, startStr, endStr] = line.match(/^FOR\s+(\w+)\s*<-\s*(\w+|\d+)\s+TO\s+(\w+|\d+)$/i);
+
+                    const start = isNaN(startStr) ? 
+                        (executionState.variables.hasOwnProperty(startStr) ? executionState.variables[startStr] : parseInt(startStr)) : 
+                        parseInt(startStr);
+
+                    const end = isNaN(endStr) ? 
+                        (executionState.variables.hasOwnProperty(endStr) ? executionState.variables[endStr] : parseInt(endStr)) : 
+                        parseInt(endStr);
+
+                    executionState.variables[varName] = start;
+
+                    executionState.stack.push({
+                        type: 'FOR',
+                        line: executionState.currentLine,
+                        varName: varName,
+                        end: end
+                    });
+
+                    exBox.textContent = `FOR loop started: ${varName} from ${start} to ${end}`;
+                    executionState.currentLine++;
+                    return true;
+                }
+
+                // NEXT handler - Enhanced to handle both 'next' and 'next variable'
+                if (/^NEXT\s*(\w*)$/i.test(line)) {
+                    const [, varName] = line.match(/^NEXT\s*(\w*)$/i);
+                    
+                    // Find the last FOR in the stack
+                    for (let i = executionState.stack.length - 1; i >= 0; i--) {
+                        const loop = executionState.stack[i];
+                        if (loop.type === 'FOR') {
+                            // If variable name is provided, verify it matches
+                            if (varName && varName !== loop.varName) {
+                                continue; // Keep looking for matching FOR loop
+                            }
+                            
+                            executionState.variables[loop.varName]++;
+                            
+                            if (executionState.variables[loop.varName] <= loop.end) {
+                                executionState.currentLine = loop.line + 1;
+                                exBox.textContent = `Looping again FOR ${loop.varName} = ${executionState.variables[loop.varName]}`;
+                            } else {
+                                executionState.stack.splice(i, 1);  // Remove this FOR loop
+                                executionState.currentLine++;
+                                exBox.textContent = `Exiting FOR loop (${loop.varName})`;
+                            }
+                            return true;
+                        }
+                    }
+
+                    exBox.textContent = "Error: NEXT without matching FOR";
+                    executionState.isRunning = false;
+                    return false;
+                }
+
+                // WHILE loop - Enhanced with proper structure
+                if (/^WHILE\s+(.+)$/i.test(line)) {
+                    const condition = line.match(/^WHILE\s+(.+)$/i)[1];
+                    const result = evalInScope(replaceVars(condition), executionState.variables);
+                    
+                    if (!result) {
+                        // Skip the entire while block
+                        let depth = 0;
+                        for (let j = executionState.currentLine + 1; j < executionState.rawLines.length; j++) {
+                            const checkLine = executionState.rawLines[j].trim();
+                            if (/^WHILE\s+.+$/i.test(checkLine)) depth++;
+                            else if (/^ENDWHILE$/i.test(checkLine)) {
+                                if (depth === 0) {
+                                    executionState.currentLine = j + 1;
+                                    exBox.textContent = `Skipping WHILE loop.`;
+                                    return true;
+                                } else {
+                                    depth--;
+                                }
+                            }
+                        }
+                    }
+                    
+                    executionState.stack.push({ 
+                        type: 'WHILE', 
+                        line: executionState.currentLine, 
+                        condition 
+                    });
+                    
+                    exBox.textContent = `Entering WHILE loop. Condition: ${condition}`;
+                    executionState.currentLine++;
+                    return true;
+                }
+
+                // ENDWHILE
+                if (/^ENDWHILE$/i.test(line)) {
+                    const loopIndex = executionState.stack.findIndex(item => item.type === 'WHILE');
+                    if (loopIndex === -1) {
+                        exBox.textContent = "Error: ENDWHILE without matching WHILE";
+                        executionState.isRunning = false;
+                        return false;
+                    }
+                    
+                    const loop = executionState.stack[loopIndex];
+                    const result = evalInScope(replaceVars(loop.condition), executionState.variables);
+                    
+                    if (result) {
+                        executionState.currentLine = loop.line + 1;
+                        exBox.textContent = "Repeating WHILE loop.";
+                    } else {
+                        executionState.stack.splice(loopIndex, 1);
+                        executionState.currentLine++;
+                        exBox.textContent = "Exiting WHILE loop.";
+                    }
                     return true;
                 }
 
@@ -1089,114 +1244,6 @@ OUTPUT x"></textarea>
                         return false;
                     }
                     executionState.currentLine++;
-                    return true;
-                }
-
-                // FOR loop
-                if (/^FOR\s+(\w+)\s*<-\s*(\w+|\d+)\s+TO\s+(\w+|\d+)(?:\s+DO)?$/i.test(line)) {
-                    const [, varName, startStr, endStr] = line.match(/^FOR\s+(\w+)\s*<-\s*(\w+|\d+)\s+TO\s+(\w+|\d+)(?:\s+DO)?$/i);
-
-                    const start = isNaN(startStr) ? 
-                        (executionState.variables.hasOwnProperty(startStr) ? executionState.variables[startStr] : parseInt(startStr)) : 
-                        parseInt(startStr);
-
-                    const end = isNaN(endStr) ? 
-                        (executionState.variables.hasOwnProperty(endStr) ? executionState.variables[endStr] : parseInt(endStr)) : 
-                        parseInt(endStr);
-
-                    executionState.variables[varName] = start;
-
-                    executionState.stack.push({
-                        type: 'FOR',
-                        line: executionState.currentLine,
-                        varName: varName,
-                        end: end
-                    });
-
-                    exBox.textContent = `FOR loop started: ${varName} from ${start} to ${end}`;
-                    executionState.currentLine++;
-                    return true;
-                }
-
-                // NEXT handler
-                if (/^NEXT$/i.test(line)) {
-                    // Find the last FOR in the stack (top-most unmatched FOR)
-                    for (let i = executionState.stack.length - 1; i >= 0; i--) {
-                        const loop = executionState.stack[i];
-                        if (loop.type === 'FOR') {
-                            const varName = loop.varName;
-                            executionState.variables[varName]++;
-
-                            if (executionState.variables[varName] <= loop.end) {
-                                executionState.currentLine = loop.line + 1;
-                                exBox.textContent = `Looping again FOR ${varName} = ${executionState.variables[varName]}`;
-                            } else {
-                                executionState.stack.splice(i, 1);  // Remove this FOR loop
-                                executionState.currentLine++;
-                                exBox.textContent = `Exiting FOR loop (${varName})`;
-                            }
-                            return true;
-                        }
-                    }
-
-                    exBox.textContent = "Error: NEXT without matching FOR";
-                    executionState.isRunning = false;
-                    return false;
-                }
-
-                // WHILE
-                if (/^WHILE\s+(.+)\s+DO$/i.test(line)) {
-                    const condition = line.match(/^WHILE\s+(.+)\s+DO$/i)[1];
-                    const result = evalInScope(replaceVars(condition), executionState.variables);
-                    
-                    if (!result) {
-                        let depth = 0;
-                        for (let j = executionState.currentLine + 1; j < executionState.rawLines.length; j++) {
-                            const checkLine = executionState.rawLines[j].trim();
-                            if (/^WHILE\s+.+\s+DO$/i.test(checkLine)) depth++;
-                            else if (/^ENDWHILE$/i.test(checkLine)) {
-                                if (depth === 0) {
-                                    executionState.currentLine = j + 1;
-                                    exBox.textContent = `Skipping WHILE loop.`;
-                                    return true;
-                                } else {
-                                    depth--;
-                                }
-                            }
-                        }
-                    }
-                    
-                    executionState.stack.push({ 
-                        type: 'WHILE', 
-                        line: executionState.currentLine, 
-                        condition 
-                    });
-                    
-                    exBox.textContent = `Entering WHILE loop.`;
-                    executionState.currentLine++;
-                    return true;
-                }
-
-                // ENDWHILE
-                if (/^ENDWHILE$/i.test(line)) {
-                    const loopIndex = executionState.stack.findIndex(item => item.type === 'WHILE');
-                    if (loopIndex === -1) {
-                        exBox.textContent = "Error: ENDWHILE without matching WHILE";
-                        executionState.isRunning = false;
-                        return false;
-                    }
-                    
-                    const loop = executionState.stack[loopIndex];
-                    const result = evalInScope(replaceVars(loop.condition), executionState.variables);
-                    
-                    if (result) {
-                        executionState.currentLine = loop.line + 1;
-                        exBox.textContent = "Repeating WHILE loop.";
-                    } else {
-                        executionState.stack.splice(loopIndex, 1);
-                        executionState.currentLine++;
-                        exBox.textContent = "Exiting WHILE loop.";
-                    }
                     return true;
                 }
 
@@ -1289,7 +1336,6 @@ OUTPUT x"></textarea>
         
         function resetCompiler() {
             stopExecution();
-            document.getElementById('codeInput').value = '';
             document.getElementById('codeDisplay').innerHTML = '';
             document.getElementById('outputBox').textContent = '';
             document.getElementById('explanationBox').textContent = 'Enter your pseudocode and click "Run Next Step" or "Run Automatically"';
