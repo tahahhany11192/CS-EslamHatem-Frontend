@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS-IslamHatem | Live Classroom</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066ff;
+            --secondary: #00ccff;
+            --accent: #ff00cc;
+            --dark: #0a1128;
+            --light: #f0f6ff;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(255, 0, 204, 0.1) 0%, transparent 20%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 17, 40, 0.95);
+            border-bottom: 1px solid rgba(0, 204, 255, 0.2);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--light);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: var(--gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Motion Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--light);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 204, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--light), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px rgba(0, 204, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(0, 204, 255, 0.8), 0 0 30px rgba(0, 204, 255, 0.6);
+            }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: rgba(240, 246, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        /* Conference Section */
+        .conference-section {
+            padding: 40px 0;
+            margin: 0 auto;
+            max-width: 1200px;
+        }
+
+        .conference-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 204, 255, 0.2);
+            position: relative;
+        }
+
+        .conference-header {
+            background: var(--gradient);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .conference-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--light);
+        }
+
+        .conference-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .conference-frame {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            background: #000;
+        }
+
+        .conference-info {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(0, 204, 255, 0.1);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 204, 255, 0.1);
+        }
+
+        .info-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .info-card p {
+            color: rgba(240, 246, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 60px 0 30px;
+            margin-top: 100px;
+            border-top: 1px solid rgba(0, 204, 255, 0.2);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--light);
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: rgba(240, 246, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--secondary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--light);
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--gradient);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 204, 255, 0.1);
+        }
+
+        .footer-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--light);
+            margin-bottom: 15px;
+        }
+
+        .footer-logo span {
+            color: var(--secondary);
+        }
+
+        /* Animated Background Elements */
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -150px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            background: var(--accent);
+            bottom: -100px;
+            right: 20%;
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            width: 150px;
+            height: 150px;
+            background: var(--secondary);
+            top: 30%;
+            right: -75px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            50% {
+                transform: translate(20px, 20px) rotate(180deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .conference-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .conference-frame {
+                height: 50vh;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .conference-title {
+                font-size: 1.2rem;
+            }
+            
+            .conference-frame {
+                height: 40vh;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background Elements -->
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                CS-<span>IslamHatem</span>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="ٍStudent-Pages/available-lessons.html">Lessons</a>
+                <a href="ٍStudent-Pages/available-courses.html">Packages</a>
+                <a href="ٍStudent-Pages/Student-Dashboard.html">Dashboard</a>
+            </nav>
+            
+            <div class="auth-buttons">
+                <a href="Login-Pages/Login.html">
+                    <button class="btn btn-secondary">Login</button>
+                </a>
+                <a href="Login-Pages/Register.html">
+                    <button class="btn btn-primary">Register</button>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Live Classroom Session</h1>
+            <p>Join the interactive computer science class with Islam Hatem. Participate in real-time discussions, coding sessions, and collaborative learning.</p>
+        </div>
+    </section>
+
+    <!-- Conference Section -->
+    <section class="conference-section container">
+        <div class="conference-container">
+            <div class="conference-header">
+                <div class="conference-title">
+                    <i class="fas fa-video"></i> Computer Science Live Class
+                </div>
+                <div class="conference-controls">
+                    <button class="control-btn" title="Microphone">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="control-btn" title="Camera">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="control-btn" title="Screen Share">
+                        <i class="fas fa-desktop"></i>
+                    </button>
+                    <button class="control-btn" title="Participants">
+                        <i class="fas fa-users"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <iframe 
+                src="https://easy-videoconf-1939.app.100ms.live/meeting/cut-whqh-nbo" 
+                class="conference-frame"
+                allow="camera; microphone; display-capture"
+                allowfullscreen>
+            </iframe>
+            
+            <div class="conference-info">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> Session Information</h3>
+                        <p>Topic: Computer Science - Data Structures & Algorithms</p>
+                        <p>Instructor: Islam Hatem</p>
+                        <p>Duration: 60 minutes</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-tasks"></i> Today's Agenda</h3>
+                        <p>• Introduction to Arrays & Linked Lists</p>
+                        <p>• Time Complexity Analysis</p>
+                        <p>• Live Coding Examples</p>
+                        <p>• Q&A Session</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-headset"></i> Technical Support</h3>
+                        <p>If you're experiencing issues with audio or video:</p>
+                        <p>1. Check your internet connection</p>
+                        <p>2. Allow camera/microphone permissions</p>
+                        <p>3. Refresh the page if needed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>CS-IslamHatem</h3>
+                    <p>Revolutionizing computer science education for IG students worldwide through innovative teaching methods and cutting-edge technology.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="ٍStudent-Pages/available-courses.html">Courses</a></li>
+                        <li><a href="ٍStudent-Pages/available-courses.html">Packages</a></li>
+                        <li><a href="ٍStudent-Pages/compiler.html">Compiler</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="ٍStudent-Pages/available-lessons.html">Tutorials</a></li>
+                        <li><a href="ٍStudent-Pages/user-quizzes.html">Practice Exercises</a></li>
+                        <li><a href="ٍStudent-Pages/Student-Dashboard.html">IG Syllabus Guide</a></li>
+                        <li><a href="ٍStudent-Pages/student-helpCenter.html">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><a href="mailto:cs.islamhatem@gmail.com">cs.islamhatem@gmail.com</a></li>
+                        <li><a href="tel:+201001209763">+201001209763</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-logo">
+                    CS-<span>IslamHatem</span> &copy; 2023
+                </div>
+                <p>All rights reserved. Designed with ❤️ for computer science education.</p>
+                <p>Powered by Orycom ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple button animations
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('mouseenter', function(e) {
+                this.style.transform = 'translateY(-3px)';
+            });
+            
+            button.addEventListener('mouseleave', function(e) {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Control button functionality (placeholder)
+        document.querySelectorAll('.control-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // In a real implementation, this would control the iframe content
+                // For now, we'll just toggle an active state
+                this.classList.toggle('active');
+                
+                if (this.querySelector('.fa-microphone')) {
+                    if (this.classList.contains('active')) {
+                        this.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                    } else {
+                        this.innerHTML = '<i class="fas fa-microphone"></i>';
+                    }
+                }
+                
+                if (this.querySelector('.fa-video')) {
+                    if (this.classList.contains('active')) {
+                        this.innerHTML = '<i class="fas fa-video-slash"></i>';
+                    } else {
+                        this.innerHTML = '<i class="fas fa-video"></i>';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
