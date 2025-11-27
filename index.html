@@ -50,7 +50,7 @@
             top: 0;
             z-index: 1000;
             backdrop-filter: blur(10px);
-            background: rgba(10, 17, 40, 0.8);
+            background: rgba(10, 17, 40, 0.95);
             border-bottom: 1px solid rgba(0, 204, 255, 0.2);
         }
 
@@ -69,6 +69,7 @@
             font-size: 1.8rem;
             color: var(--light);
             text-decoration: none;
+            z-index: 1001;
         }
 
         .logo span {
@@ -109,6 +110,17 @@
             gap: 15px;
         }
 
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
         /* Motion Buttons */
         .btn {
             padding: 12px 25px;
@@ -122,6 +134,7 @@
             overflow: hidden;
             transition: all 0.3s ease;
             outline: none;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -204,6 +217,7 @@
             gap: 20px;
             justify-content: center;
             margin-bottom: 60px;
+            flex-wrap: wrap;
         }
 
         /* Features Section */
@@ -521,6 +535,56 @@
             color: var(--secondary);
         }
 
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: rgba(10, 17, 40, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            transition: right 0.3s ease;
+            padding: 100px 30px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu .nav-links {
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .mobile-menu .auth-buttons {
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
         /* Responsive Design */
         @media (max-width: 992px) {
             .about {
@@ -537,6 +601,10 @@
                 font-size: 2.8rem;
             }
             
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
             .hero-buttons {
                 flex-direction: column;
                 align-items: center;
@@ -544,6 +612,14 @@
             
             .nav-links {
                 display: none;
+            }
+            
+            .auth-buttons {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
             }
             
             .features, .testimonial-cards {
@@ -554,6 +630,10 @@
                 padding: 40px 20px;
             }
             
+            .cta h2 {
+                font-size: 2rem;
+            }
+            
             .footer-content {
                 grid-template-columns: 1fr;
                 text-align: center;
@@ -561,6 +641,45 @@
             
             .social-links {
                 justify-content: center;
+            }
+            
+            .about h2 {
+                font-size: 2rem;
+            }
+            
+            .testimonials .section-header h2 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .feature-card, .testimonial-card {
+                padding: 20px;
+            }
+            
+            .cta {
+                padding: 30px 15px;
+            }
+            
+            .cta h2 {
+                font-size: 1.8rem;
+            }
+            
+            .about h2 {
+                font-size: 1.8rem;
             }
         }
         
@@ -645,35 +764,59 @@
                 <a href="ٍStudent-Pages/Student-Dashboard.html">Dashboard</a>
             </nav>
             
-<div class="auth-buttons">
-  <a href="Login-Pages/Login.html">
-    <button class="btn btn-secondary">Login</button>
-  </a>
-  <a href="Login-Pages/Register.html">
-    <button class="btn btn-primary">Register</button>
-  </a>
-</div>
+            <div class="auth-buttons">
+                <a href="Login-Pages/Login.html">
+                    <button class="btn btn-secondary">Login</button>
+                </a>
+                <a href="Login-Pages/Register.html">
+                    <button class="btn btn-primary">Register</button>
+                </a>
+            </div>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="ٍStudent-Pages/available-lessons.html">Lessons</a>
+            <a href="ٍStudent-Pages/available-courses.html">Packages</a>
+            <a href="ٍStudent-Pages/Student-Dashboard.html">Dashboard</a>
+        </nav>
+        
+        <div class="auth-buttons">
+            <a href="Login-Pages/Login.html">
+                <button class="btn btn-secondary">Login</button>
+            </a>
+            <a href="Login-Pages/Register.html">
+                <button class="btn btn-primary">Register</button>
+            </a>
+        </div>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
             <h1>Computer Science Education For IG Students</h1>
-            <p>Join Islam Hatem's online classes and master programming with our interactive compiler designed for IG Students, comprehensive lessons, and personalized feedback .</p>
+            <p>Join Islam Hatem's online classes and master programming with our interactive compiler designed for IG Students, comprehensive lessons, and personalized feedback.</p>
             
-<div class="hero-buttons">
-  <a href="ٍStudent-Pages/available-courses.html">
-    <button class="btn btn-primary">Explore Courses</button>
-  </a>
-  <a href="ٍStudent-Pages/student-streams.html">
-    <button class="btn btn-secondary">Live Classes Schedule</button>
-  </a>
-  <a href="ٍStudent-Pages/compiler.html">
-    <button class="btn btn-primary">Try Compiler</button>
-  </a>
-</div>
-
+            <div class="hero-buttons">
+                <a href="ٍStudent-Pages/available-courses.html">
+                    <button class="btn btn-primary">Explore Courses</button>
+                </a>
+                <a href="ٍStudent-Pages/student-streams.html">
+                    <button class="btn btn-secondary">Live Classes Schedule</button>
+                </a>
+                <a href="ٍStudent-Pages/compiler.html">
+                    <button class="btn btn-primary">Try Compiler</button>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -719,7 +862,7 @@
         <div class="about-content">
             <h2>About Islam Hatem</h2>
             <p>Islam Hatem is a Computer Engineering student at the German University in Cairo (GUC), currently in his fourth year. He earned his IGCSE certificate from El Rowad International School (2019–2022), graduating with eight O-Levels, all graded between 8 and 9, and one AS-Level with grade A. He distinguished himself in Computer Science with a grade 9.</p>
-            <p>With five years of teaching experience, Islam has served as a teaching assistant under Eng. Amr Osama in eight sessions and has also provided two years of private tutoring. His teaching approach has consistently supported student success, with the majority achieving grades 8 and 9 (67%), followed by grade 7 (23%), and grade 6 or below (10%).</p>
+            <p>With five years of teaching experience, Islam has served as a teaching assistant under Eng. Amr Osama in eight sessions and has also provided two years of private tutoring. His teaching approach has consistently supported student success, with the majority achieving grades 8 and 9 (67%), followed by grade 7 (23%), and grade 6 or below (10%).</p>
             <a href="ٍStudent-Pages/student-helpCenter.html">
             <button class="btn btn-primary">Learn More</button>
             </a>
@@ -787,14 +930,13 @@
 
     <!-- CTA Section -->
     <section class="container">
-<div class="cta">
-  <h2>Start Your Computer Science Journey Today</h2>
-  <p>Join thousands of students worldwide who have transformed their programming skills with Islam Hatem's innovative teaching approach.</p>
-  <a href="ٍStudent-Pages/available-courses.html">
-    <button class="btn btn-secondary">Explore All Courses</button>
-  </a>
-</div>
-
+        <div class="cta">
+            <h2>Start Your Computer Science Journey Today</h2>
+            <p>Join thousands of students worldwide who have transformed their programming skills with Islam Hatem's innovative teaching approach.</p>
+            <a href="ٍStudent-Pages/available-courses.html">
+                <button class="btn btn-secondary">Explore All Courses</button>
+            </a>
+        </div>
     </section>
 
     <!-- Footer -->
@@ -857,6 +999,26 @@
     </footer>
 
     <script>
+        // Mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('overlay');
+        
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        }
+        
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        overlay.addEventListener('click', toggleMobileMenu);
+        
+        // Close mobile menu when clicking on a link
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', toggleMobileMenu);
+        });
+
         // Simple animation for buttons
         document.querySelectorAll('.btn').forEach(button => {
             button.addEventListener('mouseenter', function(e) {
