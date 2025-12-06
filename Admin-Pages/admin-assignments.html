@@ -477,6 +477,7 @@
       padding: clamp(15px, 2vw, 20px);
       border: 1px solid rgba(0, 204, 255, 0.2);
       transition: all 0.3s ease;
+      position: relative;
     }
 
     .submission-card:hover {
@@ -645,6 +646,38 @@
       left: 100%;
     }
 
+    /* Submission Actions */
+    .submission-actions {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .delete-submission-btn {
+      background: rgba(255, 77, 77, 0.1);
+      color: #ff4d4d;
+      border: 1px solid #ff4d4d;
+      border-radius: 20px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.8rem;
+    }
+
+    .delete-submission-btn:hover {
+      background: rgba(255, 77, 77, 0.2);
+      transform: scale(1.05);
+    }
+
+    /* Bulk Delete Button */
+    .bulk-delete-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 15px;
+    }
+
     /* Alerts */
     .alert {
       padding: 15px;
@@ -779,6 +812,12 @@
       .submission-list {
         grid-template-columns: 1fr;
       }
+      
+      .submission-actions {
+        position: static;
+        margin-top: 10px;
+        justify-content: flex-end;
+      }
     }
 
     @media (max-width: 480px) {
@@ -827,7 +866,8 @@
 
     /* Print Styles */
     @media print {
-      .sidebar, .menu-toggle, .logout-btn, .assignment-actions, .review-btn {
+      .sidebar, .menu-toggle, .logout-btn, .assignment-actions, .review-btn,
+      .submission-actions, .bulk-delete-container {
         display: none !important;
       }
       
@@ -1052,6 +1092,13 @@
           <h2><i class="fas fa-file-upload"></i> All Submissions</h2>
         </div>
 
+        <!-- Bulk Delete Button -->
+        <div class="bulk-delete-container">
+          <button class="btn btn-danger" id="deleteAllSubmissionsBtn" style="display: none;">
+            <i class="fas fa-trash-alt"></i> Delete All Submissions
+          </button>
+        </div>
+
         <div class="submission-list" id="submissions">
           <div class="submission-card">
             <div class="submission-header">
@@ -1142,6 +1189,7 @@
     const dueInput = document.getElementById("dueDate");
     const pdfInput = document.getElementById("pdf");
     const pdfFileName = document.getElementById("pdf-file-name");
+    const deleteAllSubmissionsBtn = document.getElementById("deleteAllSubmissionsBtn");
 
     const assignmentsDiv = document.getElementById("assignments");
     const submissionsDiv = document.getElementById("submissions");
@@ -1151,6 +1199,7 @@
     // Local state
     const assignmentMap = new Map();
     const courseMap = new Map();
+    let submissions = []; // Store submissions for bulk delete
 
     // Helper functions
     function headersAuthJSON() {
@@ -1314,8 +1363,12 @@
         
         const data = await res.json();
         submissionsDiv.innerHTML = "";
+        submissions = data.data || [];
 
-        if (!data.data || data.data.length === 0) {
+        // Show/hide bulk delete button
+        deleteAllSubmissionsBtn.style.display = submissions.length > 0 ? "inline-block" : "none";
+
+        if (!submissions || submissions.length === 0) {
           submissionsDiv.innerHTML = `
             <div class="submission-card">
               <div class="submission-header">
@@ -1327,7 +1380,7 @@
           return;
         }
 
-        data.data.forEach(s => {
+        submissions.forEach(s => {
           const assignmentTitle = s.assignment?.title || "Assignment";
           const studentName = s.student?.name || "Unknown";
           const studentEmail = s.student?.email || "";
@@ -1338,6 +1391,11 @@
           const div = document.createElement("div");
           div.className = "submission-card";
           div.innerHTML = `
+            <div class="submission-actions">
+              <button class="delete-submission-btn" onclick="deleteSubmission('${s._id}')" title="Delete this submission">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
             <div class="submission-header">
               <div>
                 <h3 class="submission-title">${assignmentTitle}</h3>
@@ -1371,6 +1429,7 @@
       }
     }
 
+    // Handle review submission grading
     document.addEventListener("click", async (e) => {
       if (e.target.classList.contains("review-btn")) {
         const id = e.target.dataset.id;
@@ -1407,6 +1466,91 @@
         }
       }
     });
+
+    // Delete individual submission
+    async function deleteSubmission(id) {
+      if (!confirm("Are you sure you want to delete this submission? This action cannot be undone.")) return;
+      
+      try {
+        const res = await fetch(`${ASSIGN_API}/submissions/${id}`, {
+          method: "DELETE",
+          headers: headersAuthJSON()
+        });
+
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+
+        if (res.ok) {
+          showSuccess("🗑 Submission deleted successfully");
+          loadSubmissions();
+        } else {
+          showError("❌ Failed to delete submission");
+        }
+      } catch (error) {
+        console.error("Error deleting submission:", error);
+        showError("❌ Failed to delete submission. Please try again.");
+      }
+    }
+
+    // Delete all submissions
+    async function deleteAllSubmissions() {
+      if (submissions.length === 0) return;
+      
+      const count = submissions.length;
+      if (!confirm(`Are you sure you want to delete ALL ${count} submissions? This action cannot be undone.`)) return;
+      
+      try {
+        // Show loading state
+        const originalText = deleteAllSubmissionsBtn.innerHTML;
+        deleteAllSubmissionsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        deleteAllSubmissionsBtn.disabled = true;
+        
+        // Delete each submission
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const submission of submissions) {
+          try {
+            const res = await fetch(`${ASSIGN_API}/submissions/${submission._id}`, {
+              method: "DELETE",
+              headers: headersAuthJSON()
+            });
+            
+            if (res.ok) {
+              successCount++;
+            } else {
+              errorCount++;
+            }
+          } catch (error) {
+            errorCount++;
+            console.error(`Error deleting submission ${submission._id}:`, error);
+          }
+        }
+        
+        if (errorCount === 0) {
+          showSuccess(`✅ Successfully deleted all ${successCount} submissions`);
+        } else if (successCount > 0) {
+          showError(`⚠️ Deleted ${successCount} submissions, but failed to delete ${errorCount} submissions`);
+        } else {
+          showError("❌ Failed to delete any submissions");
+        }
+        
+        // Refresh the list
+        await loadSubmissions();
+        
+      } catch (error) {
+        console.error("Error in deleteAllSubmissions:", error);
+        showError("❌ An error occurred while deleting submissions");
+      } finally {
+        deleteAllSubmissionsBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete All Submissions';
+        deleteAllSubmissionsBtn.disabled = false;
+      }
+    }
+
+    // Attach event listener to delete all button
+    deleteAllSubmissionsBtn.addEventListener("click", deleteAllSubmissions);
 
     // Start editing an assignment
     function startEdit(id) {
@@ -1508,7 +1652,7 @@
 
     // Initial load
     (async function init() {
-      await loadCourses();
+      await loadCourses(); 
       await loadAssignments();
       await loadSubmissions();
     })();
