@@ -802,7 +802,7 @@
             </div>
             <p class="session-description">${session.description || "No description provided."}</p>
             <div class="session-actions">
-              <a href="https://orycom-videoconf-2201.app.100ms.live/meeting/urw-hkuu-wlj" ${!isLive ? 'style="opacity: 0.6; pointer-events: none;"' : ''}>
+              <a href="room.html" ${!isLive ? 'style="opacity: 0.6; pointer-events: none;"' : ''}>
                 <i class="fas fa-broadcast-tower"></i> Go Live / Join
               </a>
               <button class="btn btn-assistant btn-sm" onclick="openModal('${session._id}', '${session.title}', '${session.description || ""}', '${session.scheduledAt}', '${session.duration || ""}')">
