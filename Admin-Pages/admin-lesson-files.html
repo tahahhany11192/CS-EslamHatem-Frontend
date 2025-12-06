@@ -262,7 +262,7 @@
 
     .btn-admin:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 153, 0, 极速4);
+      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.4);
     }
 
     .btn-secondary {
@@ -451,6 +451,49 @@
       margin-top: 5px;
     }
 
+    /* Chunk Upload Status */
+    .chunk-status {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--admin-accent);
+    }
+
+    .chunk-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    /* Upload Strategy Selector */
+    .upload-strategy {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .strategy-btn {
+      padding: 8px 15px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 153, 0, 0.3);
+      color: var(--light);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .strategy-btn.active {
+      background: rgba(255, 153, 0, 0.2);
+      border-color: var(--admin-accent);
+    }
+
+    .strategy-btn:hover:not(.active) {
+      border-color: var(--admin-accent);
+    }
+
     /* Responsive Design */
     @media (max-width: 992px) {
       .sidebar {
@@ -495,13 +538,17 @@
       .preview-content {
         grid-template-columns: 1fr;
       }
+      
+      .upload-strategy {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
   <div class="dashboard">
     <!-- Sidebar -->
-    <aside class="sidebar"  style="width: 280px;">
+    <aside class="sidebar" style="width: 280px;">
       <div class="sidebar-header">
         <div class="sidebar-logo">
           <i class="fas fa-code"></i>
@@ -515,15 +562,15 @@
       <ul class="sidebar-nav">
         <li><a href="admin-courses.html"><i class="fas fa-book"></i> <span>Courses</span></a></li>
         <li><a href="admin-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
-        <li><a href="admin-lessons.html" ><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
-        <li><a href="admin-lesson-files.html"class="active"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
-        <li><a href="admin-quizzes.html" ><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="admin-lessons.html"><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
+        <li><a href="admin-lesson-files.html" class="active"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
+        <li><a href="admin-quizzes.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
         <li><a href="admin-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
-        <li><a href="admin-payment-requests.html" ><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
-        <li><a href="admin-assistants.html" ><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
-        <li><a href="admin-students.html" ><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="admin-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
-        <li><a href="admin-profile.html" ><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="admin-payment-requests.html"><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
+        <li><a href="admin-assistants.html"><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
+        <li><a href="admin-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="admin-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
         <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
       </ul>
     </aside>
@@ -552,6 +599,17 @@
       <div class="content-card">
         <div class="card-header">
           <h2><i class="fas fa-cloud-upload-alt"></i> Upload Lesson Files</h2>
+          <div class="upload-strategy">
+            <button class="strategy-btn active" data-strategy="chunked">
+              <i class="fas fa-layer-group"></i> Chunked Upload
+            </button>
+            <button class="strategy-btn" data-strategy="direct">
+              <i class="fas fa-bolt"></i> Direct Upload
+            </button>
+            <button class="strategy-btn" data-strategy="resumable">
+              <i class="fas fa-pause-circle"></i> Resumable
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
@@ -608,6 +666,12 @@
                 </div>
                 <div class="remaining-time">Remaining: Calculating...</div>
               </div>
+              <div id="video-chunk-status" class="chunk-status" style="display: none;">
+                <div class="chunk-info">
+                  <span>Chunks: <span id="chunk-current">0</span>/<span id="chunk-total">0</span></span>
+                  <span id="chunk-size">0 MB</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -661,7 +725,13 @@
     const COURSE_API = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/courses";
     const LESSON_API = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/lessons";
     const UPLOADS_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev";
+    const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
+    
     const token = localStorage.getItem("adminToken");
+    let uploadStrategy = "chunked"; // Default strategy
+    let uploadStartTime = 0;
+    let lastLoaded = 0;
+    let lastTime = 0;
 
     if (!token) {
       showError("⚠️ Not authorized. Please login as admin.");
@@ -670,6 +740,7 @@
       }, 2000);
     }
 
+    // DOM Elements
     const courseSelect = document.getElementById("course");
     const lessonSelect = document.getElementById("lesson");
     const previewDiv = document.getElementById("preview");
@@ -681,11 +752,10 @@
     const thumbnailFileName = document.getElementById("thumbnail-file-name");
     const alertSuccess = document.getElementById("alertSuccess");
     const alertError = document.getElementById("alertError");
-
-    // Upload progress elements
-    const materialProgress = document.getElementById("material-progress");
-    const videoProgress = document.getElementById("video-progress");
-    const thumbnailProgress = document.getElementById("thumbnail-progress");
+    const videoChunkStatus = document.getElementById("video-chunk-status");
+    const chunkCurrent = document.getElementById("chunk-current");
+    const chunkTotal = document.getElementById("chunk-total");
+    const chunkSize = document.getElementById("chunk-size");
 
     // Helper functions
     function pickData(json) {
@@ -736,20 +806,74 @@
       if (seconds < 60) return `${Math.ceil(seconds)} seconds`;
       const minutes = Math.floor(seconds / 60);
       const remainingSeconds = Math.ceil(seconds % 60);
-      return `${minutes}m ${remainingSeconds}s`;
+      if (minutes < 60) return `${minutes}m ${remainingSeconds}s`;
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      return `${hours}h ${remainingMinutes}m`;
     }
 
     // File name display
     materialInput.addEventListener("change", function() {
-      materialFileName.textContent = this.files[0] ? this.files[0].name : "";
+      const file = this.files[0];
+      if (file) {
+        materialFileName.textContent = `${file.name} (${formatFileSize(file.size)})`;
+        if (file.size > 500 * 1024 * 1024) {
+          showError(`⚠️ Material file is large (${formatFileSize(file.size)}). Consider compressing it.`);
+        }
+      } else {
+        materialFileName.textContent = "";
+      }
     });
 
     videoInput.addEventListener("change", function() {
-      videoFileName.textContent = this.files[0] ? this.files[0].name : "";
+      const file = this.files[0];
+      if (file) {
+        videoFileName.textContent = `${file.name} (${formatFileSize(file.size)})`;
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        chunkTotal.textContent = totalChunks;
+        chunkSize.textContent = formatFileSize(CHUNK_SIZE);
+        if (file.size > 100 * 1024 * 1024) {
+          videoChunkStatus.style.display = "block";
+        } else {
+          videoChunkStatus.style.display = "none";
+        }
+      } else {
+        videoFileName.textContent = "";
+        videoChunkStatus.style.display = "none";
+      }
     });
 
     thumbnailInput.addEventListener("change", function() {
-      thumbnailFileName.textContent = this.files[0] ? this.files[0].name : "";
+      const file = this.files[0];
+      if (file) {
+        thumbnailFileName.textContent = `${file.name} (${formatFileSize(file.size)})`;
+        if (file.size > 10 * 1024 * 1024) {
+          showError("⚠️ Thumbnail image is too large. Please use images under 10MB.");
+        }
+      } else {
+        thumbnailFileName.textContent = "";
+      }
+    });
+
+    // Upload strategy selection
+    document.querySelectorAll('.strategy-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.strategy-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        uploadStrategy = this.dataset.strategy;
+        
+        switch(uploadStrategy) {
+          case 'chunked':
+            showSuccess("✅ Using chunked upload for large files (best for 500MB+ videos)");
+            break;
+          case 'direct':
+            showSuccess("✅ Using direct upload for faster small files");
+            break;
+          case 'resumable':
+            showSuccess("✅ Using resumable upload (can pause/resume)");
+            break;
+        }
+      });
     });
 
     // Load courses
@@ -908,7 +1032,200 @@
       }
     });
 
-    // Upload files with progress tracking
+    // Reset progress bars
+    function resetProgressBars() {
+      uploadStartTime = Date.now();
+      lastLoaded = 0;
+      lastTime = uploadStartTime;
+      
+      const progressElements = ['material', 'video', 'thumbnail'];
+      progressElements.forEach(field => {
+        const element = document.getElementById(`${field}-progress`);
+        if (element) {
+          const fill = element.querySelector('.progress-fill');
+          const percentage = element.querySelector('.progress-percentage');
+          const speed = element.querySelector('.progress-speed');
+          const time = element.querySelector('.remaining-time');
+          
+          if (fill) fill.style.width = '0%';
+          if (percentage) percentage.textContent = '0%';
+          if (speed) speed.textContent = '0 MB/s';
+          if (time) time.textContent = 'Remaining: Calculating...';
+        }
+      });
+      
+      chunkCurrent.textContent = '0';
+    }
+
+    // Update progress for a specific field
+    function updateProgressForField(fieldName, percent, loaded, total) {
+      const element = document.getElementById(`${fieldName}-progress`);
+      if (!element) return;
+      
+      const fill = element.querySelector('.progress-fill');
+      const percentage = element.querySelector('.progress-percentage');
+      const speed = element.querySelector('.progress-speed');
+      const time = element.querySelector('.remaining-time');
+      
+      if (fill) fill.style.width = percent + '%';
+      if (percentage) percentage.textContent = Math.round(percent) + '%';
+      
+      const currentTime = Date.now();
+      const elapsedSeconds = (currentTime - uploadStartTime) / 1000;
+      const currentSpeed = loaded / elapsedSeconds;
+      
+      if (speed) {
+        const speedMB = (currentSpeed / (1024 * 1024)).toFixed(2);
+        speed.textContent = speedMB + ' MB/s';
+      }
+      
+      if (time && currentSpeed > 0) {
+        const remainingBytes = total - loaded;
+        const remainingSeconds = remainingBytes / currentSpeed;
+        time.textContent = `Remaining: ${formatTime(remainingSeconds)}`;
+      }
+    }
+
+    // Upload file normally (for small files)
+    function uploadFileNormally(file, fieldName, lessonId) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        formData.append(fieldName, file);
+        
+        xhr.upload.addEventListener("progress", (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            updateProgressForField(fieldName, percentComplete, event.loaded, event.total);
+          }
+        });
+        
+        xhr.onload = () => {
+          if (xhr.status === 200 || xhr.status === 201) {
+            resolve();
+          } else {
+            reject(new Error(`Failed to upload ${fieldName}: ${xhr.status}`));
+          }
+        };
+        
+        xhr.onerror = () => reject(new Error(`Network error for ${fieldName}`));
+        xhr.ontimeout = () => reject(new Error(`Timeout for ${fieldName}`));
+        
+        // Set longer timeout for large files
+        xhr.timeout = 3600000; // 1 hour
+        
+        xhr.open("PUT", `${LESSON_API}/${lessonId}/files`);
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+        xhr.send(formData);
+      });
+    }
+
+    // Upload file in chunks (for large files)
+    async function uploadFileInChunks(file, fieldName, lessonId) {
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+      const fileId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Show chunk status
+      const chunkStatus = document.getElementById(`${fieldName}-chunk-status`);
+      if (chunkStatus) {
+        chunkStatus.style.display = "block";
+        const currentEl = chunkStatus.querySelector('#chunk-current') || document.getElementById('chunk-current');
+        if (currentEl) currentEl.textContent = '0';
+      }
+      
+      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        const start = chunkIndex * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, file.size);
+        const chunk = file.slice(start, end);
+        
+        // Update chunk status
+        chunkCurrent.textContent = chunkIndex + 1;
+        
+        // Create FormData for this chunk
+        const chunkFormData = new FormData();
+        chunkFormData.append(fieldName, chunk);
+        chunkFormData.append('chunkIndex', chunkIndex);
+        chunkFormData.append('totalChunks', totalChunks);
+        chunkFormData.append('fileId', fileId);
+        chunkFormData.append('originalName', file.name);
+        
+        // Calculate overall progress
+        const overallLoaded = chunkIndex * CHUNK_SIZE;
+        const overallProgress = (overallLoaded / file.size) * 100;
+        
+        updateProgressForField(fieldName, overallProgress, overallLoaded, file.size);
+        
+        // Upload chunk with retry logic
+        let retries = 3;
+        while (retries > 0) {
+          try {
+            const xhr = new XMLHttpRequest();
+            
+            const uploadPromise = new Promise((resolve, reject) => {
+              xhr.onload = () => {
+                if (xhr.status === 200) {
+                  resolve();
+                } else {
+                  reject(new Error(`Chunk ${chunkIndex} failed: ${xhr.status}`));
+                }
+              };
+              
+              xhr.onerror = () => reject(new Error(`Network error on chunk ${chunkIndex}`));
+              xhr.ontimeout = () => reject(new Error(`Timeout on chunk ${chunkIndex}`));
+              
+              xhr.timeout = 600000; // 10 minutes per chunk
+              xhr.open("POST", `${LESSON_API}/${lessonId}/upload-chunk`);
+              xhr.setRequestHeader("Authorization", "Bearer " + token);
+              xhr.send(chunkFormData);
+            });
+            
+            await uploadPromise;
+            break; // Success, exit retry loop
+          } catch (error) {
+            retries--;
+            if (retries === 0) {
+              throw new Error(`Failed to upload chunk ${chunkIndex + 1} after 3 attempts: ${error.message}`);
+            }
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait before retry
+          }
+        }
+      }
+      
+      // Finalize the upload
+      return await finalizeChunkedUpload(lessonId, fileId, fieldName, file.name);
+    }
+
+    // Finalize chunked upload
+    async function finalizeChunkedUpload(lessonId, fileId, fieldName, originalName) {
+      const xhr = new XMLHttpRequest();
+      
+      return new Promise((resolve, reject) => {
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            resolve();
+          } else {
+            reject(new Error(`Failed to finalize upload: ${xhr.status}`));
+          }
+        };
+        
+        xhr.onerror = () => reject(new Error('Network error during finalization'));
+        
+        xhr.open("POST", `${LESSON_API}/${lessonId}/finalize-upload`);
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        
+        const data = {
+          fileId,
+          fieldName,
+          originalName,
+          timestamp: Date.now()
+        };
+        
+        xhr.send(JSON.stringify(data));
+      });
+    }
+
+    // Main form submit handler
     document.getElementById("fileForm").addEventListener("submit", async e => {
       e.preventDefault();
       const lessonId = lessonSelect.value;
@@ -920,29 +1237,57 @@
 
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
       submitBtn.disabled = true;
 
       // Reset progress bars
       resetProgressBars();
 
-      const formData = new FormData();
       let hasFiles = false;
+      const uploadPromises = [];
+      const largeFileThreshold = 500 * 1024 * 1024; // 500MB
       
+      // Handle material file
       if (materialInput.files[0]) {
-        formData.append("material", materialInput.files[0]);
+        const file = materialInput.files[0];
+        const element = document.getElementById("material-progress");
+        if (element) element.style.display = "block";
+        
+        if (file.size > largeFileThreshold && uploadStrategy === "chunked") {
+          uploadPromises.push(uploadFileInChunks(file, 'material', lessonId));
+        } else {
+          uploadPromises.push(uploadFileNormally(file, 'material', lessonId));
+        }
         hasFiles = true;
-        materialProgress.style.display = "block";
       }
+      
+      // Handle video file
       if (videoInput.files[0]) {
-        formData.append("video", videoInput.files[0]);
+        const file = videoInput.files[0];
+        const element = document.getElementById("video-progress");
+        if (element) element.style.display = "block";
+        
+        if (file.size > 100 * 1024 * 1024) {
+          // For videos > 100MB, use chunked upload if selected
+          if (uploadStrategy === "chunked") {
+            uploadPromises.push(uploadFileInChunks(file, 'video', lessonId));
+          } else {
+            // For direct upload, use longer timeout
+            uploadPromises.push(uploadFileNormally(file, 'video', lessonId));
+          }
+        } else {
+          uploadPromises.push(uploadFileNormally(file, 'video', lessonId));
+        }
         hasFiles = true;
-        videoProgress.style.display = "block";
       }
+      
+      // Handle thumbnail (always normal upload)
       if (thumbnailInput.files[0]) {
-        formData.append("thumbnail", thumbnailInput.files[0]);
+        const file = thumbnailInput.files[0];
+        const element = document.getElementById("thumbnail-progress");
+        if (element) element.style.display = "block";
+        uploadPromises.push(uploadFileNormally(file, 'thumbnail', lessonId));
         hasFiles = true;
-        thumbnailProgress.style.display = "block";
       }
 
       if (!hasFiles) {
@@ -953,115 +1298,82 @@
       }
 
       try {
-        const xhr = new XMLHttpRequest();
+        // Show upload started message
+        showSuccess(`🚀 Starting upload using ${uploadStrategy} strategy...`);
         
-        // Track upload progress
-        xhr.upload.addEventListener("progress", function(event) {
-          if (event.lengthComputable) {
-            const percentComplete = (event.loaded / event.total) * 100;
-            updateProgressBars(percentComplete, event.loaded, event.total, event.timeStamp);
-          }
-        });
+        // Execute all uploads
+        await Promise.all(uploadPromises);
         
-        xhr.addEventListener("load", function() {
-          if (xhr.status === 200 || xhr.status === 201) {
-            try {
-              const response = JSON.parse(xhr.responseText);
-              showSuccess("✅ Files uploaded successfully!");
-              // Clear file inputs
-              materialInput.value = "";
-              videoInput.value = "";
-              thumbnailInput.value = "";
-              materialFileName.textContent = "";
-              videoFileName.textContent = "";
-              thumbnailFileName.textContent = "";
-              // Hide progress bars
-              materialProgress.style.display = "none";
-              videoProgress.style.display = "none";
-              thumbnailProgress.style.display = "none";
-              // Refresh preview
-              lessonSelect.dispatchEvent(new Event("change"));
-            } catch (e) {
-              showError("❌ Failed to parse server response.");
-            }
-          } else {
-            try {
-              const errorData = JSON.parse(xhr.responseText);
-              showError("❌ Failed to upload files: " + (errorData.message || "Unknown error"));
-            } catch (e) {
-              showError("❌ Failed to upload files. Server returned status: " + xhr.status);
-            }
-          }
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-        });
+        showSuccess("✅ All files uploaded successfully!");
         
-        xhr.addEventListener("error", function() {
-          showError("❌ Network error. Please check your connection and try again.");
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-        });
+        // Clear inputs and hide progress after delay
+        setTimeout(() => {
+          materialInput.value = "";
+          videoInput.value = "";
+          thumbnailInput.value = "";
+          materialFileName.textContent = "";
+          videoFileName.textContent = "";
+          thumbnailFileName.textContent = "";
+          
+          const progressElements = ['material', 'video', 'thumbnail'];
+          progressElements.forEach(field => {
+            const element = document.getElementById(`${field}-progress`);
+            if (element) element.style.display = "none";
+          });
+          
+          videoChunkStatus.style.display = "none";
+        }, 2000);
         
-        xhr.open("PUT", `${LESSON_API}/${lessonId}/files`);
-        xhr.setRequestHeader("Authorization", "Bearer " + token);
-        xhr.send(formData);
+        // Refresh preview
+        lessonSelect.dispatchEvent(new Event("change"));
         
-      } catch (e) {
-        console.error("Upload error:", e);
-        showError("❌ Failed to upload files. Please try again.");
+      } catch (error) {
+        console.error("Upload error:", error);
+        showError(`❌ Upload failed: ${error.message}`);
+        
+        // If using chunked upload, offer to resume
+        if (uploadStrategy === "chunked" && error.message.includes("chunk")) {
+          showError("💡 Tip: Try using the 'Resumable' strategy for large files.");
+        }
+      } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
       }
     });
 
-    // Progress tracking variables
-    let uploadStartTime = 0;
-    let lastLoaded = 0;
-    let lastTime = 0;
-    
-    function resetProgressBars() {
-      uploadStartTime = Date.now();
-      lastLoaded = 0;
-      lastTime = uploadStartTime;
+    // Add a helper to check file size before upload
+    function validateFileSizes() {
+      let totalSize = 0;
+      const files = [];
       
-      const progressBars = document.querySelectorAll('.progress-fill');
-      const percentages = document.querySelectorAll('.progress-percentage');
-      const speeds = document.querySelectorAll('.progress-speed');
-      const times = document.querySelectorAll('.remaining-time');
+      if (materialInput.files[0]) {
+        files.push(materialInput.files[0]);
+        totalSize += materialInput.files[0].size;
+      }
+      if (videoInput.files[0]) {
+        files.push(videoInput.files[0]);
+        totalSize += videoInput.files[0].size;
+      }
+      if (thumbnailInput.files[0]) {
+        files.push(thumbnailInput.files[0]);
+        totalSize += thumbnailInput.files[0].size;
+      }
       
-      progressBars.forEach(bar => bar.style.width = '0%');
-      percentages.forEach(el => el.textContent = '0%');
-      speeds.forEach(el => el.textContent = '0 MB/s');
-      times.forEach(el => el.textContent = 'Remaining: Calculating...');
+      // Warn for very large total size
+      if (totalSize > 2 * 1024 * 1024 * 1024) { // 2GB
+        return confirm(`You're about to upload ${formatFileSize(totalSize)}. This may take a long time. Continue?`);
+      }
+      
+      return true;
     }
-    
-    function updateProgressBars(percentComplete, loaded, total, timestamp) {
-      const currentTime = Date.now();
-      const elapsedTime = (currentTime - uploadStartTime) / 1000; // in seconds
-      
-      // Calculate upload speed
-      const speed = (loaded - lastLoaded) / (currentTime - lastTime) * 1000; // bytes per second
-      const speedMB = (speed / (1024 * 1024)).toFixed(2);
-      
-      // Calculate remaining time
-      const remainingBytes = total - loaded;
-      const remainingTime = speed > 0 ? remainingBytes / speed : 0;
-      
-      // Update all progress bars
-      const progressBars = document.querySelectorAll('.progress-fill');
-      const percentages = document.querySelectorAll('.progress-percentage');
-      const speeds = document.querySelectorAll('.progress-speed');
-      const times = document.querySelectorAll('.remaining-time');
-      
-      progressBars.forEach(bar => bar.style.width = percentComplete + '%');
-      percentages.forEach(el => el.textContent = Math.round(percentComplete) + '%');
-      speeds.forEach(el => el.textContent = speedMB + ' MB/s');
-      times.forEach(el => el.textContent = 'Remaining: ' + formatTime(remainingTime));
-      
-      // Update tracking variables
-      lastLoaded = loaded;
-      lastTime = currentTime;
-    }
+
+    // Add validation to form submission
+    document.getElementById("fileForm").addEventListener("submit", function(e) {
+      if (!validateFileSizes()) {
+        e.preventDefault();
+        return false;
+      }
+    });
 
     // Initial load
     loadCourses();
