@@ -589,64 +589,77 @@
             }
         }
 
+        .profile-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            transition: transform 0.2s ease;
+        }
 
-            .profile-img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--gradient);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      transition: transform 0.2s ease;
-    }
+        .profile-img:hover {
+            transform: scale(1.1);
+        }
 
-    .profile-img:hover {
-      transform: scale(1.1);
-    }
+        /* Balls */
+        .ball {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            text-decoration: none;
+            opacity: 0;
+            transform: translate(0, 0);
+            transition: transform 0.6s ease, opacity 0.4s ease;
+            pointer-events: none;
+        }
 
-    /* Balls */
-    .ball {
-      position: absolute;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: #007bff;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      text-decoration: none;
-      opacity: 0;
-      transform: translate(0, 0);
-      transition: transform 0.6s ease, opacity 0.4s ease;
-      pointer-events: none;
-    }
+        .ball.logout {
+            background: #e74c3c;
+        }
 
-    .ball.logout {
-      background: #e74c3c;
-    }
+        .ball.profile {
+            background: #2ecc71;
+        }
 
-    .ball.profile {
-      background: #2ecc71;
-    }
+        /* Active (thrown out) state */
+        .user-profile.active .ball.logout {
+            transform: translate(-60px, 30px);
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-    /* Active (thrown out) state */
-    .user-profile.active .ball.logout {
-      transform: translate(-60px, 30px);
-      opacity: 1;
-      pointer-events: auto;
-    }
+        .user-profile.active .ball.profile {
+            transform: translate(-60px, -30px);
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-    .user-profile.active .ball.profile {
-      transform: translate(-60px, -30px);
-      opacity: 1;
-      pointer-events: auto;
-    }
+        /* Course info in assignment card */
+        .course-info {
+            margin-bottom: 10px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
 
+        .course-info i {
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -655,7 +668,7 @@
         <div class="overlay" id="overlay"></div>
 
         <!-- Sidebar -->
-          <aside class="sidebar" id="sidebar" >
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="../../index.html" class="sidebar-logo">
                     <i class="fas fa-code"></i>
@@ -727,7 +740,6 @@
             </ul>
         </aside>
 
-
         <!-- Main Content -->
         <main class="main-content">
             <!-- Header -->
@@ -739,13 +751,13 @@
                 <button class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-               <div class="user-profile" id="userMenu">
-    <div class="profile-img">
-      <i class="fas fa-user"></i>
-    </div>
-    <a href="student-profile.html" class="ball profile">Profile</a>
-    <a onclick="logout()" class="ball logout">Logout</a>
-  </div>
+                <div class="user-profile" id="userMenu">
+                    <div class="profile-img">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <a href="student-profile.html" class="ball profile">Profile</a>
+                    <a onclick="logout()" class="ball logout">Logout</a>
+                </div>
             </div>
 
             <!-- Page Title -->
@@ -785,7 +797,7 @@
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
-            <a href="available-courses.html" class="nav-btn" >
+            <a href="available-courses.html" class="nav-btn">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Courses</span>
             </a>
@@ -801,20 +813,21 @@
     </div>
 
     <script>
-                    const userMenu = document.getElementById("userMenu");
-                function logout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userInfo");
-      window.location.href = "../Login-Pages/login.html";
-    }
+        const userMenu = document.getElementById("userMenu");
+        
+        function logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("userInfo");
+            window.location.href = "../Login-Pages/login.html";
+        }
 
-    userMenu.addEventListener("click", () => {
-      userMenu.classList.toggle("active");
-    });
-
+        userMenu.addEventListener("click", () => {
+            userMenu.classList.toggle("active");
+        });
 
         // Global variables for tracking assignments
         let assignments = [];
+        let enrolledCourses = [];
         let pendingCount = 0;
         let completedCount = 0;
         let overdueCount = 0;
@@ -859,22 +872,90 @@
             loadAssignments();
         });
 
-        // Load assignments from API
+        // Load assignments from API - UPDATED VERSION
         async function loadAssignments() {
             try {
                 const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
-                const res = await fetch(`${API_BASE}/users/my-assignments`, {
+                
+                // 1. Get enrolled courses (like my-learning.html does)
+                const enrolledCoursesRes = await fetch(`${API_BASE}/users/my-courses`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 
-                if (res.status === 401) {
+                if (enrolledCoursesRes.status === 401) {
                     localStorage.removeItem("token");
                     window.location.href = 'login.html';
                     return;
                 }
                 
-                const data = await res.json();
-                assignments = data.data || [];
+                enrolledCourses = await enrolledCoursesRes.json();
+                const enrolledCourseIds = enrolledCourses.map(course => course._id);
+                
+                // 2. Get all assignments
+                const assignmentsRes = await fetch(`${API_BASE}/users/my-assignments`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                
+                if (assignmentsRes.status === 401) {
+                    localStorage.removeItem("token");
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const data = await assignmentsRes.json();
+                const allAssignments = data.data || [];
+                
+                // 3. Filter assignments: only show assignments from enrolled courses
+                assignments = allAssignments.filter(assignment => {
+                    // Check if assignment has a course property
+                    if (!assignment.course) {
+                        return false; // Hide assignments without course association
+                    }
+                    
+                    // Check if the assignment's course is in our enrolled courses
+                    const assignmentCourseId = assignment.course.toString();
+                    return enrolledCourseIds.some(courseId => courseId.toString() === assignmentCourseId);
+                });
+                
+                // 4. Add course name to each assignment for display
+                assignments.forEach(assignment => {
+                    const course = enrolledCourses.find(c => c._id.toString() === assignment.course.toString());
+                    assignment.courseName = course ? course.title : 'Unknown Course';
+                });
+                
+                // 5. Handle empty state
+                if (assignments.length === 0) {
+                    if (enrolledCourses.length === 0) {
+                        document.getElementById("assignments-container").innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-graduation-cap"></i>
+                                <p>You are not enrolled in any courses yet.</p>
+                                <p>Enroll in a course to see assignments.</p>
+                                <a href="available-courses.html" class="btn btn-primary" style="margin-top: 15px;">Browse Courses</a>
+                            </div>
+                        `;
+                    } else {
+                        document.getElementById("assignments-container").innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-clipboard-check"></i>
+                                <p>No assignments found for your enrolled courses.</p>
+                                <p>Assignments will appear here when created by your instructor.</p>
+                                <div style="margin-top: 20px;">
+                                    <p style="color: var(--secondary);">Your enrolled courses:</p>
+                                    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                                        ${enrolledCourses.map(course => `<li>${course.title}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    // Reset stats
+                    document.getElementById('pending-count').textContent = '0';
+                    document.getElementById('completed-count').textContent = '0';
+                    document.getElementById('overdue-count').textContent = '0';
+                    return;
+                }
                 
                 // Update stats counters
                 updateAssignmentStats();
@@ -963,6 +1044,12 @@
                     <div class="assignment-header">
                         <h3 class="assignment-title">${assignment.title}</h3>
                         <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    
+                    <!-- ADDED: Course Name Display -->
+                    <div class="course-info">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>${assignment.courseName || 'Course Assignment'}</span>
                     </div>
                     
                     <div class="assignment-desc">${assignment.description || "No description provided."}</div>
@@ -1161,7 +1248,25 @@
                 }
             } catch (err) {
                 console.error("Submit error:", err);
+                alert("Error submitting assignment. Please try again.");
+            }
+        }
+
+        // Helper function to get enrolled courses
+        async function getEnrolledCourses() {
+            try {
+                const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
+                const res = await fetch(`${API_BASE}/users/my-courses`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
                 
+                if (res.ok) {
+                    return await res.json();
+                }
+                return [];
+            } catch (err) {
+                console.error("Error fetching enrolled courses:", err);
+                return [];
             }
         }
     </script>
