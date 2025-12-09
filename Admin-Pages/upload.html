@@ -814,7 +814,7 @@
 
   <script>
     // API Configuration
-    const API_BASE = "https://cs-eslamhatem.fly.dev/api/r2";
+    const API_BASE = "http://localhost:5000/api/r2";
     const TOKEN = localStorage.getItem("adminToken");
     
     // DOM Elements
@@ -1055,4 +1055,151 @@
                   
                   resolve(saved.video);
                 } else {
-                  throw new Error
+                  throw new Error('Failed to save video in database');
+                }
+              } catch (saveError) {
+                reject(saveError);
+              }
+            } else {
+              reject(`Upload failed: HTTP ${xhr.status}`);
+            }
+          };
+
+          // Error handler
+          xhr.onerror = function() {
+            clearInterval(uploadTimer);
+            reject("Network error during upload");
+          };
+
+          // Start upload
+          xhr.send(file);
+        });
+
+      } catch (error) {
+        console.error('Upload error:', error);
+        showAlert(alertError, `Upload failed: ${error.message || error}`);
+        uploadStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> Upload failed: ${error.message || error}`;
+      } finally {
+        // Reset upload state after 3 seconds
+        setTimeout(() => {
+          uploadProgress.classList.remove('active');
+          uploadButton.disabled = false;
+          uploadButton.innerHTML = '<i class="fas fa-upload"></i> Upload Video';
+          isUploading = false;
+          clearInterval(uploadTimer);
+        }, 3000);
+      }
+    }
+
+    // Load uploaded videos
+    async function loadUploadedVideos() {
+      try {
+        videosGrid.innerHTML = `
+          <div class="upload-loading">
+            <div class="spinner"></div>
+            <div>Loading videos...</div>
+          </div>
+        `;
+
+        const response = await fetch(`${API_BASE}/videos`);
+        const data = await response.json();
+
+        if (data.success && data.videos && data.videos.length > 0) {
+          videosGrid.innerHTML = '';
+          
+          data.videos.forEach(video => {
+            const videoCard = document.createElement('div');
+            videoCard.className = 'video-card';
+            
+            const uploadDate = new Date(video.createdAt || video.uploadDate).toLocaleDateString();
+            
+            videoCard.innerHTML = `
+              <div class="video-header">
+                <div>
+                  <h3 class="video-title">${video.title}</h3>
+                  <div class="video-date">Uploaded: ${uploadDate}</div>
+                </div>
+                <span class="status-badge status-uploaded">Uploaded</span>
+              </div>
+              
+              ${video.description ? `<div class="video-info-item"><i class="fas fa-align-left"></i> ${video.description.substring(0, 100)}${video.description.length > 100 ? '...' : ''}</div>` : ''}
+              
+              <div class="video-info">
+                <div class="video-info-item">
+                  <i class="fas fa-hdd"></i> Size: ${formatBytes(video.size)}
+                </div>
+                <div class="video-info-item">
+                  <i class="fas fa-file-video"></i> Type: ${video.contentType || 'Video'}
+                </div>
+              </div>
+              
+              <div class="video-actions">
+                <button class="btn btn-secondary btn-sm" onclick="window.open('${video.url}', '_blank')">
+                  <i class="fas fa-external-link-alt"></i> View
+                </button>
+                <button class="btn btn-success btn-sm" onclick="copyToClipboard('${video.url}')">
+                  <i class="fas fa-copy"></i> Copy URL
+                </button>
+              </div>
+            `;
+            
+            videosGrid.appendChild(videoCard);
+          });
+        } else {
+          videosGrid.innerHTML = `
+            <div class="upload-loading" style="grid-column: 1 / -1;">
+              <i class="fas fa-video-slash" style="font-size: 3rem; color: rgba(240, 246, 255, 0.3);"></i>
+              <div>No videos uploaded yet</div>
+              <div style="font-size: 0.9rem; color: rgba(240, 246, 255, 0.5);">Upload your first video using the form above</div>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error loading videos:', error);
+        videosGrid.innerHTML = `
+          <div class="upload-loading" style="grid-column: 1 / -1;">
+            <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--error);"></i>
+            <div>Failed to load videos</div>
+            <div style="font-size: 0.9rem; color: rgba(240, 246, 255, 0.5);">${error.message}</div>
+          </div>
+        `;
+      }
+    }
+
+    // Copy URL to clipboard
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showAlert(alertSuccess, '✅ URL copied to clipboard!');
+      }).catch(err => {
+        showAlert(alertError, '❌ Failed to copy URL');
+      });
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "../Login-Pages/admin-login.html";
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if token exists
+      if (!TOKEN) {
+        showAlert(alertError, '⚠️ Not authorized. Please login as admin.');
+        setTimeout(() => {
+          window.location.href = "../Login-Pages/admin-login.html";
+        }, 2000);
+        return;
+      }
+
+      // Load videos on page load
+      loadUploadedVideos();
+    });
+
+    // Prevent form submission on enter key
+    document.getElementById('uploadForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+    });
+  </script>
+</body>
+</html>
