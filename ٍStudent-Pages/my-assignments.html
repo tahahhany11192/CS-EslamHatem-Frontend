@@ -660,6 +660,27 @@
         .course-info i {
             font-size: 0.8rem;
         }
+
+        /* API Source Badge */
+        .api-source-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .api-primary {
+            background: rgba(0, 102, 255, 0.2);
+            color: var(--primary);
+        }
+
+        .api-secondary {
+            background: rgba(255, 0, 204, 0.2);
+            color: var(--accent);
+        }
     </style>
 </head>
 <body>
@@ -782,6 +803,21 @@
                 </div>
             </div>
 
+            <!-- API Info -->
+            <div style="margin-bottom: 20px; padding: 10px 15px; background: rgba(0, 102, 255, 0.1); border-radius: 8px; border-left: 4px solid var(--primary);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-server" style="color: var(--secondary);"></i>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Dual-API System Active</div>
+                        <div style="font-size: 0.9rem; color: rgba(240, 246, 255, 0.7);">
+                            Checking both APIs for assignments. 
+                            <span class="api-source-badge api-primary">Primary API</span>
+                            <span class="api-source-badge api-secondary">Backup API</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Assignments Container -->
             <div id="assignments-container" class="assignments-container">
                 <div class="loading-state">
@@ -832,6 +868,10 @@
         let completedCount = 0;
         let overdueCount = 0;
         let token = null;
+        let apiStatus = {
+            primary: false,
+            secondary: false
+        };
 
         document.addEventListener('DOMContentLoaded', function() {
             token = localStorage.getItem("token");
@@ -868,17 +908,17 @@
                 }
             });
 
-            // Load assignments
-            loadAssignments();
+            // Load assignments from both APIs
+            loadAssignmentsFromBothAPIs();
         });
 
-        // Load assignments from API - UPDATED VERSION
-        async function loadAssignments() {
+        // Load assignments from both APIs
+        async function loadAssignmentsFromBothAPIs() {
             try {
-                const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
+                const container = document.getElementById("assignments-container");
                 
-                // 1. Get enrolled courses (like my-learning.html does)
-                const enrolledCoursesRes = await fetch(`${API_BASE}/users/my-courses`, {
+                // First, get enrolled courses
+                const enrolledCoursesRes = await fetch("https://cs-eslamhatem-backend-1i25nw.fly.dev/api/users/my-courses", {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 
@@ -891,25 +931,51 @@
                 enrolledCourses = await enrolledCoursesRes.json();
                 const enrolledCourseIds = enrolledCourses.map(course => course._id);
                 
-                // 2. Get all assignments
-                const assignmentsRes = await fetch(`${API_BASE}/users/my-assignments`, {
-                    headers: { "Authorization": "Bearer " + token }
-                });
-                
-                if (assignmentsRes.status === 401) {
-                    localStorage.removeItem("token");
-                    window.location.href = 'login.html';
-                    return;
+                // Try Primary API first
+                let primaryApiAssignments = [];
+                try {
+                    const primaryRes = await fetch("https://cs-eslamhatem.fly.dev/api/users/my-assignments", {
+                        headers: { "Authorization": "Bearer " + token }
+                    });
+                    
+                    if (primaryRes.ok) {
+                        const primaryData = await primaryRes.json();
+                        primaryApiAssignments = primaryData.data || primaryData.assignments || [];
+                        apiStatus.primary = true;
+                        console.log(`Primary API returned ${primaryApiAssignments.length} assignments`);
+                    } else {
+                        console.log("Primary API failed, will try secondary API");
+                    }
+                } catch (primaryError) {
+                    console.log("Primary API error:", primaryError.message);
                 }
                 
-                const data = await assignmentsRes.json();
-                const allAssignments = data.data || [];
+                // Try Secondary API
+                let secondaryApiAssignments = [];
+                try {
+                    const secondaryRes = await fetch("https://cs-eslamhatem-backend-1i25nw.fly.dev/api/users/my-assignments", {
+                        headers: { "Authorization": "Bearer " + token }
+                    });
+                    
+                    if (secondaryRes.ok) {
+                        const secondaryData = await secondaryRes.json();
+                        secondaryApiAssignments = secondaryData.data || secondaryData.assignments || [];
+                        apiStatus.secondary = true;
+                        console.log(`Secondary API returned ${secondaryApiAssignments.length} assignments`);
+                    }
+                } catch (secondaryError) {
+                    console.log("Secondary API error:", secondaryError.message);
+                }
                 
-                // 3. Filter assignments: only show assignments from enrolled courses
-                assignments = allAssignments.filter(assignment => {
-                    // Check if assignment has a course property
+                // Combine assignments, avoiding duplicates
+                const allAssignments = [...primaryApiAssignments, ...secondaryApiAssignments];
+                const uniqueAssignments = removeDuplicates(allAssignments);
+                
+                // Filter assignments: only show assignments from enrolled courses
+                assignments = uniqueAssignments.filter(assignment => {
+                    // If assignment has no course association, show it (some assignments might be general)
                     if (!assignment.course) {
-                        return false; // Hide assignments without course association
+                        return true;
                     }
                     
                     // Check if the assignment's course is in our enrolled courses
@@ -917,16 +983,22 @@
                     return enrolledCourseIds.some(courseId => courseId.toString() === assignmentCourseId);
                 });
                 
-                // 4. Add course name to each assignment for display
+                // Add course name to each assignment for display
                 assignments.forEach(assignment => {
-                    const course = enrolledCourses.find(c => c._id.toString() === assignment.course.toString());
-                    assignment.courseName = course ? course.title : 'Unknown Course';
+                    if (assignment.course) {
+                        const course = enrolledCourses.find(c => c._id.toString() === assignment.course.toString());
+                        assignment.courseName = course ? course.title : 'Unknown Course';
+                        assignment.apiSource = course ? (primaryApiAssignments.includes(assignment) ? 'primary' : 'secondary') : 'unknown';
+                    } else {
+                        assignment.courseName = 'General Assignment';
+                        assignment.apiSource = primaryApiAssignments.includes(assignment) ? 'primary' : 'secondary';
+                    }
                 });
                 
-                // 5. Handle empty state
+                // Handle empty state
                 if (assignments.length === 0) {
                     if (enrolledCourses.length === 0) {
-                        document.getElementById("assignments-container").innerHTML = `
+                        container.innerHTML = `
                             <div class="empty-state">
                                 <i class="fas fa-graduation-cap"></i>
                                 <p>You are not enrolled in any courses yet.</p>
@@ -935,15 +1007,16 @@
                             </div>
                         `;
                     } else {
-                        document.getElementById("assignments-container").innerHTML = `
+                        container.innerHTML = `
                             <div class="empty-state">
                                 <i class="fas fa-clipboard-check"></i>
                                 <p>No assignments found for your enrolled courses.</p>
                                 <p>Assignments will appear here when created by your instructor.</p>
-                                <div style="margin-top: 20px;">
-                                    <p style="color: var(--secondary);">Your enrolled courses:</p>
+                                <div style="margin-top: 20px; color: ${!apiStatus.primary && !apiStatus.secondary ? '#f87171' : 'inherit'};">
+                                    <p>API Status:</p>
                                     <ul style="text-align: left; display: inline-block; margin-top: 10px;">
-                                        ${enrolledCourses.map(course => `<li>${course.title}</li>`).join('')}
+                                        <li>Primary API: ${apiStatus.primary ? '✅ Connected' : '❌ Not available'}</li>
+                                        <li>Secondary API: ${apiStatus.secondary ? '✅ Connected' : '❌ Not available'}</li>
                                     </ul>
                                 </div>
                             </div>
@@ -962,16 +1035,54 @@
                 
                 // Render assignments
                 renderAssignments();
+                
+                // Update API status display
+                updateAPIStatusDisplay();
             } catch (err) {
                 console.error("Load assignments error:", err);
                 document.getElementById("assignments-container").innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exclamation-circle"></i>
                         <p>Error loading assignments. Please try again.</p>
-                        <button class="btn btn-primary" onclick="loadAssignments()" style="margin-top: 15px;">Retry</button>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Error: ${err.message}</p>
+                        <button class="btn btn-primary" onclick="loadAssignmentsFromBothAPIs()" style="margin-top: 15px;">Retry</button>
                     </div>
                 `;
             }
+        }
+
+        // Remove duplicate assignments based on ID
+        function removeDuplicates(assignments) {
+            const seen = new Set();
+            const unique = [];
+            
+            for (const assignment of assignments) {
+                if (assignment._id && !seen.has(assignment._id)) {
+                    seen.add(assignment._id);
+                    unique.push(assignment);
+                }
+            }
+            
+            return unique;
+        }
+
+        // Update API status display
+        function updateAPIStatusDisplay() {
+            const apiInfo = document.querySelector('.api-info');
+            if (!apiInfo) return;
+            
+            let statusText = '';
+            if (apiStatus.primary && apiStatus.secondary) {
+                statusText = '✅ Both APIs connected';
+            } else if (apiStatus.primary) {
+                statusText = '✅ Primary API connected (Backup unavailable)';
+            } else if (apiStatus.secondary) {
+                statusText = '⚠️ Using Backup API (Primary unavailable)';
+            } else {
+                statusText = '❌ Both APIs unavailable';
+            }
+            
+            apiInfo.querySelector('p').textContent = statusText;
         }
 
         // Update assignment statistics
@@ -1040,13 +1151,20 @@
                     statusText = 'Pending';
                 }
                 
+                // Determine which API this came from
+                const apiSource = assignment.apiSource || 'unknown';
+                const apiBadgeClass = apiSource === 'primary' ? 'api-primary' : 'api-secondary';
+                const apiBadgeText = apiSource === 'primary' ? 'Primary' : 'Backup';
+                
                 assignmentCard.innerHTML = `
                     <div class="assignment-header">
-                        <h3 class="assignment-title">${assignment.title}</h3>
+                        <div>
+                            <h3 class="assignment-title">${assignment.title}</h3>
+                            <span class="api-source-badge ${apiBadgeClass}">${apiBadgeText} API</span>
+                        </div>
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
                     
-                    <!-- ADDED: Course Name Display -->
                     <div class="course-info">
                         <i class="fas fa-graduation-cap"></i>
                         <span>${assignment.courseName || 'Course Assignment'}</span>
@@ -1065,7 +1183,14 @@
                         ${assignment.pdf ? `
                             <div class="meta-item">
                                 <i class="fas fa-file-pdf"></i>
-                                <a href="https://cs-eslamhatem-backend-1i25nw.fly.dev/uploads/${assignment.pdf}" target="_blank">Download PDF</a>
+                                <a href="${getPdfUrl(assignment, apiSource)}" target="_blank">Download PDF</a>
+                            </div>
+                        ` : ''}
+                        
+                        ${assignment.createdAt ? `
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                Assigned: ${new Date(assignment.createdAt).toLocaleDateString()}
                             </div>
                         ` : ''}
                     </div>
@@ -1091,6 +1216,23 @@
             });
         }
 
+        // Get PDF URL based on API source
+        function getPdfUrl(assignment, apiSource) {
+            if (!assignment.pdf) return '#';
+            
+            // If it's a full URL, return as is
+            if (assignment.pdf.startsWith('http')) {
+                return assignment.pdf;
+            }
+            
+            // Otherwise, construct the URL based on API source
+            const baseUrl = apiSource === 'primary' 
+                ? 'https://cs-eslamhatem.fly.dev/uploads/' 
+                : 'https://cs-eslamhatem-backend-1i25nw.fly.dev/uploads/';
+            
+            return baseUrl + assignment.pdf;
+        }
+
         // Render submission details for already submitted assignments
         function renderSubmissionDetails(assignment) {
             return `
@@ -1101,8 +1243,19 @@
                     </div>
                     
                     <div class="submission-meta">
-                        <div class="meta-item">
-                        </div>
+                        ${assignment.submission.submittedAt ? `
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-check"></i>
+                                Submitted: ${new Date(assignment.submission.submittedAt).toLocaleDateString()}
+                            </div>
+                        ` : ''}
+                        
+                        ${assignment.submission.file ? `
+                            <div class="meta-item">
+                                <i class="fas fa-paperclip"></i>
+                                <a href="${getSubmissionFileUrl(assignment)}" target="_blank">Download Submission</a>
+                            </div>
+                        ` : ''}
                     </div>
                     
                     ${assignment.submission.grade !== undefined && assignment.submission.grade !== null ? `
@@ -1121,8 +1274,32 @@
                             ${assignment.submission.feedback}
                         </div>
                     ` : ''}
+                    
+                    ${assignment.submission.textAnswer ? `
+                        <div class="feedback" style="margin-top: 10px;">
+                            <strong>Your Answer:</strong><br>
+                            ${assignment.submission.textAnswer}
+                        </div>
+                    ` : ''}
                 </div>
             `;
+        }
+
+        // Get submission file URL
+        function getSubmissionFileUrl(assignment) {
+            if (!assignment.submission || !assignment.submission.file) return '#';
+            
+            if (assignment.submission.file.startsWith('http')) {
+                return assignment.submission.file;
+            }
+            
+            // Try to determine which API to use based on assignment source
+            const apiSource = assignment.apiSource || 'secondary';
+            const baseUrl = apiSource === 'primary' 
+                ? 'https://cs-eslamhatem.fly.dev/uploads/' 
+                : 'https://cs-eslamhatem-backend-1i25nw.fly.dev/uploads/';
+            
+            return baseUrl + assignment.submission.file;
         }
 
         // Render submission form for unsubmitted assignments
@@ -1130,28 +1307,32 @@
             const now = new Date();
             const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null;
             const isOverdue = dueDate && dueDate < now;
+            const apiSource = assignment.apiSource || 'secondary';
             
             return `
-                <form class="submission-form" onsubmit="submitAssignment(event, '${assignment._id}')">
+                <form class="submission-form" onsubmit="submitAssignment(event, '${assignment._id}', '${apiSource}')">
                     <div class="form-group">
-                        <label class="form-label" for="textAnswer-${assignment._id}">Your Comment:</label>
+                        <label class="form-label" for="textAnswer-${assignment._id}">Your Answer/Explanation:</label>
                         <textarea 
                             id="textAnswer-${assignment._id}" 
                             name="textAnswer" 
-                            placeholder="Write your comment here..." 
+                            placeholder="Write your answer or explanation here..." 
                             rows="4"
                             ${isOverdue ? 'disabled' : ''}
                         ></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label" for="file-${assignment._id}">Upload File (optional):</label>
+                        <label class="form-label" for="file-${assignment._id}">Upload File (Code, PDF, etc.):</label>
                         <input 
                             type="file" 
                             id="file-${assignment._id}" 
                             name="file"
                             ${isOverdue ? 'disabled' : ''}
                         >
+                        <div style="font-size: 0.8rem; color: rgba(240, 246, 255, 0.6); margin-top: 5px;">
+                            Maximum file size: 10MB
+                        </div>
                     </div>
                     
                     <button 
@@ -1159,14 +1340,19 @@
                         class="btn btn-primary"
                         ${isOverdue ? 'disabled' : ''}
                     >
+                        <i class="fas fa-paper-plane"></i>
                         ${isOverdue ? 'Assignment Closed' : 'Submit Assignment'}
                     </button>
                     
                     ${isOverdue ? `
-                        <div style="margin-top: 10px; color: #f87171;">
+                        <div style="margin-top: 10px; color: #f87171; font-size: 0.9rem;">
                             <i class="fas fa-exclamation-circle"></i> This assignment is overdue and can no longer be submitted.
                         </div>
                     ` : ''}
+                    
+                    <div style="font-size: 0.8rem; color: rgba(240, 246, 255, 0.5); margin-top: 10px;">
+                        <i class="fas fa-info-circle"></i> Submitting via ${apiSource === 'primary' ? 'Primary' : 'Backup'} API
+                    </div>
                 </form>
             `;
         }
@@ -1221,15 +1407,26 @@
         }
 
         // Submit assignment
-        async function submitAssignment(e, assignmentId) {
+        async function submitAssignment(e, assignmentId, apiSource) {
             e.preventDefault();
             const form = e.target;
-            const formData = new FormData(form);
-            formData.append("assignmentId", assignmentId);
-
+            const submitButton = form.querySelector('.btn-primary');
+            const originalButtonText = submitButton.innerHTML;
+            
+            // Disable button and show loading
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            
             try {
-                const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
-                const res = await fetch(`${API_BASE}/users/submit-assignment`, {
+                const formData = new FormData(form);
+                formData.append("assignmentId", assignmentId);
+                
+                // Determine which API to submit to
+                const baseUrl = apiSource === 'primary' 
+                    ? 'https://cs-eslamhatem.fly.dev/api' 
+                    : 'https://cs-eslamhatem-backend-1i25nw.fly.dev/api';
+                
+                const res = await fetch(`${baseUrl}/users/submit-assignment`, {
                     method: "POST",
                     headers: { "Authorization": "Bearer " + token },
                     body: formData
@@ -1238,37 +1435,40 @@
                 const data = await res.json();
                 
                 if (data.success) {
-                    alert("Assignment submitted successfully!");
-                    form.reset();
+                    // Show success message
+                    const successDiv = document.createElement('div');
+                    successDiv.innerHTML = `
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(74, 222, 128, 0.1); border-radius: 8px; border-left: 4px solid #4ade80;">
+                            <i class="fas fa-check-circle" style="color: #4ade80; margin-right: 8px;"></i>
+                            Assignment submitted successfully!
+                        </div>
+                    `;
+                    form.parentNode.insertBefore(successDiv, form.nextSibling);
                     
-                    // Reload assignments to update the UI
-                    loadAssignments();
+                    // Remove the form
+                    form.style.display = 'none';
+                    
+                    // Reload assignments after a short delay
+                    setTimeout(() => {
+                        loadAssignmentsFromBothAPIs();
+                    }, 2000);
                 } else {
                     alert("Error submitting assignment: " + (data.error || "Unknown error"));
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
                 }
             } catch (err) {
                 console.error("Submit error:", err);
                 alert("Error submitting assignment. Please try again.");
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
             }
         }
 
-        // Helper function to get enrolled courses
-        async function getEnrolledCourses() {
-            try {
-                const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
-                const res = await fetch(`${API_BASE}/users/my-courses`, {
-                    headers: { "Authorization": "Bearer " + token }
-                });
-                
-                if (res.ok) {
-                    return await res.json();
-                }
-                return [];
-            } catch (err) {
-                console.error("Error fetching enrolled courses:", err);
-                return [];
-            }
-        }
+        // Retry loading assignments
+        window.retryLoadAssignments = function() {
+            loadAssignmentsFromBothAPIs();
+        };
     </script>
 </body>
 </html>
