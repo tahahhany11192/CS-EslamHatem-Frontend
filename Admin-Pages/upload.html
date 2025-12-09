@@ -23,7 +23,7 @@ async function uploadVideo() {
     if (!title) return alert("Please enter a name for your video!");
 
     // 1️⃣ – Get presigned URL from backend
-    const res = await fetch(`http://localhost:5000/api/r2/upload-url?filename=${file.name}&contentType=${file.type}`);
+    const res = await fetch(`https://cs-eslamhatem.fly.dev/api/r2/upload-url?filename=${file.name}&contentType=${file.type}`);
     const data = await res.json();
 
     const uploadUrl = data.uploadUrl;
@@ -72,7 +72,7 @@ async function uploadVideo() {
                 document.getElementById("etaInfo").innerHTML = "Upload complete! Saving...";
 
                 // 3️⃣ – Save record in database
-                const saveRes = await fetch(`http://localhost:5000/api/r2/save-video`, {
+                const saveRes = await fetch(`https://cs-eslamhatem.fly.dev/api/r2/save-video`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
