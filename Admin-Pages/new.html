@@ -1,133 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Video Upload</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<input type="file" id="videoFile" accept="video/*" />
+<button onclick="uploadVideo()">Upload</button>
+<progress id="progressBar" max="100" value="0"></progress>
+<div id="status"></div>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+<script>
+const API_KEY = "YOUR_SECRET_API_KEY";
+const WORKER_URL = "https://r2-upload-worker.cs-islamhatem.workers.dev";
 
-    .upload-box {
-      background: #020617;
-      padding: 25px;
-      border-radius: 10px;
-      width: 420px;
-      box-shadow: 0 0 20px rgba(0,0,0,.4);
-    }
+async function uploadVideo() {
+  const file = document.getElementById("videoFile").files[0];
+  const progressBar = document.getElementById("progressBar");
+  const status = document.getElementById("status");
+  
+  if (!file) return alert("Select a video");
+  
+  // Step 1: request pre-signed URL
+  const res = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-Key": API_KEY,
+    },
+    body: JSON.stringify({
+      filename: file.name,
+      fileType: file.type,
+      fileSize: file.size
+    }),
+  });
+  
+  if (!res.ok) return alert("Upload failed: " + await res.text());
+  
+  const { url, key } = await res.json();
+  
+  // Step 2: upload in chunks
+  const chunkSize = 10 * 1024 * 1024; // 10MB
+  let uploaded = 0;
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+  for (let start = 0; start < file.size; start += chunkSize) {
+    const end = Math.min(start + chunkSize, file.size);
+    const chunk = file.slice(start, end);
 
-    input[type=file] {
-      width: 100%;
-      margin-bottom: 15px;
-    }
+    await fetch(url, { method: "PUT", body: chunk });
+    uploaded += chunk.size;
+    progressBar.value = (uploaded / file.size) * 100;
+    status.textContent = `Uploading ${Math.round(progressBar.value)}%`;
+  }
 
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #2563eb;
-      border: none;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    button:disabled {
-      background: #334155;
-      cursor: not-allowed;
-    }
-
-    progress {
-      width: 100%;
-      height: 20px;
-      margin-top: 15px;
-    }
-
-    .status {
-      margin-top: 10px;
-      text-align: center;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="upload-box">
-    <h2>Upload Video</h2>
-
-    <input type="file" id="videoFile" accept="video/*" />
-
-    <button id="uploadBtn" onclick="uploadVideo()">Upload</button>
-
-    <progress id="progressBar" value="0" max="100"></progress>
-
-    <div class="status" id="statusText"></div>
-  </div>
-
-  <script>
-    const WORKER_URL = "https://r2-upload-worker.cs-islamhatem.workers.dev";
-
-    function uploadVideo() {
-      const fileInput = document.getElementById("videoFile");
-      const file = fileInput.files[0];
-      const progressBar = document.getElementById("progressBar");
-      const statusText = document.getElementById("statusText");
-      const uploadBtn = document.getElementById("uploadBtn");
-
-      if (!file) {
-        alert("Please select a video");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("video", file);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", WORKER_URL, true);
-
-      uploadBtn.disabled = true;
-      statusText.textContent = "Uploading...";
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const percent = (e.loaded / e.total) * 100;
-          progressBar.value = percent;
-          statusText.textContent = `Uploading ${Math.round(percent)}%`;
-        }
-      };
-
-      xhr.onload = () => {
-        uploadBtn.disabled = false;
-        if (xhr.status === 200) {
-          const res = JSON.parse(xhr.responseText);
-          statusText.textContent = "Upload complete ✔";
-          console.log("Uploaded file key:", res.key);
-        } else {
-          statusText.textContent = "Upload failed ❌";
-        }
-      };
-
-      xhr.onerror = () => {
-        uploadBtn.disabled = false;
-        statusText.textContent = "Network error ❌";
-      };
-
-      xhr.send(formData);
-    }
-  </script>
-
-</body>
-</html>
+  status.textContent = "Upload complete ✔";
+  console.log("R2 key:", key);
+}
+</script>
