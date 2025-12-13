@@ -1,534 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R2 Video Uploader</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.2rem;
-        }
-        
-        .subtitle {
-            text-align: center;
-            opacity: 0.8;
-            margin-bottom: 30px;
-        }
-        
-        .upload-area {
-            border: 3px dashed rgba(255, 255, 255, 0.4);
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .upload-area:hover, .upload-area.dragover {
-            border-color: #4facfe;
-            background: rgba(79, 172, 254, 0.1);
-        }
-        
-        .upload-area i {
-            font-size: 3.5rem;
-            color: #4facfe;
-            margin-bottom: 15px;
-            display: block;
-        }
-        
-        .upload-area .main-text {
-            font-size: 1.3rem;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .upload-area .sub-text {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        
-        #fileInput {
-            display: none;
-        }
-        
-        .file-info {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            display: none;
-        }
-        
-        .file-info p {
-            margin: 5px 0;
-        }
-        
-        .progress-container {
-            margin: 20px 0;
-            display: none;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 6px;
-        }
-        
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-        }
-        
-        button {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
-        }
-        
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .result.success {
-            border-left: 4px solid #4CAF50;
-        }
-        
-        .result.error {
-            border-left: 4px solid #f44336;
-        }
-        
-        .result h3 {
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .result-url {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            word-break: break-all;
-        }
-        
-        .result-url a {
-            color: #4facfe;
-            text-decoration: none;
-        }
-        
-        .result-url a:hover {
-            text-decoration: underline;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .note {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 193, 7, 0.1);
-            border-radius: 10px;
-            border-left: 4px solid #ffc107;
-            font-size: 0.9rem;
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <div class="container">
-        <h1><i class="fas fa-cloud-upload-alt"></i> Video Upload</h1>
-        <p class="subtitle">Upload videos directly to Cloudflare R2 storage</p>
-        
-        <div class="upload-area" id="uploadArea">
-            <i class="fas fa-file-video"></i>
-            <div class="main-text">Select a video file</div>
-            <div class="sub-text">Click to browse or drag & drop</div>
-            <div class="sub-text">Supported: MP4, MOV, AVI, MKV, WebM (Max 100MB)</div>
-            <input type="file" id="fileInput" accept="video/*">
-        </div>
-        
-        <div class="file-info" id="fileInfo">
-            <p><strong>Selected File:</strong> <span id="fileName"></span></p>
-            <p><strong>File Size:</strong> <span id="fileSize"></span></p>
-            <p><strong>File Type:</strong> <span id="fileType"></span></p>
-        </div>
-        
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="progress-text">
-                <span id="statusText">Preparing upload...</span>
-                <span id="progressPercent">0%</span>
-            </div>
-        </div>
-        
-        <button id="uploadBtn" onclick="uploadVideo()" disabled>
-            <i class="fas fa-cloud-upload-alt"></i> Upload Video
-        </button>
-        
-        <div class="result" id="resultContainer">
-            <h3 id="resultTitle"></h3>
-            <div id="resultMessage"></div>
-            <div class="result-url" id="resultUrl" style="display: none;">
-                <strong>Public URL:</strong><br>
-                <a id="publicUrl" target="_blank"></a>
-            </div>
-        </div>
-        
-        <div class="note">
-            <p><strong>Note:</strong> Videos are uploaded to Cloudflare R2 storage. The public URL will be available after upload.</p>
-        </div>
-    </div>
+<html>
+   <head>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  </head>
+   <body>
+     <div class="mb-3">
+        <label for="inputCategoryLogo" class="form-label">Logo Image</label>
+        <input type="file"
+               accept="image/*"
+               class="form-control form-control-sm"
+               id="inputCategoryLogo"/>
 
-    <script>
-        const API_KEY = "c7d8f2e4-5a6b-4c9d-9e1f-123456789abc";
-        const WORKER_URL = "https://r2-upload-worker.cs-islamhatem.workers.dev";
-        
-        let currentFile = null;
-        let isUploading = false;
-        
-        // DOM elements
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const fileType = document.getElementById('fileType');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressFill = document.getElementById('progressFill');
-        const statusText = document.getElementById('statusText');
-        const progressPercent = document.getElementById('progressPercent');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const resultContainer = document.getElementById('resultContainer');
-        const resultTitle = document.getElementById('resultTitle');
-        const resultMessage = document.getElementById('resultMessage');
-        const resultUrl = document.getElementById('resultUrl');
-        const publicUrl = document.getElementById('publicUrl');
-        
-        // Initialize
-        initUploader();
-        
-        function initUploader() {
-            // File selection via click
-            uploadArea.addEventListener('click', () => fileInput.click());
-            
-            // File input change
-            fileInput.addEventListener('change', handleFileSelect);
-            
-            // Drag and drop
-            uploadArea.addEventListener('dragover', handleDragOver);
-            uploadArea.addEventListener('dragleave', handleDragLeave);
-            uploadArea.addEventListener('drop', handleDrop);
-            
-            console.log('Uploader initialized');
-        }
-        
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                processSelectedFile(file);
-            }
-        }
-        
-        function handleDragOver(e) {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        }
-        
-        function handleDragLeave() {
-            uploadArea.classList.remove('dragover');
-        }
-        
-        function handleDrop(e) {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            
-            const file = e.dataTransfer.files[0];
-            if (file) {
-                processSelectedFile(file);
-            }
-        }
-        
-        function processSelectedFile(file) {
-            // Check if it's a video
-            if (!file.type.startsWith('video/')) {
-                showResult('Please select a video file (MP4, MOV, AVI, etc.)', 'error');
-                return;
-            }
-            
-            // Check file size (100MB limit)
-            if (file.size > 100 * 1024 * 1024) {
-                showResult('File is too large. Maximum size is 100MB.', 'error');
-                return;
-            }
-            
-            currentFile = file;
-            
-            // Update file info display
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            fileType.textContent = file.type || 'Unknown';
-            fileInfo.style.display = 'block';
-            
-            // Enable upload button
-            uploadBtn.disabled = false;
-            
-            // Reset progress and results
-            resetProgress();
-            hideResult();
-            
-            console.log(`File selected: ${file.name} (${formatFileSize(file.size)})`);
-        }
-        
-        async function uploadVideo() {
-            if (!currentFile || isUploading) return;
-            
-            isUploading = true;
-            
-            // Disable upload button and show progress
-            uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="loading"></span> Uploading...';
-            
-            // Show progress container
-            progressContainer.style.display = 'block';
-            updateProgress(10, 'Preparing upload...');
-            
-            // Hide previous results
-            hideResult();
-            
-            try {
-                // Create FormData
-                const formData = new FormData();
-                formData.append('file', currentFile);
-                
-                updateProgress(30, 'Uploading to server...');
-                
-                // Upload to worker
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout
-                
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: {
-                        'X-API-Key': API_KEY
-                    },
-                    body: formData,
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                updateProgress(70, 'Processing...');
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Server error (${response.status}): ${errorText}`);
+        <div class="my-3">
+            <div class="progress">
+                <div id="imageUploadProgressBar" class="progress-bar" role="progressbar" style="width: 0%;"
+                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+
+  
+        <input type="hidden" id="categoryLogoUrl" name="logo" value="">
+          
+         <img id="category-logo" class="card-img-top"
+                         src="/images/image-placeholder.png"
+                         style="max-width: 40rem; max-height: 40rem"
+                         alt="Card image cap">
+    </div>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-storage.js"></script>
+     <script>
+        // Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCU3yj4qS00er8j5wn08weT7jWewldYU28",
+  authDomain: "uploadfilestorage.firebaseapp.com",
+  projectId: "uploadfilestorage",
+  storageBucket: "uploadfilestorage.firebasestorage.app",
+  messagingSenderId: "736631149334",
+  appId: "1:736631149334:web:7a3ed9d081a1a729787637"
+};
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        console.log("firebase initialized.")
+        // render the image file in image view
+        const imageInputField = document.getElementById("inputCategoryLogo")
+        const preview = document.getElementById("category-logo")
+        const hiddenImageUrlHolderInputField = document.getElementById("categoryLogoUrl");
+        onImageSelected(imageInputField, preview, hiddenImageUrlHolderInputField);
+        function onImageSelected(inputImageField, previewImg, imageUrlHolderHiddenInputField) {
+            const funcName = "onImageSelected(): ";
+            console.log(funcName);
+            inputImageField.addEventListener("change", function () {
+                console.log(funcName + "image selected for logo")
+                if (this.files && this.files[0]) {
+                    uploadToFirebase(this.files[0], function (imageUrl) {
+                        console.log(funcName + "adding image url to src")
+                        imageUrlHolderHiddenInputField.setAttribute("value", imageUrl);
+                        previewImg.setAttribute('src', imageUrl);
+                    });
                 }
-                
-                const result = await response.json();
-                
-                if (!result.success) {
-                    throw new Error(result.error || 'Upload failed');
+            });
+        }
+        function uploadToFirebase(file, onUploadSuccess) {
+            const fileName = file.name;
+            // Points to the root reference
+            const storageRef = firebase.storage().ref();
+            // Points to 'images'
+            const imagesStorageRef = storageRef.child('images');
+            // space ref where image will be stored
+            const currentDate = new Date().getTime();
+            const spaceRef = imagesStorageRef.child(currentDate + "-" + fileName);
+            const uploadTask = spaceRef.put(file);
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    // Observe state change events such as progress, pause, and resume
+                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                    let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                    const imageUploadProgressBar = document.querySelector("#imageUploadProgressBar");
+                    imageUploadProgressBar.setAttribute("style", "width: " + progress + "%;");
+                    imageUploadProgressBar.setAttribute("aria-valuenow", progress + "");
+                },
+                (error) => {
+                    // Handle unsuccessful uploads
+                },
+                () => {
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        console.log('File available at', downloadURL);
+                        onUploadSuccess(downloadURL);
+                    });
                 }
-                
-                updateProgress(100, 'Upload complete!');
-                
-                // Show success
-                setTimeout(() => {
-                    showResult(
-                        'Video uploaded successfully!',
-                        'success',
-                        result.publicUrl,
-                        `Your video has been uploaded. File size: ${formatFileSize(result.size)}`
-                    );
-                    
-                    // Reset for next upload
-                    resetUploader();
-                }, 1000);
-                
-            } catch (error) {
-                console.error('Upload error:', error);
-                
-                // Show error
-                let errorMessage = error.message;
-                
-                if (error.name === 'AbortError') {
-                    errorMessage = 'Upload timed out. Please try again.';
-                } else if (error.message.includes('Network')) {
-                    errorMessage = 'Network error. Please check your connection and try again.';
-                }
-                
-                showResult('Upload failed', 'error', null, errorMessage);
-                
-                // Reset uploader
-                resetUploader();
-            } finally {
-                isUploading = false;
-            }
+            );
         }
-        
-        function updateProgress(percent, text) {
-            progressFill.style.width = `${percent}%`;
-            progressPercent.textContent = `${percent}%`;
-            statusText.textContent = text;
+        function parseImageNameFromUrl(imageUrl){
+            const startIdx = imageUrl.indexOf("images%2F") + "images%2F".length;
+            const endIdx = imageUrl.indexOf("?alt",startIdx);
+            const imageName = imageUrl.substring(startIdx, endIdx);
+            console.log("parseImageNameFromUrl()->"+imageName);
         }
-        
-        function resetProgress() {
-            progressFill.style.width = '0%';
-            progressPercent.textContent = '0%';
-            statusText.textContent = 'Waiting...';
-            progressContainer.style.display = 'none';
+        function deleteImageFromFirebaseStorage(imageUrl) {
+            const imageName = parseImageNameFromUrl(imageUrl)
+            // Create a reference to the file to delete
+            const desertRef = storageRef.child('images/'+imageName);
+            // Delete the file
+            desertRef.delete().then(() => {
+                // File deleted successfully
+                console.log(imageName+" deleted successfully form firebase")
+            }).catch((error) => {
+                // Uh-oh, an error occurred!
+                console.log(imageName+" was not deleted from firebase.")
+            });
         }
-        
-        function resetUploader() {
-            uploadBtn.disabled = false;
-            uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Video';
-            currentFile = null;
-            fileInfo.style.display = 'none';
-            
-            // Clear file input
-            fileInput.value = '';
-            
-            // Hide progress after delay
-            setTimeout(() => {
-                progressContainer.style.display = 'none';
-            }, 2000);
-        }
-        
-        function showResult(title, type, url = null, message = '') {
-            resultContainer.className = `result ${type}`;
-            resultTitle.innerHTML = type === 'success' 
-                ? '<i class="fas fa-check-circle"></i> ' + title
-                : '<i class="fas fa-exclamation-circle"></i> ' + title;
-            
-            resultMessage.textContent = message || title;
-            
-            if (url) {
-                publicUrl.href = url;
-                publicUrl.textContent = url;
-                resultUrl.style.display = 'block';
-            } else {
-                resultUrl.style.display = 'none';
-            }
-            
-            resultContainer.style.display = 'block';
-            
-            // Auto-scroll to result
-            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        
-        function hideResult() {
-            resultContainer.style.display = 'none';
-        }
-        
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-        
-        // Prevent accidental page navigation during upload
-        window.addEventListener('beforeunload', (e) => {
-            if (isUploading) {
-                e.preventDefault();
-                e.returnValue = 'You have an upload in progress. Are you sure you want to leave?';
-                return e.returnValue;
-            }
-        });
     </script>
-</body>
+  </body>
 </html>
