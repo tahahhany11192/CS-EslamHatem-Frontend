@@ -1,55 +1,562 @@
-<input type="file" id="videoFile" accept="video/*">
-<button onclick="uploadVideo()">Upload</button>
-<progress id="progressBar" max="100" value="0"></progress>
-<div id="status"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R2 Video Uploader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        h1 i {
+            color: #f6821f;
+        }
+        
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            border-color: #6ac6ff;
+            background-color: rgba(106, 198, 255, 0.1);
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #6ac6ff;
+        }
+        
+        .upload-area p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .file-types {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        progress {
+            width: 100%;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        progress::-webkit-progress-bar {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        progress::-webkit-progress-value {
+            background-color: #28a745;
+            border-radius: 10px;
+        }
+        
+        progress::-moz-progress-bar {
+            background-color: #28a745;
+            border-radius: 10px;
+        }
+        
+        #status {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        #uploadBtn {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        #uploadBtn:hover:not(:disabled) {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        
+        #cancelBtn {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        #cancelBtn:hover:not(:disabled) {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+        
+        .result.success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .result.error {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .result-url {
+            word-break: break-all;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .result-url a {
+            color: #6ac6ff;
+            text-decoration: none;
+        }
+        
+        .result-url a:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-cloud-upload-alt"></i> R2 Video Uploader</h1>
+        
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-file-video"></i>
+            <p>Click to select a video file</p>
+            <p class="file-types">Supports MP4, WebM, MOV, AVI, MKV (Max 2GB)</p>
+        </div>
+        
+        <input type="file" id="fileInput" accept="video/*">
+        
+        <div class="file-info" id="fileInfo">
+            <p><strong>File:</strong> <span id="fileName"></span></p>
+            <p><strong>Size:</strong> <span id="fileSize"></span></p>
+            <p><strong>Type:</strong> <span id="fileType"></span></p>
+        </div>
+        
+        <div class="progress-container" id="progressContainer">
+            <progress id="progressBar" max="100" value="0"></progress>
+            <div id="status">Waiting...</div>
+        </div>
+        
+        <div class="result" id="resultContainer">
+            <div id="resultMessage"></div>
+            <div class="result-url" id="resultUrl" style="display: none;">
+                <strong>Public URL:</strong> <a id="publicUrl" target="_blank"></a>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button id="cancelBtn" onclick="cancelUpload()" disabled>
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button id="uploadBtn" onclick="uploadVideo()" disabled>
+                <i class="fas fa-cloud-upload-alt"></i> Upload Video
+            </button>
+        </div>
+    </div>
 
-<script>
-const API_KEY = "c7d8f2e4-5a6b-4c9d-9e1f-123456789abc";
-const WORKER_URL = "https://r2-upload-worker.cs-islamhatem.workers.dev";
-
-async function uploadVideo() {
-  const file = document.getElementById("videoFile").files[0];
-  const status = document.getElementById("status");
-  const progressBar = document.getElementById("progressBar");
-
-  if (!file) return alert("Select a video");
-
-  const chunkSize = 10 * 1024 * 1024; // 10MB
-  const chunkCount = Math.ceil(file.size / chunkSize);
-
-  // Step 1: Get pre-signed URLs for all chunks
-  const resp = await fetch(WORKER_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-API-Key": API_KEY },
-    body: JSON.stringify({
-      filename: file.name,
-      fileType: file.type,
-      fileSize: file.size,
-      chunkCount
-    })
-  });
-
-  if (!resp.ok) {
-    const text = await resp.text();
-    return alert("Upload failed: " + text);
-  }
-
-  const { key, uploadId, urls } = await resp.json();
-
-  // Step 2: Upload chunks
-  for (let i = 0; i < urls.length; i++) {
-    const start = i * chunkSize;
-    const end = Math.min(start + chunkSize, file.size);
-    const chunk = file.slice(start, end);
-
-    await fetch(urls[i].url, { method: "PUT", body: chunk });
-
-    progressBar.value = ((i + 1) / chunkCount) * 100;
-    status.textContent = `Uploading ${Math.round(progressBar.value)}%`;
-  }
-
-  // Step 3: Complete multipart upload (optional, can be done in Worker or backend)
-  status.textContent = "Upload complete ✔";
-  console.log("R2 key:", key);
-}
-</script>
+    <script>
+        const API_KEY = "c7d8f2e4-5a6b-4c9d-9e1f-123456789abc";
+        const WORKER_URL = "https://r2-upload-worker.cs-islamhatem.workers.dev";
+        
+        let currentUpload = {
+            uploadId: null,
+            key: null,
+            parts: [],
+            isUploading: false
+        };
+        
+        // DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileType = document.getElementById('fileType');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const status = document.getElementById('status');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultMessage = document.getElementById('resultMessage');
+        const resultUrl = document.getElementById('resultUrl');
+        const publicUrl = document.getElementById('publicUrl');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        
+        // File selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Update file info
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileType.textContent = file.type || 'Unknown';
+                fileInfo.style.display = 'block';
+                
+                // Enable upload button
+                uploadBtn.disabled = false;
+                
+                // Reset progress
+                progressBar.value = 0;
+                status.textContent = 'Ready to upload';
+                progressContainer.style.display = 'none';
+                
+                // Hide any previous results
+                resultContainer.style.display = 'none';
+            }
+        });
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#6ac6ff';
+            uploadArea.style.backgroundColor = 'rgba(106, 198, 255, 0.1)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            uploadArea.style.backgroundColor = 'transparent';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            uploadArea.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+        
+        // Upload function
+        async function uploadVideo() {
+            const file = fileInput.files[0];
+            if (!file) {
+                showResult('Please select a video file first.', 'error');
+                return;
+            }
+            
+            // Reset state
+            currentUpload = {
+                uploadId: null,
+                key: null,
+                parts: [],
+                isUploading: true
+            };
+            
+            // Disable upload button, enable cancel button
+            uploadBtn.disabled = true;
+            cancelBtn.disabled = false;
+            uploadBtn.innerHTML = '<span class="loading"></span> Uploading...';
+            
+            // Show progress
+            progressContainer.style.display = 'block';
+            progressBar.value = 0;
+            status.textContent = 'Preparing upload...';
+            
+            // Hide previous results
+            resultContainer.style.display = 'none';
+            
+            const chunkSize = 10 * 1024 * 1024; // 10MB chunks
+            const chunkCount = Math.ceil(file.size / chunkSize);
+            
+            try {
+                // Step 1: Get pre-signed URLs for all chunks
+                status.textContent = 'Initializing upload...';
+                
+                const initResponse = await fetch(WORKER_URL, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json", 
+                        "X-API-Key": API_KEY 
+                    },
+                    body: JSON.stringify({
+                        filename: file.name,
+                        fileType: file.type,
+                        fileSize: file.size,
+                        chunkCount
+                    })
+                });
+                
+                if (!initResponse.ok) {
+                    const errorText = await initResponse.text();
+                    throw new Error(`Failed to initialize upload: ${errorText}`);
+                }
+                
+                const { key, uploadId, urls } = await initResponse.json();
+                
+                if (!key || !uploadId || !urls) {
+                    throw new Error('Invalid response from server');
+                }
+                
+                currentUpload.key = key;
+                currentUpload.uploadId = uploadId;
+                
+                // Step 2: Upload chunks
+                const uploadedParts = [];
+                
+                for (let i = 0; i < urls.length; i++) {
+                    if (!currentUpload.isUploading) {
+                        throw new Error('Upload cancelled');
+                    }
+                    
+                    const { partNumber, url } = urls[i];
+                    const start = (partNumber - 1) * chunkSize;
+                    const end = Math.min(start + chunkSize, file.size);
+                    const chunk = file.slice(start, end);
+                    
+                    status.textContent = `Uploading part ${partNumber} of ${chunkCount}...`;
+                    
+                    const uploadResponse = await fetch(url, {
+                        method: "PUT",
+                        body: chunk
+                    });
+                    
+                    if (!uploadResponse.ok) {
+                        throw new Error(`Failed to upload part ${partNumber}`);
+                    }
+                    
+                    // Get ETag from response
+                    const etag = uploadResponse.headers.get('ETag');
+                    if (etag) {
+                        uploadedParts.push({
+                            ETag: etag.replace(/"/g, ''), // Remove quotes
+                            PartNumber: partNumber
+                        });
+                    }
+                    
+                    // Update progress
+                    const progress = Math.round((partNumber / chunkCount) * 100);
+                    progressBar.value = progress;
+                    status.textContent = `Uploading... ${progress}%`;
+                }
+                
+                // Step 3: Complete multipart upload
+                status.textContent = 'Finalizing upload...';
+                
+                const completeUrl = `${WORKER_URL}?action=complete&uploadId=${uploadId}&key=${encodeURIComponent(key)}&parts=${encodeURIComponent(JSON.stringify(uploadedParts))}`;
+                
+                const completeResponse = await fetch(completeUrl, {
+                    method: "GET",
+                    headers: { "X-API-Key": API_KEY }
+                });
+                
+                if (!completeResponse.ok) {
+                    const errorText = await completeResponse.text();
+                    throw new Error(`Failed to complete upload: ${errorText}`);
+                }
+                
+                const completeData = await completeResponse.json();
+                
+                // Success!
+                progressBar.value = 100;
+                status.textContent = 'Upload complete!';
+                
+                // Generate public URL
+                const publicUrlStr = `https://pub-${'cs-islamhatem'}.${'408d7d602795b9c468f103fa8eb14769'}.r2.cloudflarestorage.com/${key}`;
+                
+                showResult(
+                    'Video uploaded successfully!', 
+                    'success',
+                    publicUrlStr
+                );
+                
+                // Reset upload state
+                currentUpload.isUploading = false;
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                
+                // Try to abort the upload if it was started
+                if (currentUpload.uploadId && currentUpload.key) {
+                    try {
+                        const abortUrl = `${WORKER_URL}?action=abort&uploadId=${currentUpload.uploadId}&key=${encodeURIComponent(currentUpload.key)}`;
+                        await fetch(abortUrl, {
+                            method: "GET",
+                            headers: { "X-API-Key": API_KEY }
+                        });
+                    } catch (abortError) {
+                        console.warn('Failed to abort upload:', abortError);
+                    }
+                }
+                
+                showResult(`Upload failed: ${error.message}`, 'error');
+            } finally {
+                // Reset UI
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Video';
+                cancelBtn.disabled = true;
+                currentUpload.isUploading = false;
+            }
+        }
+        
+        // Cancel upload
+        async function cancelUpload() {
+            if (confirm('Are you sure you want to cancel the upload?')) {
+                currentUpload.isUploading = false;
+                cancelBtn.disabled = true;
+                status.textContent = 'Cancelling...';
+                
+                // Try to abort the upload on server
+                if (currentUpload.uploadId && currentUpload.key) {
+                    try {
+                        const abortUrl = `${WORKER_URL}?action=abort&uploadId=${currentUpload.uploadId}&key=${encodeURIComponent(currentUpload.key)}`;
+                        await fetch(abortUrl, {
+                            method: "GET",
+                            headers: { "X-API-Key": API_KEY }
+                        });
+                    } catch (error) {
+                        console.warn('Failed to abort upload:', error);
+                    }
+                }
+                
+                showResult('Upload cancelled', 'error');
+                progressContainer.style.display = 'none';
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Video';
+            }
+        }
+        
+        // Show result message
+        function showResult(message, type, url = null) {
+            resultContainer.className = `result ${type}`;
+            resultMessage.textContent = message;
+            
+            if (url) {
+                publicUrl.href = url;
+                publicUrl.textContent = url;
+                resultUrl.style.display = 'block';
+            } else {
+                resultUrl.style.display = 'none';
+            }
+            
+            resultContainer.style.display = 'block';
+            
+            // Scroll to result
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Prevent accidental page reload during upload
+        window.addEventListener('beforeunload', function(e) {
+            if (currentUpload.isUploading) {
+                e.preventDefault();
+                e.returnValue = 'You have an upload in progress. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
+    </script>
+</body>
+</html>
