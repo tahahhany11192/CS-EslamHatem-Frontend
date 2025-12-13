@@ -496,6 +496,43 @@
         grid-template-columns: 1fr;
       }
     }
+
+   .video-select-container {
+  position: relative;
+}
+
+.video-info {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style for video dropdown */
+#videoSelect {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 153, 0, 0.3);
+  color: var(--light);
+  padding: 12px 15px;
+  border-radius: 8px;
+  width: 100%;
+  font-family: 'Exo 2', sans-serif;
+  transition: all 0.3s ease;
+}
+
+#videoSelect:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 15px rgba(255, 153, 0, 0.3);
+}
+
+#videoSelect option {
+  background: var(--dark);
+  color: var(--light);
+  padding: 10px;
+}
   </style>
 </head>
 <body>
@@ -1078,5 +1115,260 @@
     // Initial load
     loadCourses();
   </script>
+ <script>
+  // Firebase Configuration (same as upload.html)
+const firebaseConfig = {
+  apiKey: "AIzaSyCU3yj4qS00er8j5wn08weT7jWewldYU28",
+  authDomain: "uploadfilestorage.firebaseapp.com",
+  projectId: "uploadfilestorage",
+  storageBucket: "uploadfilestorage.firebasestorage.app",
+  messagingSenderId: "736631149334",
+  appId: "1:736631149334:web:7a3ed9d081a1a729787637"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+
+// DOM Elements
+const videoSelect = document.getElementById("videoSelect");
+const videoInfo = document.getElementById("videoInfo");
+const selectedVideoName = document.getElementById("selectedVideoName");
+const selectedVideoSize = document.getElementById("selectedVideoSize");
+const selectedVideoUrl = document.getElementById("selectedVideoUrl");
+const refreshVideosBtn = document.getElementById("refreshVideosBtn");
+
+// Fetch videos from Firebase
+async function fetchFirebaseVideos() {
+  try {
+    // Show loading state
+    videoSelect.innerHTML = '<option value="">Loading videos...</option>';
+    
+    // List all videos from Firebase Storage
+    const storageRef = storage.ref();
+    
+    // Check different folders
+    const folders = ['videos/', 'user_uploads/', 'archive/'];
+    let allVideos = [];
+    
+    for (const folder of folders) {
+      try {
+        const folderRef = storageRef.child(folder);
+        const listResult = await folderRef.listAll();
+        
+        const videoFiles = listResult.items.filter(item => {
+          const name = item.name.toLowerCase();
+          return name.endsWith('.mp4') || name.endsWith('.avi') || 
+                 name.endsWith('.mov') || name.endsWith('.mkv') ||
+                 name.endsWith('.webm') || name.endsWith('.wmv') ||
+                 name.endsWith('.flv');
+        });
+        
+        // Get metadata for each video
+        for (const item of videoFiles) {
+          try {
+            const metadata = await item.getMetadata();
+            const downloadURL = await item.getDownloadURL();
+            
+            allVideos.push({
+              name: item.name,
+              url: downloadURL,
+              path: item.fullPath,
+              size: metadata.size,
+              contentType: metadata.contentType,
+              createdAt: metadata.timeCreated,
+              folder: folder
+            });
+          } catch (err) {
+            console.warn(`Could not get metadata for ${item.name}:`, err);
+          }
+        }
+      } catch (err) {
+        console.warn(`Could not list files in ${folder}:`, err);
+      }
+    }
+    
+    // Sort by date (newest first)
+    allVideos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    // Populate dropdown
+    if (allVideos.length === 0) {
+      videoSelect.innerHTML = '<option value="">No videos found in Firebase</option>';
+      return;
+    }
+    
+    videoSelect.innerHTML = '<option value="">-- Select a video from Firebase --</option>';
+    
+    allVideos.forEach(video => {
+      const option = document.createElement('option');
+      option.value = video.url;
+      option.textContent = `${video.name} (${formatFileSize(video.size)}) - ${video.folder}`;
+      option.dataset.name = video.name;
+      option.dataset.size = video.size;
+      videoSelect.appendChild(option);
+    });
+    
+    console.log(`Loaded ${allVideos.length} videos from Firebase`);
+    
+  } catch (error) {
+    console.error('Error fetching videos:', error);
+    videoSelect.innerHTML = '<option value="">Error loading videos</option>';
+    showError('Failed to load videos from Firebase. Please check console.');
+  }
+}
+
+// Format file size
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Handle video selection
+videoSelect.addEventListener('change', function() {
+  if (this.value) {
+    const selectedOption = this.options[this.selectedIndex];
+    selectedVideoName.textContent = selectedOption.dataset.name;
+    selectedVideoSize.textContent = formatFileSize(selectedOption.dataset.size);
+    selectedVideoUrl.value = this.value;
+    videoInfo.style.display = 'block';
+  } else {
+    videoInfo.style.display = 'none';
+    selectedVideoUrl.value = '';
+  }
+});
+
+// Refresh videos button
+refreshVideosBtn.addEventListener('click', fetchFirebaseVideos);
+
+// Initial load
+fetchFirebaseVideos();
+
+// Update form submission to include videoUrl
+document.getElementById("fileForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const lessonId = lessonSelect.value;
+  
+  if (!lessonId) {
+    showError("Please select a lesson first.");
+    return;
+  }
+
+  // Check if video is selected
+  if (!selectedVideoUrl.value && !videoInput.files[0]) {
+    showError("Please select a video from Firebase or upload a new one.");
+    return;
+  }
+
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+  submitBtn.disabled = true;
+
+  // Reset progress bars
+  resetProgressBars();
+
+  const formData = new FormData();
+  let hasFiles = false;
+  
+  if (materialInput.files[0]) {
+    formData.append("material", materialInput.files[0]);
+    hasFiles = true;
+    materialProgress.style.display = "block";
+  }
+  
+  // Add Firebase video URL to form data
+  if (selectedVideoUrl.value) {
+    formData.append("videoUrl", selectedVideoUrl.value);
+    hasFiles = true;
+  } else if (videoInput.files[0]) {
+    // Fallback to file upload (if you keep the file input as backup)
+    formData.append("video", videoInput.files[0]);
+    hasFiles = true;
+    videoProgress.style.display = "block";
+  }
+  
+  if (thumbnailInput.files[0]) {
+    formData.append("thumbnail", thumbnailInput.files[0]);
+    hasFiles = true;
+    thumbnailProgress.style.display = "block";
+  }
+
+  if (!hasFiles) {
+    showError("Please select at least one file to upload.");
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+    return;
+  }
+
+  // Rest of your upload logic remains the same...
+  try {
+    const xhr = new XMLHttpRequest();
+    
+    // Track upload progress
+    xhr.upload.addEventListener("progress", function(event) {
+      if (event.lengthComputable) {
+        const percentComplete = (event.loaded / event.total) * 100;
+        updateProgressBars(percentComplete, event.loaded, event.total, event.timeStamp);
+      }
+    });
+    
+    xhr.addEventListener("load", function() {
+      if (xhr.status === 200 || xhr.status === 201) {
+        try {
+          const response = JSON.parse(xhr.responseText);
+          showSuccess("✅ Files uploaded successfully!");
+          // Clear file inputs
+          materialInput.value = "";
+          videoInput.value = "";
+          thumbnailInput.value = "";
+          materialFileName.textContent = "";
+          videoFileName.textContent = "";
+          thumbnailFileName.textContent = "";
+          // Clear video selection
+          videoSelect.value = "";
+          selectedVideoUrl.value = "";
+          videoInfo.style.display = "none";
+          // Hide progress bars
+          materialProgress.style.display = "none";
+          videoProgress.style.display = "none";
+          thumbnailProgress.style.display = "none";
+          // Refresh preview
+          lessonSelect.dispatchEvent(new Event("change"));
+        } catch (e) {
+          showError("❌ Failed to parse server response.");
+        }
+      } else {
+        try {
+          const errorData = JSON.parse(xhr.responseText);
+          showError("❌ Failed to upload files: " + (errorData.message || "Unknown error"));
+        } catch (e) {
+          showError("❌ Failed to upload files. Server returned status: " + xhr.status);
+        }
+      }
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    });
+    
+    xhr.addEventListener("error", function() {
+      showError("❌ Network error. Please check your connection and try again.");
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    });
+    
+    xhr.open("PUT", `${LESSON_API}/${lessonId}/files`);
+    xhr.setRequestHeader("Authorization", "Bearer " + token);
+    xhr.send(formData);
+    
+  } catch (e) {
+    console.error("Upload error:", e);
+    showError("❌ Failed to upload files. Please try again.");
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  }
+});
+ </script>
 </body>
 </html>
