@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Select Lesson Video - Admin Dashboard - CS-IslamHatem</title>
+  <title>Manage Lesson Files - Admin Dashboard - CS-IslamHatem</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
@@ -262,7 +262,7 @@
 
     .btn-admin:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.4);
+      box-shadow: 0 8px 20px rgba(255, 153, 0, 极速4);
     }
 
     .btn-secondary {
@@ -291,78 +291,110 @@
       left: 100%;
     }
 
-    /* Video Selection Card */
-    .video-selection-card {
-      background: rgba(255, 153, 0, 0.1);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-      border: 2px solid rgba(255, 153, 0, 0.3);
+    /* File Input Styling */
+    .file-input {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .file-input input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-input-label {
+      display: block;
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px dashed rgba(255, 153, 0, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: rgba(240, 246, 255, 0.7);
       cursor: pointer;
       transition: all 0.3s ease;
     }
 
-    .video-selection-card:hover {
-      transform: translateY(-3px);
+    .file-input-label:hover {
       border-color: var(--admin-accent);
-      box-shadow: 0 10px 20px rgba(255, 153, 0, 0.2);
-    }
-
-    .video-selection-card.selected {
-      background: rgba(0, 255, 140, 0.1);
-      border-color: #00ff8c;
-      box-shadow: 0 10px 20px rgba(0, 255, 140, 0.2);
-    }
-
-    .video-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .video-card-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.1rem;
       color: var(--light);
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      background: rgba(255, 153, 0, 0.1);
     }
 
-    .video-card-title i {
-      color: var(--admin-accent);
-    }
-
-    .video-info {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 15px;
-      color: rgba(240, 246, 255, 0.7);
+    .file-name {
+      margin-top: 8px;
       font-size: 0.9rem;
+      color: var(--admin-accent);
+      text-align: center;
     }
 
-    .video-info-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
+    /* Preview Section */
+    .preview-section {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 153, 0, 0.2);
     }
 
-    .video-info-item i {
+    .preview-header {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: var(--light);
+    }
+
+    .preview-content {
+      display: grid;
+      gap: 20px;
+    }
+
+    .preview-item {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .preview-item h4 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 10px;
       color: var(--admin-accent);
     }
 
-    .video-preview {
-      width: 100%;
-      max-height: 200px;
+    .preview-thumbnail {
+      max-width: 100%;
       border-radius: 8px;
       margin-top: 10px;
-      background: rgba(0, 0, 0, 0.3);
-      display: none;
     }
 
-    .video-preview.show {
-      display: block;
+    .preview-video {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .file-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--admin-accent);
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      background: rgba(255, 153, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .file-link:hover {
+      background: rgba(255, 153, 0, 0.2);
+      transform: translateY(-2px);
     }
 
     /* Alerts */
@@ -371,18 +403,6 @@
       border-radius: 8px;
       margin-bottom: 20px;
       display: none;
-      animation: slideInRight 0.4s ease;
-    }
-
-    @keyframes slideInRight {
-      from {
-        opacity: 0;
-        transform: translateX(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
     }
 
     .alert-success {
@@ -397,32 +417,38 @@
       color: #ff4d4d;
     }
 
-    .alert-info {
-      background: rgba(0, 102, 255, 0.1);
-      border-left: 4px solid var(--primary);
-      color: var(--secondary);
+    /* Upload Progress Styling */
+    .upload-progress {
+      margin-top: 15px;
+      display: none;
     }
 
-    /* Loading Spinner */
-    .spinner-container {
+    .progress-info {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 200px;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
     }
 
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 153, 0, 0.3);
-      border-top: 3px solid var(--admin-accent);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    .progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .progress-fill {
+      height: 100%;
+      background: var(--admin-gradient);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .remaining-time {
+      color: var(--admin-accent);
+      font-size: 0.85rem;
+      margin-top: 5px;
     }
 
     /* Responsive Design */
@@ -466,9 +492,8 @@
         flex-direction: column;
       }
       
-      .video-info {
-        flex-direction: column;
-        gap: 10px;
+      .preview-content {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -476,7 +501,7 @@
 <body>
   <div class="dashboard">
     <!-- Sidebar -->
-    <aside class="sidebar" style="width: 280px;">
+    <aside class="sidebar"  style="width: 280px;">
       <div class="sidebar-header">
         <div class="sidebar-logo">
           <i class="fas fa-code"></i>
@@ -490,15 +515,15 @@
       <ul class="sidebar-nav">
         <li><a href="admin-courses.html"><i class="fas fa-book"></i> <span>Courses</span></a></li>
         <li><a href="admin-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
-        <li><a href="admin-lessons.html"><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
-        <li><a href="admin-lesson-files.html" class="active"><i class="fas fa-folder"></i> <span>Select Lesson Video</span></a></li>
-        <li><a href="admin-quizzes.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="admin-lessons.html" ><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
+        <li><a href="admin-lesson-files.html"class="active"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
+        <li><a href="admin-quizzes.html" ><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
         <li><a href="admin-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
-        <li><a href="admin-payment-requests.html"><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
-        <li><a href="admin-assistants.html"><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
-        <li><a href="admin-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="admin-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
-        <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="admin-payment-requests.html" ><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
+        <li><a href="admin-assistants.html" ><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
+        <li><a href="admin-students.html" ><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="admin-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="admin-profile.html" ><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
         <li><a href="upload.html"><i class="fas fa-share-alt"></i> <span>Upload Videos</span></a></li>
       </ul>
     </aside>
@@ -507,7 +532,7 @@
     <main class="main-content">
       <!-- Header -->
       <header class="header">
-        <h1><i class="fas fa-video"></i> Select Lesson Video</h1>
+        <h1><i class="fas fa-folder"></i> Manage Lesson Files</h1>
         <div class="user-menu">
           <div class="user-info">
             <div class="user-name">Admin User</div>
@@ -522,12 +547,11 @@
       <!-- Alerts -->
       <div id="alertSuccess" class="alert alert-success"></div>
       <div id="alertError" class="alert alert-error"></div>
-      <div id="alertInfo" class="alert alert-info"></div>
 
-      <!-- Lesson Selection Form -->
+      <!-- File Upload Form -->
       <div class="content-card">
         <div class="card-header">
-          <h2><i class="fas fa-film"></i> Select Lesson and Course</h2>
+          <h2><i class="fas fa-cloud-upload-alt"></i> Upload Lesson Files</h2>
         </div>
 
         <div class="form-group">
@@ -544,80 +568,99 @@
           </select>
         </div>
 
-        <div id="currentLessonInfo" style="display: none;">
-          <h3 style="color: var(--admin-accent); margin-bottom: 15px;">
-            <i class="fas fa-info-circle"></i> Current Lesson Information
-          </h3>
-          <div style="background: rgba(255, 153, 0, 0.1); padding: 15px; border-radius: 8px;">
-            <p><strong>Title:</strong> <span id="currentLessonTitle"></span></p>
-            <p><strong>Description:</strong> <span id="currentLessonDescription"></span></p>
-            <p><strong>Current Video:</strong> <span id="currentVideoUrl" style="color: var(--secondary);"></span></p>
+        <form id="fileForm" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>Material (PDF/Docs)</label>
+            <div class="file-input">
+              <input type="file" id="material" name="material" accept=".pdf,.doc,.docx">
+              <div class="file-input-label">
+                <i class="fas fa-file-pdf"></i> Choose Material File
+              </div>
+              <div id="material-file-name" class="file-name"></div>
+              <div id="material-progress" class="upload-progress">
+                <div class="progress-info">
+                  <span class="progress-percentage">0%</span>
+                  <span class="progress-speed">0 MB/s</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <div class="remaining-time">Remaining: Calculating...</div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <div class="form-group">
+            <label>Video</label>
+            <div class="file-input">
+              <input type="file" id="video" name="video" accept="video/*">
+              <div class="file-input-label">
+                <i class="fas fa-video"></i> Choose Video File
+              </div>
+              <div id="video-file-name" class="file-name"></div>
+              <div id="video-progress" class="upload-progress">
+                <div class="progress-info">
+                  <span class="progress-percentage">0%</span>
+                  <span class="progress-speed">0 MB/s</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <div class="remaining-time">Remaining: Calculating...</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Thumbnail (Image)</label>
+            <div class="file-input">
+              <input type="file" id="thumbnail" name="thumbnail" accept="image/*">
+              <div class="file-input-label">
+                <i class="fas fa-image"></i> Choose Thumbnail Image
+              </div>
+              <div id="thumbnail-file-name" class="file-name"></div>
+              <div id="thumbnail-progress" class="upload-progress">
+                <div class="progress-info">
+                  <span class="progress-percentage">0%</span>
+                  <span class="progress-speed">0 MB/s</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <div class="remaining-time">Remaining: Calculating...</div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-admin">
+            <i class="fas fa-upload"></i> Upload Files
+          </button>
+        </form>
       </div>
 
-      <!-- Firebase Videos Selection -->
+      <!-- Preview Section -->
       <div class="content-card">
         <div class="card-header">
-          <h2><i class="fas fa-cloud"></i> Firebase Storage Videos</h2>
-          <button class="btn btn-secondary" onclick="loadFirebaseVideos()">
-            <i class="fas fa-sync-alt"></i> Refresh Videos
-          </button>
+          <h2><i class="fas fa-eye"></i> Lesson Preview</h2>
         </div>
 
-        <div id="firebaseVideosContainer">
-          <div class="spinner-container">
-            <div class="spinner"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="content-card" id="actionButtons" style="display: none;">
-        <div class="card-header">
-          <h2><i class="fas fa-check-circle"></i> Confirm Selection</h2>
-        </div>
-        
-        <div style="text-align: center; padding: 20px;">
-          <p style="margin-bottom: 20px; color: rgba(240, 246, 255, 0.8);">
-            You have selected: <strong id="selectedVideoName" style="color: var(--admin-accent);"></strong>
-          </p>
-          
-          <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <button class="btn btn-admin" onclick="assignVideoToLesson()">
-              <i class="fas fa-link"></i> Assign Video to Lesson
-            </button>
-            <button class="btn btn-secondary" onclick="clearSelection()">
-              <i class="fas fa-times"></i> Clear Selection
-            </button>
+        <div class="preview-section">
+          <div class="preview-header">Current Files</div>
+          <div class="preview-content" id="preview">
+            <div class="preview-item">
+              <h4><i class="fas fa-info-circle"></i> Select a lesson to view files</h4>
+              <p>Choose a course and lesson from the dropdown menus above to see the current files.</p>
+            </div>
           </div>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-storage.js"></script>
-  
   <script>
-    // Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCU3yj4qS00er8j5wn08weT7jWewldYU28",
-      authDomain: "uploadfilestorage.firebaseapp.com",
-      projectId: "uploadfilestorage",
-      storageBucket: "uploadfilestorage.firebasestorage.app",
-      messagingSenderId: "736631149334",
-      appId: "1:736631149334:web:7a3ed9d081a1a729787637"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    console.log("Firebase initialized for video selection.");
-
-    // Backend API Configuration
     const COURSE_API = "https://cs-eslamhatem.fly.dev/api/admin/courses";
     const LESSON_API = "https://cs-eslamhatem.fly.dev/api/admin/lessons";
+    const UPLOADS_BASE = "https://cs-eslamhatem.fly.dev";
     const token = localStorage.getItem("adminToken");
 
     if (!token) {
@@ -627,64 +670,50 @@
       }, 2000);
     }
 
-    // DOM Elements
     const courseSelect = document.getElementById("course");
     const lessonSelect = document.getElementById("lesson");
-    const firebaseVideosContainer = document.getElementById("firebaseVideosContainer");
-    const actionButtons = document.getElementById("actionButtons");
-    const selectedVideoName = document.getElementById("selectedVideoName");
-    const currentLessonInfo = document.getElementById("currentLessonInfo");
-    const currentLessonTitle = document.getElementById("currentLessonTitle");
-    const currentLessonDescription = document.getElementById("currentLessonDescription");
-    const currentVideoUrl = document.getElementById("currentVideoUrl");
+    const previewDiv = document.getElementById("preview");
+    const materialInput = document.getElementById("material");
+    const videoInput = document.getElementById("video");
+    const thumbnailInput = document.getElementById("thumbnail");
+    const materialFileName = document.getElementById("material-file-name");
+    const videoFileName = document.getElementById("video-file-name");
+    const thumbnailFileName = document.getElementById("thumbnail-file-name");
+    const alertSuccess = document.getElementById("alertSuccess");
+    const alertError = document.getElementById("alertError");
 
-    // State variables
-    let selectedVideo = null;
-    let selectedLesson = null;
-    let firebaseVideos = [];
-    let currentLessonData = null;
+    // Upload progress elements
+    const materialProgress = document.getElementById("material-progress");
+    const videoProgress = document.getElementById("video-progress");
+    const thumbnailProgress = document.getElementById("thumbnail-progress");
 
     // Helper functions
+    function pickData(json) {
+      if (json && typeof json === "object" && "data" in json) return json.data;
+      if (json && typeof json === "object" && "lesson" in json) return json.lesson;
+      if (json && typeof json === "object" && "lessons" in json) return json.lessons;
+      return json;
+    }
+
+    function withBase(url) {
+      if (!url) return url;
+      return url.startsWith("http") ? url : (UPLOADS_BASE + url);
+    }
+
     function showSuccess(message) {
-      const alert = document.getElementById("alertSuccess");
-      alert.textContent = message;
-      alert.style.display = "block";
+      alertSuccess.textContent = message;
+      alertSuccess.style.display = "block";
       setTimeout(() => {
-        alert.style.display = "none";
+        alertSuccess.style.display = "none";
       }, 5000);
     }
 
     function showError(message) {
-      const alert = document.getElementById("alertError");
-      alert.textContent = message;
-      alert.style.display = "block";
+      alertError.textContent = message;
+      alertError.style.display = "block";
       setTimeout(() => {
-        alert.style.display = "none";
+        alertError.style.display = "none";
       }, 5000);
-    }
-
-    function showInfo(message) {
-      const alert = document.getElementById("alertInfo");
-      alert.textContent = message;
-      alert.style.display = "block";
-      setTimeout(() => {
-        alert.style.display = "none";
-      }, 3000);
-    }
-
-    function formatFileSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-    function formatTime(seconds) {
-      if (seconds < 60) return `${Math.ceil(seconds)} seconds`;
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = Math.ceil(seconds % 60);
-      return `${minutes}m ${remainingSeconds}s`;
     }
 
     function logout() {
@@ -693,7 +722,37 @@
       window.location.href = "../Login-Pages/admin-login.html";
     }
 
-    // Load courses from backend
+    // Format file size to human readable format
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Format time to human readable format
+    function formatTime(seconds) {
+      if (seconds < 60) return `${Math.ceil(seconds)} seconds`;
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.ceil(seconds % 60);
+      return `${minutes}m ${remainingSeconds}s`;
+    }
+
+    // File name display
+    materialInput.addEventListener("change", function() {
+      materialFileName.textContent = this.files[0] ? this.files[0].name : "";
+    });
+
+    videoInput.addEventListener("change", function() {
+      videoFileName.textContent = this.files[0] ? this.files[0].name : "";
+    });
+
+    thumbnailInput.addEventListener("change", function() {
+      thumbnailFileName.textContent = this.files[0] ? this.files[0].name : "";
+    });
+
+    // Load courses
     async function loadCourses() {
       try {
         const res = await fetch(COURSE_API, { 
@@ -706,7 +765,7 @@
         }
         
         const json = await res.json();
-        const courses = json.data || [];
+        const courses = pickData(json) || [];
         courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
         courses.forEach(c => {
           const opt = document.createElement("option");
@@ -724,9 +783,12 @@
     courseSelect.addEventListener("change", async () => {
       const courseId = courseSelect.value;
       lessonSelect.innerHTML = `<option value="">-- Select Lesson --</option>`;
-      currentLessonInfo.style.display = "none";
-      selectedLesson = null;
-      currentLessonData = null;
+      previewDiv.innerHTML = `
+        <div class="preview-item">
+          <h4><i class="fas fa-info-circle"></i> Select a lesson to view files</h4>
+          <p>Choose a lesson from the dropdown menu to see the current files.</p>
+        </div>
+      `;
       
       if (!courseId) return;
 
@@ -741,12 +803,12 @@
         }
         
         const json = await res.json();
-        let lessons = json.data || [];
+        let lessons = pickData(json);
 
         // Ensure array
         if (!Array.isArray(lessons)) lessons = [];
 
-        // Filter lessons by course
+        // Extra safety: filter here in case backend ignores the query
         lessons = lessons.filter(l => {
           const cid = (l.course && typeof l.course === "object") ? l.course._id : l.course;
           return String(cid) === String(courseId);
@@ -771,12 +833,14 @@
       }
     });
 
-    // Load lesson details when lesson selected
+    // Load preview when lesson selected
     lessonSelect.addEventListener("change", async () => {
       const lessonId = lessonSelect.value;
-      currentLessonInfo.style.display = "none";
-      selectedLesson = null;
-      currentLessonData = null;
+      previewDiv.innerHTML = `
+        <div class="preview-item">
+          <h4><i class="fas fa-spinner fa-spin"></i> Loading lesson files...</h4>
+        </div>
+      `;
       
       if (!lessonId) return;
       
@@ -791,432 +855,216 @@
         }
         
         const json = await res.json();
-        currentLessonData = json;
-        selectedLesson = lessonId;
-        
-        // Update current lesson info
-        currentLessonTitle.textContent = currentLessonData.title || "No title";
-        currentLessonDescription.textContent = currentLessonData.description || "No description";
-        
-        if (currentLessonData.video) {
-          currentVideoUrl.textContent = currentLessonData.video;
-          currentVideoUrl.innerHTML = `
-            <a href="${currentLessonData.video}" target="_blank" style="color: var(--secondary); text-decoration: none;">
-              ${currentLessonData.video.substring(0, 50)}...
+        const l = pickData(json) || {};
+
+        previewDiv.innerHTML = "";
+
+        if (l.thumbnail) {
+          const div = document.createElement("div");
+          div.className = "preview-item";
+          div.innerHTML = `
+            <h4><i class="fas fa-image"></i> Thumbnail</h4>
+            <img src="${withBase(l.thumbnail)}" alt="Thumbnail" class="preview-thumbnail">
+          `;
+          previewDiv.appendChild(div);
+        }
+
+        if (l.material) {
+          const div = document.createElement("div");
+          div.className = "preview-item";
+          div.innerHTML = `
+            <h4><i class="fas fa-file-pdf"></i> Material</h4>
+            <a href="${withBase(l.material)}" target="_blank" class="file-link">
+              <i class="fas fa-download"></i> Download Material
             </a>
           `;
-        } else {
-          currentVideoUrl.textContent = "No video assigned";
-          currentVideoUrl.style.color = "var(--error)";
+          previewDiv.appendChild(div);
         }
-        
-        currentLessonInfo.style.display = "block";
-        
+
+        if (l.video) {
+          const div = document.createElement("div");
+          div.className = "preview-item";
+          div.innerHTML = `
+            <h4><i class="fas fa-video"></i> Video</h4>
+            <video controls class="preview-video">
+              <source src="${withBase(l.video)}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          `;
+          previewDiv.appendChild(div);
+        }
+
+        if (!l.thumbnail && !l.material && !l.video) {
+          previewDiv.innerHTML = `
+            <div class="preview-item">
+              <h4><i class="fas fa-exclamation-circle"></i> No Files Uploaded</h4>
+              <p>This lesson doesn't have any files uploaded yet.</p>
+            </div>
+          `;
+        }
       } catch (e) {
         console.error("Failed to load lesson:", e);
         showError("Failed to load lesson. Please try again.");
       }
     });
 
-    // Load videos from Firebase Storage
-    async function loadFirebaseVideos() {
+    // Upload files with progress tracking
+    document.getElementById("fileForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const lessonId = lessonSelect.value;
+      
+      if (!lessonId) {
+        showError("Please select a lesson first.");
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+      submitBtn.disabled = true;
+
+      // Reset progress bars
+      resetProgressBars();
+
+      const formData = new FormData();
+      let hasFiles = false;
+      
+      if (materialInput.files[0]) {
+        formData.append("material", materialInput.files[0]);
+        hasFiles = true;
+        materialProgress.style.display = "block";
+      }
+      if (videoInput.files[0]) {
+        formData.append("video", videoInput.files[0]);
+        hasFiles = true;
+        videoProgress.style.display = "block";
+      }
+      if (thumbnailInput.files[0]) {
+        formData.append("thumbnail", thumbnailInput.files[0]);
+        hasFiles = true;
+        thumbnailProgress.style.display = "block";
+      }
+
+      if (!hasFiles) {
+        showError("Please select at least one file to upload.");
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        return;
+      }
+
       try {
-        firebaseVideosContainer.innerHTML = `
-          <div class="spinner-container">
-            <div class="spinner"></div>
-          </div>
-        `;
+        const xhr = new XMLHttpRequest();
         
-        showInfo("🔍 Loading videos from Firebase Storage...");
-        
-        const storage = firebase.storage();
-        const storageRef = storage.ref();
-        
-        // List all folders (videos, user_uploads, archive)
-        const folders = ['videos', 'user_uploads', 'archive'];
-        const allVideos = [];
-        
-        for (const folder of folders) {
-          try {
-            const folderRef = storageRef.child(folder);
-            const result = await folderRef.listAll();
-            
-            for (const itemRef of result.items) {
-              try {
-                // Get metadata for each file
-                const metadata = await itemRef.getMetadata();
-                const downloadURL = await itemRef.getDownloadURL();
-                
-                // Only include video files
-                if (metadata.contentType.startsWith('video/')) {
-                  allVideos.push({
-                    name: itemRef.name,
-                    fullPath: itemRef.fullPath,
-                    downloadURL: downloadURL,
-                    size: metadata.size,
-                    contentType: metadata.contentType,
-                    updated: metadata.updated,
-                    folder: folder,
-                    storageLocation: `/${folder}/`
-                  });
-                }
-              } catch (itemError) {
-                console.error(`Error processing ${itemRef.name}:`, itemError);
-              }
-            }
-          } catch (folderError) {
-            console.error(`Error accessing folder ${folder}:`, folderError);
+        // Track upload progress
+        xhr.upload.addEventListener("progress", function(event) {
+          if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            updateProgressBars(percentComplete, event.loaded, event.total, event.timeStamp);
           }
-        }
-        
-        firebaseVideos = allVideos;
-        renderFirebaseVideos();
-        
-        if (allVideos.length === 0) {
-          firebaseVideosContainer.innerHTML = `
-            <div style="text-align: center; padding: 40px 20px;">
-              <i class="fas fa-video-slash" style="font-size: 3rem; color: rgba(255, 153, 0, 0.3); margin-bottom: 20px;"></i>
-              <h3 style="color: rgba(240, 246, 255, 0.5); margin-bottom: 10px;">No Videos Found</h3>
-              <p style="color: rgba(240, 246, 255, 0.4); margin-bottom: 20px;">
-                No videos found in Firebase Storage. Upload videos first.
-              </p>
-              <a href="upload.html" class="btn btn-admin">
-                <i class="fas fa-upload"></i> Go to Upload Page
-              </a>
-            </div>
-          `;
-        }
-        
-      } catch (error) {
-        console.error("Error loading Firebase videos:", error);
-        firebaseVideosContainer.innerHTML = `
-          <div style="text-align: center; padding: 40px 20px;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--error); margin-bottom: 20px;"></i>
-            <h3 style="color: var(--error); margin-bottom: 10px;">Failed to Load Videos</h3>
-            <p style="color: rgba(240, 246, 255, 0.7); margin-bottom: 20px;">
-              ${error.message || "Unable to connect to Firebase Storage"}
-            </p>
-            <button class="btn btn-secondary" onclick="loadFirebaseVideos()">
-              <i class="fas fa-redo"></i> Try Again
-            </button>
-          </div>
-        `;
-      }
-    }
-
-    // Render Firebase videos in the UI
-    function renderFirebaseVideos() {
-      if (firebaseVideos.length === 0) {
-        firebaseVideosContainer.innerHTML = `
-          <div style="text-align: center; padding: 40px 20px;">
-            <p style="color: rgba(240, 246, 255, 0.5);">No videos available</p>
-          </div>
-        `;
-        return;
-      }
-      
-      // Group videos by folder
-      const videosByFolder = {};
-      firebaseVideos.forEach(video => {
-        if (!videosByFolder[video.folder]) {
-          videosByFolder[video.folder] = [];
-        }
-        videosByFolder[video.folder].push(video);
-      });
-      
-      let html = '';
-      
-      // Render each folder section
-      for (const [folder, videos] of Object.entries(videosByFolder)) {
-        const folderTitle = folder.charAt(0).toUpperCase() + folder.slice(1);
-        const folderIcon = folder === 'videos' ? 'fa-folder-open' : 
-                          folder === 'user_uploads' ? 'fa-user-circle' : 'fa-archive';
-        
-        html += `
-          <div style="margin-bottom: 30px;">
-            <h3 style="color: var(--admin-accent); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-              <i class="fas ${folderIcon}"></i> ${folderTitle} (${videos.length} videos)
-            </h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
-        `;
-        
-        videos.forEach(video => {
-          const isSelected = selectedVideo && selectedVideo.fullPath === video.fullPath;
-          const sizeFormatted = formatFileSize(video.size);
-          const dateFormatted = new Date(video.updated).toLocaleDateString();
-          
-          html += `
-            <div class="video-selection-card ${isSelected ? 'selected' : ''}" 
-                 onclick="selectVideo('${video.fullPath}')"
-                 style="cursor: pointer;">
-              <div class="video-card-header">
-                <div class="video-card-title">
-                  <i class="fas fa-video"></i> ${video.name}
-                </div>
-                <div style="color: ${isSelected ? '#00ff8c' : 'var(--admin-accent)'};">
-                  ${isSelected ? '<i class="fas fa-check-circle"></i> Selected' : '<i class="fas fa-mouse-pointer"></i> Select'}
-                </div>
-              </div>
-              
-              <div class="video-info">
-                <div class="video-info-item">
-                  <i class="fas fa-hdd"></i> ${sizeFormatted}
-                </div>
-                <div class="video-info-item">
-                  <i class="fas fa-calendar"></i> ${dateFormatted}
-                </div>
-                <div class="video-info-item">
-                  <i class="fas fa-folder"></i> ${video.folder}
-                </div>
-              </div>
-              
-              <div style="margin-top: 10px;">
-                <button class="btn btn-secondary" onclick="event.stopPropagation(); previewVideo('${video.downloadURL}')" 
-                        style="padding: 8px 15px; font-size: 0.9rem;">
-                  <i class="fas fa-play"></i> Preview
-                </button>
-                <button class="btn btn-secondary" onclick="event.stopPropagation(); copyVideoUrl('${video.downloadURL}')" 
-                        style="padding: 8px 15px; font-size: 0.9rem; margin-left: 10px;">
-                  <i class="fas fa-copy"></i> Copy URL
-                </button>
-              </div>
-            </div>
-          `;
         });
         
-        html += `
-            </div>
-          </div>
-        `;
-      }
-      
-      firebaseVideosContainer.innerHTML = html;
-    }
-
-    // Select a video from Firebase
-    function selectVideo(fullPath) {
-      selectedVideo = firebaseVideos.find(v => v.fullPath === fullPath);
-      selectedVideoName.textContent = selectedVideo.name;
-      actionButtons.style.display = "block";
-      
-      // Scroll to action buttons
-      actionButtons.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Update UI to show selection
-      renderFirebaseVideos();
-      showInfo(`✅ Selected: ${selectedVideo.name}`);
-    }
-
-    // Clear video selection
-    function clearSelection() {
-      selectedVideo = null;
-      actionButtons.style.display = "none";
-      renderFirebaseVideos();
-      showInfo("🗑️ Selection cleared");
-    }
-
-    // Preview video in a modal
-    function previewVideo(url) {
-      const modal = document.createElement('div');
-      modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        z-index: 1000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      `;
-      
-      modal.innerHTML = `
-        <div style="width: 90%; max-width: 800px; position: relative;">
-          <button onclick="this.parentElement.parentElement.remove()" 
-                  style="position: absolute; top: -40px; right: 0; background: var(--error); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
-            <i class="fas fa-times"></i> Close
-          </button>
-          <video controls style="width: 100%; border-radius: 10px;">
-            <source src="${url}" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      `;
-      
-      document.body.appendChild(modal);
-    }
-
-    // Copy video URL to clipboard
-    function copyVideoUrl(url) {
-      navigator.clipboard.writeText(url).then(() => {
-        showSuccess("📋 Video URL copied to clipboard!");
-      }).catch(err => {
-        showError("❌ Failed to copy URL: " + err.message);
-      });
-    }
-
-    // Assign selected video to lesson
-    async function assignVideoToLesson() {
-      if (!selectedVideo) {
-        showError("❌ Please select a video first.");
-        return;
-      }
-      
-      if (!selectedLesson) {
-        showError("❌ Please select a lesson first.");
-        return;
-      }
-      
-      if (!currentLessonData) {
-        showError("❌ Lesson data not loaded. Please refresh the page.");
-        return;
-      }
-      
-      try {
-        showInfo("📡 Assigning video to lesson...");
-        
-        // Prepare form data for the update
-        const formData = new FormData();
-        formData.append('title', currentLessonData.title || '');
-        formData.append('description', currentLessonData.description || '');
-        formData.append('type', currentLessonData.type || 'video');
-        formData.append('price', currentLessonData.price || 0);
-        formData.append('course', currentLessonData.course?._id || currentLessonData.course);
-        
-        // Create a blob from the Firebase video URL
-        const response = await fetch(selectedVideo.downloadURL);
-        const blob = await response.blob();
-        
-        // Create a File object from the blob
-        const file = new File([blob], selectedVideo.name, { type: selectedVideo.contentType });
-        formData.append('video', file);
-        
-        // Send PUT request to update lesson
-        const updateResponse = await fetch(`${LESSON_API}/${selectedLesson}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-          },
-          body: formData
+        xhr.addEventListener("load", function() {
+          if (xhr.status === 200 || xhr.status === 201) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              showSuccess("✅ Files uploaded successfully!");
+              // Clear file inputs
+              materialInput.value = "";
+              videoInput.value = "";
+              thumbnailInput.value = "";
+              materialFileName.textContent = "";
+              videoFileName.textContent = "";
+              thumbnailFileName.textContent = "";
+              // Hide progress bars
+              materialProgress.style.display = "none";
+              videoProgress.style.display = "none";
+              thumbnailProgress.style.display = "none";
+              // Refresh preview
+              lessonSelect.dispatchEvent(new Event("change"));
+            } catch (e) {
+              showError("❌ Failed to parse server response.");
+            }
+          } else {
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              showError("❌ Failed to upload files: " + (errorData.message || "Unknown error"));
+            } catch (e) {
+              showError("❌ Failed to upload files. Server returned status: " + xhr.status);
+            }
+          }
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
         });
         
-        if (updateResponse.status === 401) {
-          logout();
-          return;
-        }
-        
-        if (!updateResponse.ok) {
-          const errorData = await updateResponse.json();
-          throw new Error(errorData.message || 'Failed to update lesson');
-        }
-        
-        const result = await updateResponse.json();
-        
-        if (result.success) {
-          showSuccess(`✅ Video successfully assigned to lesson: ${currentLessonData.title}`);
-          
-          // Update current lesson info
-          currentVideoUrl.textContent = selectedVideo.downloadURL;
-          currentVideoUrl.innerHTML = `
-            <a href="${selectedVideo.downloadURL}" target="_blank" style="color: var(--secondary); text-decoration: none;">
-              ${selectedVideo.downloadURL.substring(0, 50)}...
-            </a>
-          `;
-          
-          // Clear selection
-          clearSelection();
-          
-          // Show success message with details
-          setTimeout(() => {
-            alert(`🎉 Video Assignment Successful!\n\nLesson: ${currentLessonData.title}\nVideo: ${selectedVideo.name}\nStorage: ${selectedVideo.storageLocation}\n\nYou can now view this video in the lesson.`);
-          }, 1000);
-          
-        } else {
-          throw new Error(result.message || 'Failed to assign video');
-        }
-        
-      } catch (error) {
-        console.error("Error assigning video:", error);
-        showError(`❌ Failed to assign video: ${error.message}`);
-      }
-    }
-
-    // Alternative method using direct URL assignment
-    async function assignVideoDirectUrl() {
-      if (!selectedVideo) {
-        showError("❌ Please select a video first.");
-        return;
-      }
-      
-      if (!selectedLesson) {
-        showError("❌ Please select a lesson first.");
-        return;
-      }
-      
-      try {
-        showInfo("🔗 Assigning video URL to lesson...");
-        
-        // Create a simple form to update just the video field
-        const formData = new FormData();
-        formData.append('video', selectedVideo.downloadURL);
-        
-        // We'll use the /files endpoint if available, or the main update endpoint
-        const updateResponse = await fetch(`${LESSON_API}/${selectedLesson}/files`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-          },
-          body: formData
+        xhr.addEventListener("error", function() {
+          showError("❌ Network error. Please check your connection and try again.");
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
         });
         
-        if (updateResponse.status === 401) {
-          logout();
-          return;
-        }
+        xhr.open("PUT", `${LESSON_API}/${lessonId}/files`);
+        xhr.setRequestHeader("Authorization", "Bearer " + token);
+        xhr.send(formData);
         
-        const result = await updateResponse.json();
-        
-        if (result.success) {
-          showSuccess(`✅ Video URL successfully assigned to lesson!`);
-          
-          // Update current lesson info
-          currentVideoUrl.textContent = selectedVideo.downloadURL;
-          currentVideoUrl.innerHTML = `
-            <a href="${selectedVideo.downloadURL}" target="_blank" style="color: var(--secondary); text-decoration: none;">
-              ${selectedVideo.downloadURL.substring(0, 50)}...
-            </a>
-          `;
-          
-          // Clear selection
-          clearSelection();
-          
-        } else {
-          showError(`❌ ${result.message || 'Failed to assign video URL'}`);
-        }
-        
-      } catch (error) {
-        console.error("Error assigning video URL:", error);
-        showError(`❌ Failed to assign video URL: ${error.message}`);
+      } catch (e) {
+        console.error("Upload error:", e);
+        showError("❌ Failed to upload files. Please try again.");
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
       }
-    }
-
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', () => {
-      loadCourses();
-      loadFirebaseVideos();
-      
-      // Add keyboard shortcuts
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          clearSelection();
-        }
-        if (e.ctrlKey && e.key === 'r') {
-          e.preventDefault();
-          loadFirebaseVideos();
-        }
-      });
     });
+
+    // Progress tracking variables
+    let uploadStartTime = 0;
+    let lastLoaded = 0;
+    let lastTime = 0;
+    
+    function resetProgressBars() {
+      uploadStartTime = Date.now();
+      lastLoaded = 0;
+      lastTime = uploadStartTime;
+      
+      const progressBars = document.querySelectorAll('.progress-fill');
+      const percentages = document.querySelectorAll('.progress-percentage');
+      const speeds = document.querySelectorAll('.progress-speed');
+      const times = document.querySelectorAll('.remaining-time');
+      
+      progressBars.forEach(bar => bar.style.width = '0%');
+      percentages.forEach(el => el.textContent = '0%');
+      speeds.forEach(el => el.textContent = '0 MB/s');
+      times.forEach(el => el.textContent = 'Remaining: Calculating...');
+    }
+    
+    function updateProgressBars(percentComplete, loaded, total, timestamp) {
+      const currentTime = Date.now();
+      const elapsedTime = (currentTime - uploadStartTime) / 1000; // in seconds
+      
+      // Calculate upload speed
+      const speed = (loaded - lastLoaded) / (currentTime - lastTime) * 1000; // bytes per second
+      const speedMB = (speed / (1024 * 1024)).toFixed(2);
+      
+      // Calculate remaining time
+      const remainingBytes = total - loaded;
+      const remainingTime = speed > 0 ? remainingBytes / speed : 0;
+      
+      // Update all progress bars
+      const progressBars = document.querySelectorAll('.progress-fill');
+      const percentages = document.querySelectorAll('.progress-percentage');
+      const speeds = document.querySelectorAll('.progress-speed');
+      const times = document.querySelectorAll('.remaining-time');
+      
+      progressBars.forEach(bar => bar.style.width = percentComplete + '%');
+      percentages.forEach(el => el.textContent = Math.round(percentComplete) + '%');
+      speeds.forEach(el => el.textContent = speedMB + ' MB/s');
+      times.forEach(el => el.textContent = 'Remaining: ' + formatTime(remainingTime));
+      
+      // Update tracking variables
+      lastLoaded = loaded;
+      lastTime = currentTime;
+    }
+
+    // Initial load
+    loadCourses();
   </script>
 </body>
 </html>
