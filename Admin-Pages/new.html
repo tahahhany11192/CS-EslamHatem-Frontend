@@ -38,10 +38,6 @@
             font-size: 2.5rem;
         }
         
-        h1 i {
-            color: #f6821f;
-        }
-        
         .upload-area {
             border: 3px dashed rgba(255, 255, 255, 0.3);
             border-radius: 10px;
@@ -55,6 +51,22 @@
         .upload-area:hover {
             border-color: #6ac6ff;
             background-color: rgba(106, 198, 255, 0.1);
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #6ac6ff;
+        }
+        
+        .upload-area p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .file-types {
+            font-size: 0.9rem;
+            opacity: 0.7;
         }
         
         #fileInput {
@@ -142,6 +154,23 @@
             border-left: 4px solid #dc3545;
         }
         
+        .result-url {
+            word-break: break-all;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .result-url a {
+            color: #6ac6ff;
+            text-decoration: none;
+        }
+        
+        .result-url a:hover {
+            text-decoration: underline;
+        }
+        
         .loading {
             display: inline-block;
             width: 20px;
@@ -155,17 +184,6 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
-        .debug-info {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 5px;
-            font-size: 0.8rem;
-            font-family: monospace;
-            max-height: 200px;
-            overflow-y: auto;
-        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -174,9 +192,9 @@
         <h1><i class="fas fa-cloud-upload-alt"></i> R2 Video Uploader</h1>
         
         <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-            <i class="fas fa-file-video" style="font-size: 3rem; color: #6ac6ff; margin-bottom: 15px;"></i>
-            <p style="font-size: 1.2rem; margin-bottom: 10px;">Click to select a video file</p>
-            <p style="font-size: 0.9rem; opacity: 0.7;">Supports MP4, WebM, MOV, AVI, MKV (Max 2GB)</p>
+            <i class="fas fa-file-video"></i>
+            <p>Click to select a video file</p>
+            <p class="file-types">Supports MP4, WebM, MOV, AVI, MKV (Max 2GB)</p>
         </div>
         
         <input type="file" id="fileInput" accept="video/*">
@@ -194,24 +212,21 @@
         
         <div class="result" id="resultContainer">
             <div id="resultMessage"></div>
+            <div class="result-url" id="resultUrl" style="display: none;">
+                <strong>Public URL:</strong> <a id="publicUrl" target="_blank"></a>
+            </div>
         </div>
         
         <button id="uploadBtn" onclick="uploadVideo()" disabled>
             <i class="fas fa-cloud-upload-alt"></i> Upload Video
         </button>
-        
-        <div class="debug-info" id="debugInfo" style="display: none;">
-            <strong>Debug Info:</strong>
-            <div id="debugLog"></div>
-        </div>
     </div>
 
     <script>
         const API_KEY = "c7d8f2e4-5a6b-4c9d-9e1f-123456789abc";
         const WORKER_URL = "https://r2-upload-worker.cs-islamhatem.workers.dev";
         
-        let currentUpload = null;
-        let debugLog = [];
+        let currentFile = null;
         
         // DOM elements
         const fileInput = document.getElementById('fileInput');
@@ -225,22 +240,16 @@
         const status = document.getElementById('status');
         const resultContainer = document.getElementById('resultContainer');
         const resultMessage = document.getElementById('resultMessage');
+        const resultUrl = document.getElementById('resultUrl');
+        const publicUrl = document.getElementById('publicUrl');
         const uploadBtn = document.getElementById('uploadBtn');
-        const debugInfo = document.getElementById('debugInfo');
-        const debugLogElement = document.getElementById('debugLog');
-        
-        function logDebug(message) {
-            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-            debugLog.push(`[${timestamp}] ${message}`);
-            if (debugLog.length > 20) debugLog.shift();
-            debugLogElement.innerHTML = debugLog.join('<br>');
-            console.log(message);
-        }
         
         // File selection
         fileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                currentFile = file;
+                
                 // Update file info
                 fileName.textContent = file.name;
                 fileSize.textContent = formatFileSize(file.size);
@@ -257,22 +266,41 @@
                 
                 // Hide any previous results
                 resultContainer.style.display = 'none';
+                resultUrl.style.display = 'none';
                 
-                logDebug(`File selected: ${file.name} (${formatFileSize(file.size)})`);
+                console.log(`File selected: ${file.name} (${formatFileSize(file.size)})`);
             }
         });
         
-        // Simple upload without multipart
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#6ac6ff';
+            uploadArea.style.backgroundColor = 'rgba(106, 198, 255, 0.1)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            uploadArea.style.backgroundColor = 'transparent';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            uploadArea.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+        
+        // Upload function - OPTION 1: Direct upload through worker
         async function uploadVideo() {
-            const file = fileInput.files[0];
-            if (!file) {
+            if (!currentFile) {
                 showResult('Please select a video file first.', 'error');
                 return;
             }
-            
-            // Show debug info
-            debugInfo.style.display = 'block';
-            logDebug('Starting upload...');
             
             // Disable upload button
             uploadBtn.disabled = true;
@@ -285,33 +313,16 @@
             
             // Hide previous results
             resultContainer.style.display = 'none';
+            resultUrl.style.display = 'none';
             
             try {
-                // Generate a safe filename
-                const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-                const key = `videos/${Date.now()}_${safeFilename}`;
-                
-                logDebug(`Generated key: ${key}`);
-                
-                // Direct upload to R2 (for testing)
-                status.textContent = 'Getting upload URL...';
-                
-                // For now, let's try a simple direct approach
-                const endpoint = `https://408d7d602795b9c468f103fa8eb14769.r2.cloudflarestorage.com/cs-islamhatem/${key}`;
-                logDebug(`Uploading to: ${endpoint}`);
-                
-                // Create a simple signed request
-                const timestamp = new Date().toISOString().replace(/[:\-]|\.\d{3}/g, '');
-                const date = timestamp.substring(0, 8);
-                
-                // For testing, let's use a simpler approach with the worker
-                status.textContent = 'Uploading file...';
-                
-                // Use FormData for the worker
+                // OPTION 1: Use FormData (worker handles the upload)
                 const formData = new FormData();
-                formData.append('file', file);
-                formData.append('filename', file.name);
-                formData.append('key', key);
+                formData.append('file', currentFile);
+                formData.append('filename', currentFile.name);
+                
+                status.textContent = 'Sending to server...';
+                progressBar.value = 10;
                 
                 const uploadResponse = await fetch(WORKER_URL, {
                     method: 'POST',
@@ -323,23 +334,37 @@
                 
                 if (!uploadResponse.ok) {
                     const errorText = await uploadResponse.text();
-                    logDebug(`Upload failed: ${errorText}`);
-                    throw new Error(`Upload failed: ${errorText}`);
+                    throw new Error(`Server error: ${uploadResponse.status} - ${errorText}`);
                 }
                 
-                const result = await uploadResponse.json();
-                logDebug(`Upload successful: ${JSON.stringify(result)}`);
+                progressBar.value = 50;
+                status.textContent = 'Processing...';
                 
-                // Success!
+                const result = await uploadResponse.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Upload failed');
+                }
+                
                 progressBar.value = 100;
                 status.textContent = 'Upload complete!';
                 
-                showResult('Video uploaded successfully!', 'success');
+                // Show success with public URL
+                showResult(
+                    `Video uploaded successfully!`,
+                    'success',
+                    result.publicUrl
+                );
                 
             } catch (error) {
-                logDebug(`Upload error: ${error.message}`);
                 console.error('Upload error:', error);
-                showResult(`Upload failed: ${error.message}`, 'error');
+                
+                // Try OPTION 2: Get signed URL and upload directly
+                if (error.message.includes('Server error') || error.message.includes('Invalid JSON')) {
+                    await tryDirectUpload();
+                } else {
+                    showResult(`Upload failed: ${error.message}`, 'error');
+                }
             } finally {
                 // Reset UI
                 uploadBtn.disabled = false;
@@ -347,10 +372,79 @@
             }
         }
         
+        // OPTION 2: Get signed URL and upload directly
+        async function tryDirectUpload() {
+            try {
+                status.textContent = 'Getting upload URL...';
+                progressBar.value = 20;
+                
+                // Request signed URL from worker
+                const initResponse = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 
+                        "Content-Type": "application/json", 
+                        "X-API-Key": API_KEY 
+                    },
+                    body: JSON.stringify({
+                        filename: currentFile.name,
+                        fileType: currentFile.type,
+                        fileSize: currentFile.size
+                    })
+                });
+                
+                if (!initResponse.ok) {
+                    const errorText = await initResponse.text();
+                    throw new Error(`Failed to get upload URL: ${errorText}`);
+                }
+                
+                const { uploadUrl, key, method, headers } = await initResponse.json();
+                
+                progressBar.value = 40;
+                status.textContent = 'Uploading file...';
+                
+                // Upload directly to R2 using signed URL
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: method || 'PUT',
+                    headers: headers,
+                    body: currentFile
+                });
+                
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    throw new Error(`Direct upload failed: ${uploadResponse.status} - ${errorText}`);
+                }
+                
+                progressBar.value = 100;
+                status.textContent = 'Upload complete!';
+                
+                // Generate public URL
+                const publicUrlStr = `https://pub-cs-islamhatem.408d7d602795b9c468f103fa8eb14769.r2.cloudflarestorage.com/${key}`;
+                
+                showResult(
+                    'Video uploaded successfully!',
+                    'success',
+                    publicUrlStr
+                );
+                
+            } catch (error) {
+                console.error('Direct upload error:', error);
+                showResult(`Upload failed: ${error.message}`, 'error');
+            }
+        }
+        
         // Show result message
-        function showResult(message, type) {
+        function showResult(message, type, url = null) {
             resultContainer.className = `result ${type}`;
             resultMessage.textContent = message;
+            
+            if (url) {
+                publicUrl.href = url;
+                publicUrl.textContent = url;
+                resultUrl.style.display = 'block';
+            } else {
+                resultUrl.style.display = 'none';
+            }
+            
             resultContainer.style.display = 'block';
             
             // Scroll to result
@@ -365,6 +459,15 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
+        
+        // Prevent accidental page reload during upload
+        window.addEventListener('beforeunload', function(e) {
+            if (uploadBtn.disabled && uploadBtn.innerHTML.includes('Uploading')) {
+                e.preventDefault();
+                e.returnValue = 'You have an upload in progress. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
     </script>
 </body>
 </html>
