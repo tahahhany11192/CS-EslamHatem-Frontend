@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -6,6 +6,11 @@
   <title>Manage Lesson Files - Admin Dashboard - CS-IslamHatem</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- Add Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-storage.js"></script>
+  
   <style>
     :root {
       --primary: #0066ff;
@@ -262,7 +267,7 @@
 
     .btn-admin:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 153, 0, 极速4);
+      box-shadow: 0 8px 20px rgba(255, 153, 0, 0.4);
     }
 
     .btn-secondary {
@@ -451,6 +456,44 @@
       margin-top: 5px;
     }
 
+    /* Video Selection Styles */
+    .video-select-container {
+      position: relative;
+    }
+
+    .video-info {
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Style for video dropdown */
+    #videoSelect {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 153, 0, 0.3);
+      color: var(--light);
+      padding: 12px 15px;
+      border-radius: 8px;
+      width: 100%;
+      font-family: 'Exo 2', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    #videoSelect:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 15px rgba(255, 153, 0, 0.3);
+    }
+
+    #videoSelect option {
+      background: var(--dark);
+      color: var(--light);
+      padding: 10px;
+    }
+
     /* Responsive Design */
     @media (max-width: 992px) {
       .sidebar {
@@ -496,49 +539,12 @@
         grid-template-columns: 1fr;
       }
     }
-
-   .video-select-container {
-  position: relative;
-}
-
-.video-info {
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Style for video dropdown */
-#videoSelect {
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 153, 0, 0.3);
-  color: var(--light);
-  padding: 12px 15px;
-  border-radius: 8px;
-  width: 100%;
-  font-family: 'Exo 2', sans-serif;
-  transition: all 0.3s ease;
-}
-
-#videoSelect:focus {
-  outline: none;
-  border-color: var(--admin-accent);
-  box-shadow: 0 0 15px rgba(255, 153, 0, 0.3);
-}
-
-#videoSelect option {
-  background: var(--dark);
-  color: var(--light);
-  padding: 10px;
-}
   </style>
 </head>
 <body>
   <div class="dashboard">
     <!-- Sidebar -->
-    <aside class="sidebar"  style="width: 280px;">
+    <aside class="sidebar" style="width: 280px;">
       <div class="sidebar-header">
         <div class="sidebar-logo">
           <i class="fas fa-code"></i>
@@ -552,15 +558,15 @@
       <ul class="sidebar-nav">
         <li><a href="admin-courses.html"><i class="fas fa-book"></i> <span>Courses</span></a></li>
         <li><a href="admin-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
-        <li><a href="admin-lessons.html" ><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
-        <li><a href="admin-lesson-files.html"class="active"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
-        <li><a href="admin-quizzes.html" ><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="admin-lessons.html"><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
+        <li><a href="admin-lesson-files.html" class="active"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
+        <li><a href="admin-quizzes.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
         <li><a href="admin-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
-        <li><a href="admin-payment-requests.html" ><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
-        <li><a href="admin-assistants.html" ><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
-        <li><a href="admin-students.html" ><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="admin-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
-        <li><a href="admin-profile.html" ><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="admin-payment-requests.html"><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
+        <li><a href="admin-assistants.html"><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
+        <li><a href="admin-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="admin-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
         <li><a href="upload.html"><i class="fas fa-share-alt"></i> <span>Upload Videos</span></a></li>
       </ul>
     </aside>
@@ -627,38 +633,34 @@
             </div>
           </div>
 
-<!-- Replace the Video upload section (lines 161-180) with: -->
-
-<div class="form-group">
-  <label>Video (Select from Firebase)</label>
-  <div class="video-select-container">
-    <select id="videoSelect" class="form-control">
-      <option value="">-- Select a video from Firebase --</option>
-      <!-- Videos will be populated here -->
-    </select>
-    <div id="videoInfo" class="video-info" style="display: none; margin-top: 10px; padding: 10px; background: rgba(255,153,0,0.1); border-radius: 8px; border-left: 3px solid var(--admin-accent);">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong id="selectedVideoName"></strong>
-          <div style="font-size: 0.85rem; color: rgba(240,246,255,0.7);">
-            Size: <span id="selectedVideoSize"></span>
+          <div class="form-group">
+            <label>Video (Select from Firebase)</label>
+            <div class="video-select-container">
+              <select id="videoSelect" class="form-control">
+                <option value="">-- Select a video from Firebase --</option>
+              </select>
+              <div id="videoInfo" class="video-info" style="display: none; margin-top: 10px; padding: 10px; background: rgba(255,153,0,0.1); border-radius: 8px; border-left: 3px solid var(--admin-accent);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong id="selectedVideoName"></strong>
+                    <div style="font-size: 0.85rem; color: rgba(240,246,255,0.7);">
+                      Size: <span id="selectedVideoSize"></span>
+                    </div>
+                  </div>
+                  <button type="button" id="refreshVideosBtn" class="btn btn-secondary btn-sm" style="padding: 5px 10px;">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                  </button>
+                </div>
+              </div>
+              <div style="margin-top: 10px; text-align: center;">
+                <a href="upload.html" target="_blank" class="file-link">
+                  <i class="fas fa-plus"></i> Upload New Video to Firebase
+                </a>
+              </div>
+            </div>
+            <!-- Hidden input to store selected video URL -->
+            <input type="hidden" id="selectedVideoUrl" name="videoUrl">
           </div>
-        </div>
-        <button type="button" id="refreshVideosBtn" class="btn btn-secondary btn-sm" style="padding: 5px 10px;">
-          <i class="fas fa-sync-alt"></i> Refresh
-        </button>
-      </div>
-    </div>
-    <div style="margin-top: 10px; text-align: center;">
-      <a href="upload.html" target="_blank" class="file-link">
-        <i class="fas fa-plus"></i> Upload New Video to Firebase
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- Hidden input to store selected video URL -->
-<input type="hidden" id="selectedVideoUrl" name="videoUrl">
 
           <div class="form-group">
             <label>Thumbnail (Image)</label>
@@ -707,6 +709,29 @@
   </div>
 
   <script>
+    // Firebase Configuration (same as upload.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCU3yj4qS00er8j5wn08weT7jWewldYU28",
+      authDomain: "uploadfilestorage.firebaseapp.com",
+      projectId: "uploadfilestorage",
+      storageBucket: "uploadfilestorage.firebasestorage.app",
+      messagingSenderId: "736631149334",
+      appId: "1:736631149334:web:7a3ed9d081a1a729787637"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const storage = firebase.storage();
+
+    // DOM Elements for Firebase videos
+    const videoSelect = document.getElementById("videoSelect");
+    const videoInfo = document.getElementById("videoInfo");
+    const selectedVideoName = document.getElementById("selectedVideoName");
+    const selectedVideoSize = document.getElementById("selectedVideoSize");
+    const selectedVideoUrl = document.getElementById("selectedVideoUrl");
+    const refreshVideosBtn = document.getElementById("refreshVideosBtn");
+
+    // Original variables from your existing code
     const COURSE_API = "https://cs-eslamhatem.fly.dev/api/admin/courses";
     const LESSON_API = "https://cs-eslamhatem.fly.dev/api/admin/lessons";
     const UPLOADS_BASE = "https://cs-eslamhatem.fly.dev";
@@ -723,17 +748,14 @@
     const lessonSelect = document.getElementById("lesson");
     const previewDiv = document.getElementById("preview");
     const materialInput = document.getElementById("material");
-    const videoInput = document.getElementById("video");
     const thumbnailInput = document.getElementById("thumbnail");
     const materialFileName = document.getElementById("material-file-name");
-    const videoFileName = document.getElementById("video-file-name");
     const thumbnailFileName = document.getElementById("thumbnail-file-name");
     const alertSuccess = document.getElementById("alertSuccess");
     const alertError = document.getElementById("alertError");
 
     // Upload progress elements
     const materialProgress = document.getElementById("material-progress");
-    const videoProgress = document.getElementById("video-progress");
     const thumbnailProgress = document.getElementById("thumbnail-progress");
 
     // Helper functions
@@ -793,13 +815,105 @@
       materialFileName.textContent = this.files[0] ? this.files[0].name : "";
     });
 
-    videoInput.addEventListener("change", function() {
-      videoFileName.textContent = this.files[0] ? this.files[0].name : "";
-    });
-
     thumbnailInput.addEventListener("change", function() {
       thumbnailFileName.textContent = this.files[0] ? this.files[0].name : "";
     });
+
+    // Fetch videos from Firebase
+    async function fetchFirebaseVideos() {
+      try {
+        // Show loading state
+        videoSelect.innerHTML = '<option value="">Loading videos...</option>';
+        
+        // List all videos from Firebase Storage
+        const storageRef = storage.ref();
+        
+        // Check different folders
+        const folders = ['videos/', 'user_uploads/', 'archive/'];
+        let allVideos = [];
+        
+        for (const folder of folders) {
+          try {
+            const folderRef = storageRef.child(folder);
+            const listResult = await folderRef.listAll();
+            
+            const videoFiles = listResult.items.filter(item => {
+              const name = item.name.toLowerCase();
+              return name.endsWith('.mp4') || name.endsWith('.avi') || 
+                     name.endsWith('.mov') || name.endsWith('.mkv') ||
+                     name.endsWith('.webm') || name.endsWith('.wmv') ||
+                     name.endsWith('.flv');
+            });
+            
+            // Get metadata for each video
+            for (const item of videoFiles) {
+              try {
+                const metadata = await item.getMetadata();
+                const downloadURL = await item.getDownloadURL();
+                
+                allVideos.push({
+                  name: item.name,
+                  url: downloadURL,
+                  path: item.fullPath,
+                  size: metadata.size,
+                  contentType: metadata.contentType,
+                  createdAt: metadata.timeCreated,
+                  folder: folder.replace('/', '')
+                });
+              } catch (err) {
+                console.warn(`Could not get metadata for ${item.name}:`, err);
+              }
+            }
+          } catch (err) {
+            console.warn(`Could not list files in ${folder}:`, err);
+          }
+        }
+        
+        // Sort by date (newest first)
+        allVideos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        // Populate dropdown
+        if (allVideos.length === 0) {
+          videoSelect.innerHTML = '<option value="">No videos found in Firebase</option>';
+          return;
+        }
+        
+        videoSelect.innerHTML = '<option value="">-- Select a video from Firebase --</option>';
+        
+        allVideos.forEach(video => {
+          const option = document.createElement('option');
+          option.value = video.url;
+          option.textContent = `${video.name} (${formatFileSize(video.size)}) - ${video.folder}`;
+          option.dataset.name = video.name;
+          option.dataset.size = video.size;
+          videoSelect.appendChild(option);
+        });
+        
+        console.log(`Loaded ${allVideos.length} videos from Firebase`);
+        
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+        videoSelect.innerHTML = '<option value="">Error loading videos</option>';
+        showError('Failed to load videos from Firebase. Please check console.');
+      }
+    }
+
+    // Handle video selection
+    videoSelect.addEventListener('change', function() {
+      if (this.value) {
+        const selectedOption = this.options[this.selectedIndex];
+        selectedVideoName.textContent = selectedOption.dataset.name;
+        selectedVideoSize.textContent = formatFileSize(selectedOption.dataset.size);
+        selectedVideoUrl.value = this.value;
+        videoInfo.style.display = 'block';
+      } else {
+        videoInfo.style.display = 'none';
+        selectedVideoUrl.value = '';
+      }
+    });
+
+    // Refresh videos button
+    refreshVideosBtn.addEventListener('click', fetchFirebaseVideos);
 
     // Load courses
     async function loadCourses() {
@@ -967,6 +1081,12 @@
         return;
       }
 
+      // Check if video is selected
+      if (!selectedVideoUrl.value) {
+        showError("Please select a video from Firebase.");
+        return;
+      }
+
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
@@ -983,11 +1103,13 @@
         hasFiles = true;
         materialProgress.style.display = "block";
       }
-      if (videoInput.files[0]) {
-        formData.append("video", videoInput.files[0]);
+      
+      // Add Firebase video URL to form data
+      if (selectedVideoUrl.value) {
+        formData.append("videoUrl", selectedVideoUrl.value);
         hasFiles = true;
-        videoProgress.style.display = "block";
       }
+      
       if (thumbnailInput.files[0]) {
         formData.append("thumbnail", thumbnailInput.files[0]);
         hasFiles = true;
@@ -1019,14 +1141,15 @@
               showSuccess("✅ Files uploaded successfully!");
               // Clear file inputs
               materialInput.value = "";
-              videoInput.value = "";
               thumbnailInput.value = "";
               materialFileName.textContent = "";
-              videoFileName.textContent = "";
               thumbnailFileName.textContent = "";
+              // Clear video selection
+              videoSelect.value = "";
+              selectedVideoUrl.value = "";
+              videoInfo.style.display = "none";
               // Hide progress bars
               materialProgress.style.display = "none";
-              videoProgress.style.display = "none";
               thumbnailProgress.style.display = "none";
               // Refresh preview
               lessonSelect.dispatchEvent(new Event("change"));
@@ -1114,261 +1237,7 @@
 
     // Initial load
     loadCourses();
+    fetchFirebaseVideos();
   </script>
- <script>
-  // Firebase Configuration (same as upload.html)
-const firebaseConfig = {
-  apiKey: "AIzaSyCU3yj4qS00er8j5wn08weT7jWewldYU28",
-  authDomain: "uploadfilestorage.firebaseapp.com",
-  projectId: "uploadfilestorage",
-  storageBucket: "uploadfilestorage.firebasestorage.app",
-  messagingSenderId: "736631149334",
-  appId: "1:736631149334:web:7a3ed9d081a1a729787637"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const storage = firebase.storage();
-
-// DOM Elements
-const videoSelect = document.getElementById("videoSelect");
-const videoInfo = document.getElementById("videoInfo");
-const selectedVideoName = document.getElementById("selectedVideoName");
-const selectedVideoSize = document.getElementById("selectedVideoSize");
-const selectedVideoUrl = document.getElementById("selectedVideoUrl");
-const refreshVideosBtn = document.getElementById("refreshVideosBtn");
-
-// Fetch videos from Firebase
-async function fetchFirebaseVideos() {
-  try {
-    // Show loading state
-    videoSelect.innerHTML = '<option value="">Loading videos...</option>';
-    
-    // List all videos from Firebase Storage
-    const storageRef = storage.ref();
-    
-    // Check different folders
-    const folders = ['videos/', 'user_uploads/', 'archive/'];
-    let allVideos = [];
-    
-    for (const folder of folders) {
-      try {
-        const folderRef = storageRef.child(folder);
-        const listResult = await folderRef.listAll();
-        
-        const videoFiles = listResult.items.filter(item => {
-          const name = item.name.toLowerCase();
-          return name.endsWith('.mp4') || name.endsWith('.avi') || 
-                 name.endsWith('.mov') || name.endsWith('.mkv') ||
-                 name.endsWith('.webm') || name.endsWith('.wmv') ||
-                 name.endsWith('.flv');
-        });
-        
-        // Get metadata for each video
-        for (const item of videoFiles) {
-          try {
-            const metadata = await item.getMetadata();
-            const downloadURL = await item.getDownloadURL();
-            
-            allVideos.push({
-              name: item.name,
-              url: downloadURL,
-              path: item.fullPath,
-              size: metadata.size,
-              contentType: metadata.contentType,
-              createdAt: metadata.timeCreated,
-              folder: folder
-            });
-          } catch (err) {
-            console.warn(`Could not get metadata for ${item.name}:`, err);
-          }
-        }
-      } catch (err) {
-        console.warn(`Could not list files in ${folder}:`, err);
-      }
-    }
-    
-    // Sort by date (newest first)
-    allVideos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-    // Populate dropdown
-    if (allVideos.length === 0) {
-      videoSelect.innerHTML = '<option value="">No videos found in Firebase</option>';
-      return;
-    }
-    
-    videoSelect.innerHTML = '<option value="">-- Select a video from Firebase --</option>';
-    
-    allVideos.forEach(video => {
-      const option = document.createElement('option');
-      option.value = video.url;
-      option.textContent = `${video.name} (${formatFileSize(video.size)}) - ${video.folder}`;
-      option.dataset.name = video.name;
-      option.dataset.size = video.size;
-      videoSelect.appendChild(option);
-    });
-    
-    console.log(`Loaded ${allVideos.length} videos from Firebase`);
-    
-  } catch (error) {
-    console.error('Error fetching videos:', error);
-    videoSelect.innerHTML = '<option value="">Error loading videos</option>';
-    showError('Failed to load videos from Firebase. Please check console.');
-  }
-}
-
-// Format file size
-function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// Handle video selection
-videoSelect.addEventListener('change', function() {
-  if (this.value) {
-    const selectedOption = this.options[this.selectedIndex];
-    selectedVideoName.textContent = selectedOption.dataset.name;
-    selectedVideoSize.textContent = formatFileSize(selectedOption.dataset.size);
-    selectedVideoUrl.value = this.value;
-    videoInfo.style.display = 'block';
-  } else {
-    videoInfo.style.display = 'none';
-    selectedVideoUrl.value = '';
-  }
-});
-
-// Refresh videos button
-refreshVideosBtn.addEventListener('click', fetchFirebaseVideos);
-
-// Initial load
-fetchFirebaseVideos();
-
-// Update form submission to include videoUrl
-document.getElementById("fileForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const lessonId = lessonSelect.value;
-  
-  if (!lessonId) {
-    showError("Please select a lesson first.");
-    return;
-  }
-
-  // Check if video is selected
-  if (!selectedVideoUrl.value && !videoInput.files[0]) {
-    showError("Please select a video from Firebase or upload a new one.");
-    return;
-  }
-
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-  const originalText = submitBtn.innerHTML;
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-  submitBtn.disabled = true;
-
-  // Reset progress bars
-  resetProgressBars();
-
-  const formData = new FormData();
-  let hasFiles = false;
-  
-  if (materialInput.files[0]) {
-    formData.append("material", materialInput.files[0]);
-    hasFiles = true;
-    materialProgress.style.display = "block";
-  }
-  
-  // Add Firebase video URL to form data
-  if (selectedVideoUrl.value) {
-    formData.append("videoUrl", selectedVideoUrl.value);
-    hasFiles = true;
-  } else if (videoInput.files[0]) {
-    // Fallback to file upload (if you keep the file input as backup)
-    formData.append("video", videoInput.files[0]);
-    hasFiles = true;
-    videoProgress.style.display = "block";
-  }
-  
-  if (thumbnailInput.files[0]) {
-    formData.append("thumbnail", thumbnailInput.files[0]);
-    hasFiles = true;
-    thumbnailProgress.style.display = "block";
-  }
-
-  if (!hasFiles) {
-    showError("Please select at least one file to upload.");
-    submitBtn.innerHTML = originalText;
-    submitBtn.disabled = false;
-    return;
-  }
-
-  // Rest of your upload logic remains the same...
-  try {
-    const xhr = new XMLHttpRequest();
-    
-    // Track upload progress
-    xhr.upload.addEventListener("progress", function(event) {
-      if (event.lengthComputable) {
-        const percentComplete = (event.loaded / event.total) * 100;
-        updateProgressBars(percentComplete, event.loaded, event.total, event.timeStamp);
-      }
-    });
-    
-    xhr.addEventListener("load", function() {
-      if (xhr.status === 200 || xhr.status === 201) {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          showSuccess("✅ Files uploaded successfully!");
-          // Clear file inputs
-          materialInput.value = "";
-          videoInput.value = "";
-          thumbnailInput.value = "";
-          materialFileName.textContent = "";
-          videoFileName.textContent = "";
-          thumbnailFileName.textContent = "";
-          // Clear video selection
-          videoSelect.value = "";
-          selectedVideoUrl.value = "";
-          videoInfo.style.display = "none";
-          // Hide progress bars
-          materialProgress.style.display = "none";
-          videoProgress.style.display = "none";
-          thumbnailProgress.style.display = "none";
-          // Refresh preview
-          lessonSelect.dispatchEvent(new Event("change"));
-        } catch (e) {
-          showError("❌ Failed to parse server response.");
-        }
-      } else {
-        try {
-          const errorData = JSON.parse(xhr.responseText);
-          showError("❌ Failed to upload files: " + (errorData.message || "Unknown error"));
-        } catch (e) {
-          showError("❌ Failed to upload files. Server returned status: " + xhr.status);
-        }
-      }
-      submitBtn.innerHTML = originalText;
-      submitBtn.disabled = false;
-    });
-    
-    xhr.addEventListener("error", function() {
-      showError("❌ Network error. Please check your connection and try again.");
-      submitBtn.innerHTML = originalText;
-      submitBtn.disabled = false;
-    });
-    
-    xhr.open("PUT", `${LESSON_API}/${lessonId}/files`);
-    xhr.setRequestHeader("Authorization", "Bearer " + token);
-    xhr.send(formData);
-    
-  } catch (e) {
-    console.error("Upload error:", e);
-    showError("❌ Failed to upload files. Please try again.");
-    submitBtn.innerHTML = originalText;
-    submitBtn.disabled = false;
-  }
-});
- </script>
 </body>
 </html>
