@@ -3,87 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Upload to Firebase Storage</title>
+    <title>Large Video Upload (Up to 5GB) - Firebase Storage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         body {
             background-color: #f8f9fa;
             padding: 20px;
+            min-height: 100vh;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             background-color: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
             margin-top: 30px;
+            margin-bottom: 30px;
         }
         .upload-area {
-            border: 2px dashed #007bff;
-            border-radius: 10px;
-            padding: 40px 20px;
+            border: 3px dashed #007bff;
+            border-radius: 15px;
+            padding: 50px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background-color: rgba(0, 123, 255, 0.03);
         }
-        .upload-area:hover {
-            background-color: rgba(0, 123, 255, 0.05);
+        .upload-area:hover, .upload-area.highlight {
+            background-color: rgba(0, 123, 255, 0.08);
             border-color: #0056b3;
+            transform: translateY(-2px);
         }
         .upload-area i {
-            font-size: 48px;
+            font-size: 64px;
             color: #007bff;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .video-preview {
             max-width: 100%;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-top: 20px;
             display: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .storage-option {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
             cursor: pointer;
             transition: all 0.3s;
+            height: 100%;
         }
         .storage-option:hover {
-            background-color: #f8f9fa;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         .storage-option.selected {
             border-color: #007bff;
             background-color: rgba(0, 123, 255, 0.05);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
         }
         .video-info {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            border-left: 5px solid #007bff;
         }
         .progress {
-            height: 25px;
-            margin-top: 10px;
+            height: 30px;
+            margin-top: 15px;
+            border-radius: 15px;
+            overflow: hidden;
         }
         .btn-upload {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             font-weight: bold;
+            font-size: 18px;
+            border-radius: 10px;
+            margin-top: 25px;
+            transition: all 0.3s;
+        }
+        .btn-upload:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 123, 255, 0.3);
         }
         .video-list {
-            margin-top: 30px;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 2px solid #e9ecef;
         }
         .video-item {
-            padding: 10px;
-            border-bottom: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            transition: all 0.3s;
+        }
+        .video-item:hover {
+            transform: translateX(5px);
+            background-color: #e9ecef;
         }
         .video-thumbnail {
-            width: 120px;
-            height: 80px;
+            width: 140px;
+            height: 90px;
             object-fit: cover;
-            border-radius: 5px;
+            border-radius: 8px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        .file-size-indicator {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background-color: #e9ecef;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .cancel-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+        .resumable-info {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #17a2b8;
+            font-size: 14px;
+        }
+        .large-file-warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        .storage-info {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .upload-stats {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .stats-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .stats-value {
+            color: #007bff;
         }
     </style>
     <!-- Font Awesome for icons -->
@@ -91,31 +175,42 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center mb-4"><i class="fas fa-video me-2"></i>Video Upload to Firebase Storage</h1>
+        <h1 class="text-center mb-4"><i class="fas fa-video me-2"></i>Large Video Upload (Up to 5GB)</h1>
+        <p class="text-center text-muted mb-4">Upload high-quality videos directly to Firebase Storage with resumable uploads</p>
+        
+        <!-- Large File Warning -->
+        <div class="large-file-warning" id="largeFileWarning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Large file detected:</strong> This is a large video file. The upload may take some time depending on your internet connection. Firebase supports resumable uploads, so you can pause and resume if needed.
+        </div>
         
         <!-- Storage Selection -->
         <div class="mb-4">
-            <h5>Select Storage Location:</h5>
+            <h4><i class="fas fa-database me-2"></i>Storage Location</h4>
+            <p class="text-muted">Choose where to store your video:</p>
             <div class="row">
                 <div class="col-md-4">
                     <div class="storage-option selected" data-storage="videos">
-                        <i class="fas fa-folder me-2"></i>
-                        <strong>Videos Folder</strong>
-                        <p class="small mb-0 mt-2">Store in /videos/ directory</p>
+                        <i class="fas fa-folder-open fa-2x mb-3 text-primary"></i>
+                        <h5>Videos</h5>
+                        <p class="small">General video storage</p>
+                        <div class="storage-info">Path: /videos/</div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="storage-option" data-storage="user_videos">
-                        <i class="fas fa-user me-2"></i>
-                        <strong>User Videos</strong>
-                        <p class="small mb-0 mt-2">Store in /user_videos/ directory</p>
+                    <div class="storage-option" data-storage="user_uploads">
+                        <i class="fas fa-user-circle fa-2x mb-3 text-success"></i>
+                        <h5>User Uploads</h5>
+                        <p class="small">Personal video storage</p>
+                        <div class="storage-info">Path: /user_uploads/</div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="storage-option" data-storage="temp_videos">
-                        <i class="fas fa-clock me-2"></i>
-                        <strong>Temporary</strong>
-                        <p class="small mb-0 mt-2">Store in /temp_videos/ directory</p>
+                    <div class="storage-option" data-storage="archive">
+                        <i class="fas fa-archive fa-2x mb-3 text-warning"></i>
+                        <h5>Archive</h5>
+                        <p class="small">Long-term storage</p>
+                        <div class="storage-info">Path: /archive/</div>
                     </div>
                 </div>
             </div>
@@ -124,49 +219,144 @@
         <!-- Upload Area -->
         <div class="upload-area" id="uploadArea">
             <i class="fas fa-cloud-upload-alt"></i>
-            <h4>Drag & Drop Your Video Here</h4>
-            <p class="text-muted">or click to browse files</p>
-            <p class="small text-muted">Supports MP4, AVI, MOV, MKV, WebM (Max: 100MB)</p>
-            <input type="file" id="videoInput" accept="video/*" class="d-none">
+            <h3>Drag & Drop Your Video Here</h3>
+            <p class="text-muted mb-2">or click to browse files from your computer</p>
+            <p class="small text-muted"><i class="fas fa-info-circle me-1"></i>Supports MP4, AVI, MOV, MKV, WebM, and more (Max: 5GB)</p>
+            <div class="mt-3">
+                <span class="badge bg-primary me-2">5GB Max</span>
+                <span class="badge bg-success me-2">Resumable</span>
+                <span class="badge bg-info">Firebase</span>
+            </div>
+            <input type="file" id="videoInput" accept="video/*,.mkv,.avi,.mov,.wmv,.flv,.webm" class="d-none">
         </div>
         
-        <!-- Video Preview -->
+        <!-- Video Preview & Info -->
         <div id="videoPreviewContainer" class="text-center">
-            <video id="videoPreview" class="video-preview" controls></video>
+            <div class="position-relative d-inline-block">
+                <video id="videoPreview" class="video-preview" controls preload="metadata"></video>
+                <button id="cancelPreview" class="btn btn-danger btn-sm cancel-btn" style="display: none;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
             <div id="videoInfo" class="video-info">
-                <h6>Video Information</h6>
-                <p id="videoName" class="mb-1"><strong>Name:</strong> <span id="fileName">No video selected</span></p>
-                <p id="videoSize" class="mb-1"><strong>Size:</strong> <span id="fileSize">0 MB</span></p>
-                <p id="videoType" class="mb-0"><strong>Type:</strong> <span id="fileType">-</span></p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-file-video me-2"></i>Video Information</h6>
+                        <p id="videoName" class="mb-2"><strong>Name:</strong> <span id="fileName" class="text-primary">No video selected</span></p>
+                        <p id="videoSize" class="mb-2"><strong>Size:</strong> <span id="fileSize" class="text-success">0 MB</span></p>
+                        <p id="videoType" class="mb-0"><strong>Type:</strong> <span id="fileType">-</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-clock me-2"></i>Upload Estimate</h6>
+                        <p id="uploadTimeEstimate" class="mb-2"><strong>Time:</strong> <span id="timeEstimate">-</span></p>
+                        <p id="uploadSpeedEstimate" class="mb-2"><strong>Speed:</strong> <span id="speedEstimate">-</span></p>
+                        <p id="uploadStatusText" class="mb-0"><strong>Status:</strong> <span id="statusText">Ready</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-cogs me-2"></i>Storage Details</h6>
+                        <p class="mb-2"><strong>Location:</strong> <span id="storageLocation" class="text-info">/videos/</span></p>
+                        <p class="mb-2"><strong>Max Size:</strong> <span class="text-success">5 GB</span></p>
+                        <p class="mb-0"><strong>Format:</strong> <span>Any video format</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upload Stats -->
+        <div class="upload-stats" id="uploadStats" style="display: none;">
+            <h6><i class="fas fa-chart-line me-2"></i>Upload Statistics</h6>
+            <div class="stats-row">
+                <span class="stats-label">Uploaded:</span>
+                <span class="stats-value" id="statsUploaded">0 MB</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-label">Remaining:</span>
+                <span class="stats-value" id="statsRemaining">0 MB</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-label">Current Speed:</span>
+                <span class="stats-value" id="statsCurrentSpeed">0 MB/s</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-label">Average Speed:</span>
+                <span class="stats-value" id="statsAvgSpeed">0 MB/s</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-label">Elapsed Time:</span>
+                <span class="stats-value" id="statsElapsedTime">0s</span>
+            </div>
+            <div class="stats-row mb-0">
+                <span class="stats-label">Estimated Time Left:</span>
+                <span class="stats-value" id="statsTimeLeft">-</span>
             </div>
         </div>
         
         <!-- Progress Bar -->
         <div class="mt-4" id="uploadProgressContainer" style="display: none;">
-            <h5>Upload Progress</h5>
+            <h5><i class="fas fa-tasks me-2"></i>Upload Progress</h5>
             <div class="progress">
                 <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
                      role="progressbar" style="width: 0%;" aria-valuenow="0" 
-                     aria-valuemin="0" aria-valuemax="100">0%</div>
+                     aria-valuemin="0" aria-valuemax="100">
+                    <span class="progress-text">0%</span>
+                </div>
             </div>
-            <div class="d-flex justify-content-between mt-2">
-                <span id="uploadStatus">Preparing upload...</span>
-                <span id="uploadSpeed">-</span>
+            <div class="d-flex justify-content-between mt-3">
+                <div>
+                    <span id="uploadStatus" class="badge bg-info">Preparing upload...</span>
+                    <span id="uploadDetails" class="ms-2 small text-muted"></span>
+                </div>
+                <div>
+                    <span id="uploadSpeed" class="badge bg-secondary">-</span>
+                    <span id="uploadTime" class="ms-2 small text-muted">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Control Buttons -->
+        <div class="row mt-4" id="controlButtons" style="display: none;">
+            <div class="col-md-4">
+                <button id="pauseResumeButton" class="btn btn-warning w-100">
+                    <i class="fas fa-pause me-2"></i>Pause Upload
+                </button>
+            </div>
+            <div class="col-md-4">
+                <button id="cancelUploadButton" class="btn btn-danger w-100">
+                    <i class="fas fa-times me-2"></i>Cancel Upload
+                </button>
+            </div>
+            <div class="col-md-4">
+                <button id="retryUploadButton" class="btn btn-info w-100" style="display: none;">
+                    <i class="fas fa-redo me-2"></i>Retry Upload
+                </button>
             </div>
         </div>
         
         <!-- Upload Button -->
-        <button id="uploadButton" class="btn btn-primary btn-upload mt-4" disabled>
-            <i class="fas fa-upload me-2"></i>Upload Video to Firebase
+        <button id="uploadButton" class="btn btn-primary btn-upload" disabled>
+            <i class="fas fa-upload me-2"></i>Upload Video to Firebase Storage
         </button>
         
         <!-- Hidden input to store Firebase URL -->
         <input type="hidden" id="firebaseVideoUrl" value="">
         
+        <!-- Resumable Upload Info -->
+        <div class="resumable-info" id="resumableInfo" style="display: none;">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Resumable Upload:</strong> Firebase supports resumable uploads for large files. If your connection is interrupted, you can resume the upload from where it left off.
+        </div>
+        
         <!-- Uploaded Videos List -->
-        <div class="video-list mt-5" id="videoListContainer" style="display: none;">
-            <h5>Recently Uploaded Videos</h5>
-            <div id="uploadedVideosList"></div>
+        <div class="video-list" id="videoListContainer">
+            <h4><i class="fas fa-history me-2"></i>Recently Uploaded Videos</h4>
+            <p class="text-muted">Your recently uploaded videos will appear here</p>
+            <div id="uploadedVideosList">
+                <div class="text-center py-5 text-muted" id="noVideosMessage">
+                    <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                    <p>No videos uploaded yet</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -187,7 +377,7 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        console.log("Firebase initialized.");
+        console.log("Firebase initialized for large file uploads (up to 5GB).");
         
         // Get references to DOM elements
         const uploadArea = document.getElementById('uploadArea');
@@ -201,17 +391,45 @@
         const firebaseVideoUrl = document.getElementById('firebaseVideoUrl');
         const videoListContainer = document.getElementById('videoListContainer');
         const uploadedVideosList = document.getElementById('uploadedVideosList');
+        const noVideosMessage = document.getElementById('noVideosMessage');
+        const largeFileWarning = document.getElementById('largeFileWarning');
+        const resumableInfo = document.getElementById('resumableInfo');
+        const uploadStats = document.getElementById('uploadStats');
+        const controlButtons = document.getElementById('controlButtons');
+        const pauseResumeButton = document.getElementById('pauseResumeButton');
+        const cancelUploadButton = document.getElementById('cancelUploadButton');
+        const retryUploadButton = document.getElementById('retryUploadButton');
+        const cancelPreview = document.getElementById('cancelPreview');
         
         // File information elements
         const fileName = document.getElementById('fileName');
         const fileSize = document.getElementById('fileSize');
         const fileType = document.getElementById('fileType');
+        const storageLocation = document.getElementById('storageLocation');
+        const timeEstimate = document.getElementById('timeEstimate');
+        const speedEstimate = document.getElementById('speedEstimate');
+        const statusText = document.getElementById('statusText');
+        
+        // Stats elements
+        const statsUploaded = document.getElementById('statsUploaded');
+        const statsRemaining = document.getElementById('statsRemaining');
+        const statsCurrentSpeed = document.getElementById('statsCurrentSpeed');
+        const statsAvgSpeed = document.getElementById('statsAvgSpeed');
+        const statsElapsedTime = document.getElementById('statsElapsedTime');
+        const statsTimeLeft = document.getElementById('statsTimeLeft');
         
         // Variables to track upload
         let selectedFile = null;
         let selectedStorage = 'videos';
         let uploadTask = null;
         let startTime = null;
+        let isUploading = false;
+        let isPaused = false;
+        let uploadStartTime = null;
+        let lastBytesTransferred = 0;
+        let lastTimeUpdate = null;
+        let speedSamples = [];
+        const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024; // 5GB in bytes
         
         // Initialize storage options
         document.querySelectorAll('.storage-option').forEach(option => {
@@ -221,6 +439,7 @@
                 });
                 this.classList.add('selected');
                 selectedStorage = this.getAttribute('data-storage');
+                storageLocation.textContent = `/${selectedStorage}/`;
                 console.log(`Storage selected: ${selectedStorage}`);
             });
         });
@@ -230,19 +449,16 @@
         
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            uploadArea.style.borderColor = '#0056b3';
-            uploadArea.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+            uploadArea.classList.add('highlight');
         });
         
         uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '#007bff';
-            uploadArea.style.backgroundColor = '';
+            uploadArea.classList.remove('highlight');
         });
         
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.style.borderColor = '#007bff';
-            uploadArea.style.backgroundColor = '';
+            uploadArea.classList.remove('highlight');
             
             if (e.dataTransfer.files.length) {
                 handleFileSelect(e.dataTransfer.files[0]);
@@ -256,41 +472,104 @@
             }
         });
         
+        // Cancel preview button
+        cancelPreview.addEventListener('click', () => {
+            videoPreview.src = '';
+            videoPreview.style.display = 'none';
+            cancelPreview.style.display = 'none';
+            selectedFile = null;
+            uploadButton.disabled = true;
+            fileName.textContent = 'No video selected';
+            fileSize.textContent = '0 MB';
+            fileType.textContent = '-';
+            statusText.textContent = 'Ready';
+            largeFileWarning.style.display = 'none';
+            resumableInfo.style.display = 'none';
+        });
+        
         // Handle file selection
         function handleFileSelect(file) {
             // Check if file is a video
-            if (!file.type.startsWith('video/')) {
-                alert('Please select a video file.');
+            if (!file.type.startsWith('video/') && !isVideoFileExtension(file.name)) {
+                alert('Please select a video file (MP4, AVI, MOV, MKV, WebM, etc.).');
                 return;
             }
             
-            // Check file size (limit to 100MB)
-            if (file.size > 100 * 1024 * 1024) {
-                alert('File size exceeds 100MB limit.');
+            // Check file size (limit to 5GB)
+            if (file.size > MAX_FILE_SIZE) {
+                alert(`File size exceeds 5GB limit. Selected file: ${formatFileSize(file.size)}`);
                 return;
             }
             
             selectedFile = file;
             
             // Display file info
-            fileName.textContent = file.name;
+            fileName.textContent = truncateFileName(file.name, 30);
             fileSize.textContent = formatFileSize(file.size);
-            fileType.textContent = file.type || 'Unknown';
+            fileType.textContent = file.type || getFileExtension(file.name).toUpperCase();
             
-            // Show video preview
-            const videoURL = URL.createObjectURL(file);
-            videoPreview.src = videoURL;
-            videoPreview.style.display = 'block';
+            // Show/hide large file warning
+            if (file.size > 500 * 1024 * 1024) { // > 500MB
+                largeFileWarning.style.display = 'block';
+                resumableInfo.style.display = 'block';
+            } else {
+                largeFileWarning.style.display = 'none';
+                resumableInfo.style.display = 'none';
+            }
+            
+            // Calculate upload time estimate (assuming average speed of 5MB/s)
+            const estimatedTimeSeconds = file.size / (5 * 1024 * 1024); // 5MB/s
+            timeEstimate.textContent = formatTime(estimatedTimeSeconds);
+            speedEstimate.textContent = "5 MB/s (estimate)";
+            statusText.textContent = "Ready to upload";
+            
+            // Show video preview for smaller files (< 500MB)
+            if (file.size < 500 * 1024 * 1024) {
+                const videoURL = URL.createObjectURL(file);
+                videoPreview.src = videoURL;
+                videoPreview.style.display = 'block';
+                cancelPreview.style.display = 'block';
+            } else {
+                videoPreview.style.display = 'none';
+                cancelPreview.style.display = 'none';
+                videoPreview.src = '';
+            }
             
             // Enable upload button
             uploadButton.disabled = false;
-            uploadButton.innerHTML = '<i class="fas fa-upload me-2"></i>Upload Video to Firebase';
+            uploadButton.innerHTML = '<i class="fas fa-upload me-2"></i>Upload Video to Firebase Storage';
             
             console.log(`Video selected: ${file.name} (${formatFileSize(file.size)})`);
         }
         
         // Handle upload button click
-        uploadButton.addEventListener('click', uploadToFirebase);
+        uploadButton.addEventListener('click', () => {
+            if (isUploading) {
+                // If already uploading, pause the upload
+                pauseUpload();
+            } else {
+                // Start new upload
+                uploadToFirebase();
+            }
+        });
+        
+        // Pause/Resume button
+        pauseResumeButton.addEventListener('click', () => {
+            if (isUploading && !isPaused) {
+                pauseUpload();
+            } else if (isUploading && isPaused) {
+                resumeUpload();
+            }
+        });
+        
+        // Cancel upload button
+        cancelUploadButton.addEventListener('click', cancelUpload);
+        
+        // Retry upload button
+        retryUploadButton.addEventListener('click', () => {
+            retryUploadButton.style.display = 'none';
+            uploadToFirebase();
+        });
         
         // Upload to Firebase Storage
         function uploadToFirebase() {
@@ -303,16 +582,39 @@
             uploadButton.disabled = true;
             uploadButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
             uploadProgressContainer.style.display = 'block';
+            uploadStats.style.display = 'block';
+            controlButtons.style.display = 'flex';
+            retryUploadButton.style.display = 'none';
             
             // Reset progress bar
             uploadProgressBar.style.width = '0%';
-            uploadProgressBar.textContent = '0%';
+            uploadProgressBar.querySelector('.progress-text').textContent = '0%';
             uploadProgressBar.setAttribute('aria-valuenow', 0);
             uploadStatus.textContent = 'Starting upload...';
             uploadSpeed.textContent = '';
             
+            // Reset stats
+            statsUploaded.textContent = '0 MB';
+            statsRemaining.textContent = formatFileSize(selectedFile.size);
+            statsCurrentSpeed.textContent = '0 MB/s';
+            statsAvgSpeed.textContent = '0 MB/s';
+            statsElapsedTime.textContent = '0s';
+            statsTimeLeft.textContent = '-';
+            
             // Start time for speed calculation
             startTime = new Date().getTime();
+            uploadStartTime = startTime;
+            lastBytesTransferred = 0;
+            lastTimeUpdate = startTime;
+            speedSamples = [];
+            
+            // Update status
+            isUploading = true;
+            isPaused = false;
+            pauseResumeButton.innerHTML = '<i class="fas fa-pause me-2"></i>Pause Upload';
+            pauseResumeButton.classList.remove('btn-success');
+            pauseResumeButton.classList.add('btn-warning');
+            statusText.textContent = 'Uploading...';
             
             // Create storage reference
             const storage = firebase.storage();
@@ -320,44 +622,86 @@
             
             // Create a unique filename with timestamp
             const timestamp = new Date().getTime();
-            const fileExtension = selectedFile.name.split('.').pop();
+            const fileExtension = getFileExtension(selectedFile.name);
             const fileNameWithoutExt = selectedFile.name.substring(0, selectedFile.name.lastIndexOf('.'));
-            const safeFileName = fileNameWithoutExt.replace(/[^a-zA-Z0-9]/g, '_');
+            const safeFileName = fileNameWithoutExt.replace(/[^a-zA-Z0-9_-]/g, '_');
             const firebaseFileName = `${timestamp}_${safeFileName}.${fileExtension}`;
             
             // Select storage path based on user selection
             const storagePath = `${selectedStorage}/${firebaseFileName}`;
             const videoRef = storageRef.child(storagePath);
             
-            // Create upload task
+            // Firebase automatically handles resumable uploads for large files
+            // We don't need to chunk files manually for files up to 5GB
             uploadTask = videoRef.put(selectedFile);
             
             // Monitor upload progress
             uploadTask.on('state_changed', 
                 // Progress handler
                 (snapshot) => {
+                    if (isPaused) return;
+                    
                     // Calculate progress percentage
                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                     
                     // Update progress bar
                     uploadProgressBar.style.width = progress + '%';
-                    uploadProgressBar.textContent = Math.round(progress) + '%';
+                    uploadProgressBar.querySelector('.progress-text').textContent = Math.round(progress) + '%';
                     uploadProgressBar.setAttribute('aria-valuenow', progress);
                     
                     // Calculate upload speed
                     const currentTime = new Date().getTime();
                     const timeElapsed = (currentTime - startTime) / 1000; // in seconds
                     const bytesTransferred = snapshot.bytesTransferred;
-                    const speed = bytesTransferred / timeElapsed; // bytes per second
                     
-                    // Update status
-                    uploadStatus.textContent = `Uploading: ${Math.round(progress)}%`;
-                    uploadSpeed.textContent = `Speed: ${formatFileSize(speed)}/s`;
+                    // Calculate current speed (bytes per second)
+                    const timeDiff = (currentTime - lastTimeUpdate) / 1000;
+                    const bytesDiff = bytesTransferred - lastBytesTransferred;
+                    
+                    if (timeDiff > 0) {
+                        const currentSpeed = bytesDiff / timeDiff; // bytes per second
+                        speedSamples.push(currentSpeed);
+                        
+                        // Keep only last 10 samples for average
+                        if (speedSamples.length > 10) speedSamples.shift();
+                        
+                        // Calculate average speed
+                        const avgSpeed = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
+                        
+                        // Update speed display
+                        const speedText = `${formatFileSize(currentSpeed, 1)}/s`;
+                        uploadSpeed.textContent = speedText;
+                        statsCurrentSpeed.textContent = formatFileSize(currentSpeed, 1) + '/s';
+                        statsAvgSpeed.textContent = formatFileSize(avgSpeed, 1) + '/s';
+                        
+                        // Calculate estimated time remaining
+                        const bytesRemaining = snapshot.totalBytes - bytesTransferred;
+                        let timeRemaining = 'Calculating...';
+                        
+                        if (avgSpeed > 0) {
+                            const secondsRemaining = bytesRemaining / avgSpeed;
+                            timeRemaining = formatTime(secondsRemaining);
+                            statsTimeLeft.textContent = timeRemaining;
+                        }
+                        
+                        // Update status
+                        uploadStatus.textContent = `Uploading: ${Math.round(progress)}%`;
+                        uploadStatus.className = 'badge bg-primary';
+                        
+                        // Update stats
+                        statsUploaded.textContent = formatFileSize(bytesTransferred);
+                        statsRemaining.textContent = formatFileSize(bytesRemaining);
+                        statsElapsedTime.textContent = formatTime(timeElapsed);
+                    }
+                    
+                    lastBytesTransferred = bytesTransferred;
+                    lastTimeUpdate = currentTime;
                 },
                 // Error handler
                 (error) => {
                     console.error('Upload error:', error);
                     uploadStatus.textContent = 'Upload failed: ' + error.message;
+                    uploadStatus.className = 'badge bg-danger';
                     uploadProgressBar.classList.remove('progress-bar-animated');
                     uploadProgressBar.classList.remove('progress-bar-striped');
                     uploadProgressBar.classList.add('bg-danger');
@@ -365,6 +709,13 @@
                     // Reset button
                     uploadButton.disabled = false;
                     uploadButton.innerHTML = '<i class="fas fa-upload me-2"></i>Try Again';
+                    
+                    // Show retry button
+                    retryUploadButton.style.display = 'block';
+                    
+                    // Update status
+                    isUploading = false;
+                    statusText.textContent = 'Upload failed';
                 },
                 // Success handler
                 () => {
@@ -374,6 +725,7 @@
                         
                         // Update UI for success
                         uploadStatus.textContent = 'Upload complete!';
+                        uploadStatus.className = 'badge bg-success';
                         uploadProgressBar.classList.remove('progress-bar-animated');
                         uploadProgressBar.classList.remove('progress-bar-striped');
                         uploadProgressBar.classList.add('bg-success');
@@ -382,35 +734,103 @@
                         uploadButton.disabled = true;
                         uploadButton.innerHTML = '<i class="fas fa-check me-2"></i>Upload Complete';
                         
+                        // Hide control buttons
+                        controlButtons.style.display = 'none';
+                        
                         // Store URL in hidden field
                         firebaseVideoUrl.value = downloadURL;
                         
                         // Add to uploaded videos list
-                        addToUploadedVideosList(selectedFile.name, downloadURL, storagePath);
+                        addToUploadedVideosList(selectedFile.name, downloadURL, storagePath, selectedFile.size);
+                        
+                        // Update status
+                        isUploading = false;
+                        statusText.textContent = 'Upload complete';
                         
                         // Show success message
                         setTimeout(() => {
-                            alert(`Video uploaded successfully!\n\nURL: ${downloadURL}`);
+                            alert(`Video uploaded successfully!\n\nSize: ${formatFileSize(selectedFile.size)}\nURL has been copied to clipboard.`);
+                            navigator.clipboard.writeText(downloadURL);
                         }, 500);
                     });
                 }
             );
         }
         
+        // Pause upload
+        function pauseUpload() {
+            if (uploadTask && isUploading && !isPaused) {
+                uploadTask.pause();
+                isPaused = true;
+                pauseResumeButton.innerHTML = '<i class="fas fa-play me-2"></i>Resume Upload';
+                pauseResumeButton.classList.remove('btn-warning');
+                pauseResumeButton.classList.add('btn-success');
+                uploadStatus.textContent = 'Upload paused';
+                uploadStatus.className = 'badge bg-warning';
+                statusText.textContent = 'Paused';
+            }
+        }
+        
+        // Resume upload
+        function resumeUpload() {
+            if (uploadTask && isUploading && isPaused) {
+                uploadTask.resume();
+                isPaused = false;
+                pauseResumeButton.innerHTML = '<i class="fas fa-pause me-2"></i>Pause Upload';
+                pauseResumeButton.classList.remove('btn-success');
+                pauseResumeButton.classList.add('btn-warning');
+                uploadStatus.textContent = 'Resuming upload...';
+                uploadStatus.className = 'badge bg-info';
+                statusText.textContent = 'Uploading...';
+            }
+        }
+        
+        // Cancel upload
+        function cancelUpload() {
+            if (uploadTask && isUploading) {
+                uploadTask.cancel();
+                isUploading = false;
+                isPaused = false;
+                
+                // Reset UI
+                uploadProgressContainer.style.display = 'none';
+                uploadStats.style.display = 'none';
+                controlButtons.style.display = 'none';
+                uploadButton.disabled = false;
+                uploadButton.innerHTML = '<i class="fas fa-upload me-2"></i>Upload Video to Firebase Storage';
+                
+                uploadStatus.textContent = 'Upload cancelled';
+                statusText.textContent = 'Ready';
+                
+                alert('Upload cancelled.');
+            }
+        }
+        
         // Add uploaded video to the list
-        function addToUploadedVideosList(name, url, path) {
-            // Show the video list container if hidden
-            videoListContainer.style.display = 'block';
+        function addToUploadedVideosList(name, url, path, size) {
+            // Hide "no videos" message
+            noVideosMessage.style.display = 'none';
             
             // Create video item
             const videoItem = document.createElement('div');
             videoItem.className = 'video-item d-flex align-items-center';
             
-            // Create thumbnail (using a placeholder or first frame if available)
-            const thumbnail = document.createElement('img');
-            thumbnail.className = 'video-thumbnail me-3';
-            thumbnail.src = 'https://img.icons8.com/color/96/000000/video.png';
-            thumbnail.alt = 'Video thumbnail';
+            // Create thumbnail
+            const thumbnail = document.createElement('div');
+            thumbnail.className = 'me-3 position-relative';
+            
+            const thumbnailImg = document.createElement('img');
+            thumbnailImg.className = 'video-thumbnail';
+            thumbnailImg.src = 'https://img.icons8.com/color/96/000000/video.png';
+            thumbnailImg.alt = 'Video thumbnail';
+            
+            const sizeBadge = document.createElement('span');
+            sizeBadge.className = 'position-absolute bottom-0 start-0 badge bg-dark';
+            sizeBadge.style.transform = 'translate(5px, 5px)';
+            sizeBadge.textContent = formatFileSize(size, 0);
+            
+            thumbnail.appendChild(thumbnailImg);
+            thumbnail.appendChild(sizeBadge);
             
             // Create video info
             const videoInfo = document.createElement('div');
@@ -418,73 +838,99 @@
             
             const videoName = document.createElement('div');
             videoName.className = 'fw-bold';
-            videoName.textContent = name;
+            videoName.textContent = truncateFileName(name, 40);
             
             const videoPath = document.createElement('div');
             videoPath.className = 'small text-muted';
             videoPath.textContent = path;
             
             const videoUrl = document.createElement('div');
-            videoUrl.className = 'small';
+            videoUrl.className = 'small mt-1';
             
             const urlLink = document.createElement('a');
             urlLink.href = url;
             urlLink.target = '_blank';
-            urlLink.textContent = 'View Video';
-            urlLink.className = 'text-decoration-none';
+            urlLink.textContent = 'Open Video';
+            urlLink.className = 'text-decoration-none me-3';
             
-            videoUrl.appendChild(urlLink);
-            videoInfo.appendChild(videoName);
-            videoInfo.appendChild(videoPath);
-            videoInfo.appendChild(videoUrl);
-            
-            // Create copy button
             const copyButton = document.createElement('button');
-            copyButton.className = 'btn btn-sm btn-outline-secondary';
-            copyButton.innerHTML = '<i class="fas fa-copy"></i>';
-            copyButton.title = 'Copy URL';
+            copyButton.className = 'btn btn-sm btn-outline-primary';
+            copyButton.innerHTML = '<i class="fas fa-copy me-1"></i>Copy URL';
             copyButton.onclick = () => {
                 navigator.clipboard.writeText(url).then(() => {
                     const originalHTML = copyButton.innerHTML;
-                    copyButton.innerHTML = '<i class="fas fa-check"></i>';
-                    copyButton.classList.remove('btn-outline-secondary');
+                    copyButton.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+                    copyButton.classList.remove('btn-outline-primary');
                     copyButton.classList.add('btn-success');
                     
                     setTimeout(() => {
                         copyButton.innerHTML = originalHTML;
                         copyButton.classList.remove('btn-success');
-                        copyButton.classList.add('btn-outline-secondary');
+                        copyButton.classList.add('btn-outline-primary');
                     }, 2000);
                 });
             };
             
+            videoUrl.appendChild(urlLink);
+            videoUrl.appendChild(copyButton);
+            
+            videoInfo.appendChild(videoName);
+            videoInfo.appendChild(videoPath);
+            videoInfo.appendChild(videoUrl);
+            
             // Assemble the item
             videoItem.appendChild(thumbnail);
             videoItem.appendChild(videoInfo);
-            videoItem.appendChild(copyButton);
             
             // Add to the top of the list
             uploadedVideosList.insertBefore(videoItem, uploadedVideosList.firstChild);
             
-            // Limit list to 5 items
-            if (uploadedVideosList.children.length > 5) {
+            // Limit list to 10 items
+            if (uploadedVideosList.children.length > 10) {
                 uploadedVideosList.removeChild(uploadedVideosList.lastChild);
             }
         }
         
-        // Format file size
-        function formatFileSize(bytes) {
+        // Helper functions
+        function formatFileSize(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
             
             const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+        
+        function formatTime(seconds) {
+            if (seconds < 60) {
+                return Math.round(seconds) + 's';
+            } else if (seconds < 3600) {
+                return Math.round(seconds / 60) + 'm';
+            } else {
+                return Math.round(seconds / 3600) + 'h';
+            }
+        }
+        
+        function getFileExtension(filename) {
+            return filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
+        }
+        
+        function isVideoFileExtension(filename) {
+            const videoExtensions = ['mp4', 'avi', 'mov', 'mkv', 'wmv', 'flv', 'webm', 'm4v', 'mpg', 'mpeg'];
+            const ext = getFileExtension(filename).toLowerCase();
+            return videoExtensions.includes(ext);
+        }
+        
+        function truncateFileName(name, maxLength) {
+            if (name.length <= maxLength) return name;
+            return name.substring(0, maxLength - 3) + '...';
         }
         
         // Initialize
-        console.log("Video upload page initialized.");
+        console.log("Large video upload page initialized (supports up to 5GB files).");
+        console.log("Firebase Storage supports resumable uploads for large files automatically.");
     </script>
 </body>
 </html>
