@@ -11,9 +11,9 @@ async function uploadVideo() {
   const file = document.getElementById("videoFile").files[0];
   const progressBar = document.getElementById("progressBar");
   const status = document.getElementById("status");
-  
+
   if (!file) return alert("Select a video");
-  
+
   // Step 1: request pre-signed URL
   const res = await fetch(WORKER_URL, {
     method: "POST",
@@ -21,17 +21,16 @@ async function uploadVideo() {
       "Content-Type": "application/json",
       "X-API-Key": API_KEY,
     },
-    body: JSON.stringify({
-      filename: file.name,
-      fileType: file.type,
-      fileSize: file.size
-    }),
+    body: JSON.stringify({ filename: file.name, fileType: file.type, fileSize: file.size }),
   });
-  
-  if (!res.ok) return alert("Upload failed: " + await res.text());
-  
+
+  if (!res.ok) {
+    const text = await res.text();
+    return alert("Upload failed: " + text);
+  }
+
   const { url, key } = await res.json();
-  
+
   // Step 2: upload in chunks
   const chunkSize = 10 * 1024 * 1024; // 10MB
   let uploaded = 0;
