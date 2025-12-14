@@ -916,6 +916,13 @@
             return source + '/uploads' + (fileUrl.startsWith('/') ? fileUrl : '/' + fileUrl);
         }
 
+        // Check if a lesson has missing files
+        function hasMissingFiles(lessonData) {
+            return !lessonData || 
+                   (!lessonData.video && !lessonData.material && !lessonData.thumbnail) ||
+                   (lessonData.video === null && lessonData.material === null && lessonData.thumbnail === null);
+        }
+
         // Fetch lesson data from both APIs
         async function fetchLesson() {
             const params = new URLSearchParams(window.location.search);
@@ -929,6 +936,10 @@
             try {
                 let lessonData = null;
                 let source = API_SOURCES.NEW; // Default to new API
+                let newApiHasData = false;
+                let oldApiHasData = false;
+                
+                console.log("Starting lesson fetch for ID:", lessonId);
                 
                 // Try the new API first
                 try {
@@ -948,18 +959,32 @@
                     
                     if (res.ok) {
                         const data = await res.json();
-                        if (data.success) {
+                        console.log("New API response:", data);
+                        
+                        if (data.success && data.data) {
                             lessonData = data.data;
                             source = API_SOURCES.NEW;
-                            console.log("Found lesson in new API");
+                            newApiHasData = true;
+                            console.log("Found lesson in new API:", lessonData.title);
+                            console.log("New API files - video:", lessonData.video, "material:", lessonData.material, "thumbnail:", lessonData.thumbnail);
+                            
+                            // Check if new API has missing files
+                            if (hasMissingFiles(lessonData)) {
+                                console.log("New API has missing files, will try old API");
+                                newApiHasData = false;
+                            }
+                        } else {
+                            console.log("New API returned unsuccessful response or no data");
                         }
+                    } else {
+                        console.log("New API returned non-ok status:", res.status);
                     }
                 } catch (newApiError) {
                     console.warn("New API error:", newApiError);
                 }
                 
-                // If not found in new API, try the old API
-                if (!lessonData) {
+                // If new API doesn't have data or has missing files, try the old API
+                if (!newApiHasData) {
                     try {
                         console.log("Trying old API:", API_SOURCES.OLD);
                         const res = await fetch(`${API_SOURCES.OLD}/api/users/lessons/${lessonId}`, {
@@ -971,16 +996,51 @@
                         
                         if (res.ok) {
                             const data = await res.json();
-                            if (data.success) {
-                                lessonData = data.data;
-                                source = API_SOURCES.OLD;
-                                console.log("Found lesson in old API");
+                            console.log("Old API response:", data);
+                            
+                            if (data.success && data.data) {
+                                const oldLessonData = data.data;
+                                oldApiHasData = true;
+                                console.log("Found lesson in old API:", oldLessonData.title);
+                                console.log("Old API files - video:", oldLessonData.video, "material:", oldLessonData.material, "thumbnail:", oldLessonData.thumbnail);
+                                
+                                // If we have some data from new API but missing files, merge them
+                                if (lessonData && !hasMissingFiles(oldLessonData)) {
+                                    console.log("Merging data from both APIs");
+                                    // Keep new API data but use old API files if they exist
+                                    if (!lessonData.video && oldLessonData.video) {
+                                        lessonData.video = oldLessonData.video;
+                                        console.log("Using old API video:", oldLessonData.video);
+                                    }
+                                    if (!lessonData.material && oldLessonData.material) {
+                                        lessonData.material = oldLessonData.material;
+                                        console.log("Using old API material:", oldLessonData.material);
+                                    }
+                                    if (!lessonData.thumbnail && oldLessonData.thumbnail) {
+                                        lessonData.thumbnail = oldLessonData.thumbnail;
+                                        console.log("Using old API thumbnail:", oldLessonData.thumbnail);
+                                    }
+                                    source = API_SOURCES.OLD; // Files come from old API
+                                } else if (!lessonData) {
+                                    // No data from new API, use old API data
+                                    lessonData = oldLessonData;
+                                    source = API_SOURCES.OLD;
+                                    console.log("Using data from old API only");
+                                }
+                            } else {
+                                console.log("Old API returned unsuccessful response or no data");
                             }
+                        } else {
+                            console.log("Old API returned non-ok status:", res.status);
                         }
                     } catch (oldApiError) {
                         console.warn("Old API error:", oldApiError);
                     }
                 }
+                
+                console.log("Final lesson data:", lessonData);
+                console.log("Final source:", source);
+                console.log("Final files - video:", lessonData?.video, "material:", lessonData?.material, "thumbnail:", lessonData?.thumbnail);
                 
                 if (!lessonData) {
                     showError("Lesson not found", "The requested lesson could not be loaded from any source");
@@ -988,7 +1048,7 @@
                 }
                 
                 // Update page content
-                updatePageContent(lessonData, source);
+                updatePageContent(lessonData, source, newApiHasData, oldApiHasData);
                 
             } catch (err) {
                 console.error("Error loading lesson:", err);
@@ -997,7 +1057,7 @@
         }
 
         // Update the page with lesson data
-        function updatePageContent(lesson, source) {
+        function updatePageContent(lesson, source, newApiHasData, oldApiHasData) {
             const container = document.getElementById("lesson-container");
             
             // Update page elements
@@ -1013,15 +1073,25 @@
             const thumbnailUrl = lesson.thumbnail ? getFileUrl(lesson.thumbnail, source) : null;
             const materialUrl = lesson.material ? getFileUrl(lesson.material, source) : null;
             
+            // Determine source text
+            let sourceText = "";
+            if (newApiHasData && oldApiHasData) {
+                sourceText = "Mixed (New & Old APIs)";
+            } else if (newApiHasData) {
+                sourceText = "New API";
+            } else if (oldApiHasData) {
+                sourceText = "Old API";
+            }
+            
             // Build lesson HTML
             container.innerHTML = `
                 <div class="lesson-container">
                     <div class="lesson-header">
                         <h1 class="lesson-title">
                             ${lesson.title}
-                            <span class="source-indicator" title="Loaded from: ${source === API_SOURCES.NEW ? 'New API' : 'Old API'}">
+                            <span class="source-indicator" title="Loaded from: ${sourceText}">
                                 <i class="fas fa-database"></i>
-                                ${source === API_SOURCES.NEW ? 'New' : 'Old'}
+                                ${sourceText}
                             </span>
                         </h1>
                         <p class="lesson-description">${lesson.description || "No description available."}</p>
@@ -1032,7 +1102,7 @@
                             </div>
                             <div class="meta-item">
                                 <i class="fas fa-database"></i>
-                                <span>Source: ${source === API_SOURCES.NEW ? 'New Server' : 'Old Server'}</span>
+                                <span>Source: ${sourceText}</span>
                             </div>
                         </div>
                     </div>
@@ -1064,7 +1134,7 @@
                         <div class="material-section">
                             <h2 class="section-title">
                                 <i class="fas fa-file-download"></i> Lesson Materials
-                                <span class="source-indicator">${source === API_SOURCES.NEW ? 'New' : 'Old'}</span>
+                                <span class="source-indicator">${sourceText}</span>
                             </h2>
                             <div class="material-card">
                                 <div class="material-icon">
