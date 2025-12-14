@@ -480,6 +480,20 @@
             color: var(--light);
         }
 
+        /* Source Indicator */
+        .source-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            background: rgba(0, 102, 255, 0.1);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin-left: 8px;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
         /* Bottom Navigation - Mobile */
         .bottom-nav {
             position: fixed;
@@ -630,67 +644,67 @@
             }
         }
 
-            .user-profile {
-      position: relative;
-      cursor: pointer;
-    }
+        .user-profile {
+            position: relative;
+            cursor: pointer;
+        }
 
-    .profile-img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--gradient);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      transition: transform 0.2s ease;
-    }
+        .profile-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            transition: transform 0.2s ease;
+        }
 
-    .profile-img:hover {
-      transform: scale(1.1);
-    }
+        .profile-img:hover {
+            transform: scale(1.1);
+        }
 
-    /* Balls */
-    .ball {
-      position: absolute;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: #007bff;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      text-decoration: none;
-      opacity: 0;
-      transform: translate(0, 0);
-      transition: transform 0.6s ease, opacity 0.4s ease;
-      pointer-events: none;
-    }
+        /* Balls */
+        .ball {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            text-decoration: none;
+            opacity: 0;
+            transform: translate(0, 0);
+            transition: transform 0.6s ease, opacity 0.4s ease;
+            pointer-events: none;
+        }
 
-    .ball.logout {
-      background: #e74c3c;
-    }
+        .ball.logout {
+            background: #e74c3c;
+        }
 
-    .ball.profile {
-      background: #2ecc71;
-    }
+        .ball.profile {
+            background: #2ecc71;
+        }
 
-    /* Active (thrown out) state */
-    .user-profile.active .ball.logout {
-      transform: translate(-60px, 30px);
-      opacity: 1;
-      pointer-events: auto;
-    }
+        /* Active (thrown out) state */
+        .user-profile.active .ball.logout {
+            transform: translate(-60px, 30px);
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-    .user-profile.active .ball.profile {
-      transform: translate(-60px, -30px);
-      opacity: 1;
-      pointer-events: auto;
-    }
+        .user-profile.active .ball.profile {
+            transform: translate(-60px, -30px);
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
@@ -783,12 +797,12 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="user-profile" id="userMenu">
-    <div class="profile-img">
-      <i class="fas fa-user"></i>
-    </div>
-    <a href="student-profile.html" class="ball profile">Profile</a>
-    <a onclick="logout()" class="ball logout">Logout</a>
-  </div>
+                    <div class="profile-img">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <a href="student-profile.html" class="ball profile">Profile</a>
+                    <a onclick="logout()" class="ball logout">Logout</a>
+                </div>
             </div>
 
             <!-- Breadcrumb -->
@@ -831,16 +845,22 @@
     </div>
 
     <script>
-                    const userMenu = document.getElementById("userMenu");
-                function logout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userInfo");
-      window.location.href = "../Login-Pages/login.html";
-    }
+        const userMenu = document.getElementById("userMenu");
+        const API_SOURCES = {
+            NEW: 'https://cs-eslamhatem.fly.dev',
+            OLD: 'https://cs-eslamhatem-backend-1i25nw.fly.dev'
+        };
+        
+        function logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("userInfo");
+            window.location.href = "../Login-Pages/login.html";
+        }
 
-    userMenu.addEventListener("click", () => {
-      userMenu.classList.toggle("active");
-    });
+        userMenu.addEventListener("click", () => {
+            userMenu.classList.toggle("active");
+        });
+        
         document.addEventListener('DOMContentLoaded', function() {
             const overlay = document.getElementById('overlay');
             const sidebar = document.getElementById('sidebar');
@@ -866,189 +886,261 @@
                 }
             });
 
-            // Load lesson
+            // Check authentication and load lesson
+            const token = localStorage.getItem("token");
+            
+            if (!token) {
+                alert("You need to log in to view this lesson");
+                window.location.href = '../Login-Pages/login.html';
+                return;
+            }
+            
             fetchLesson();
         });
 
-        // Check authentication
-        const token = localStorage.getItem("token");
-        
-        if (!token) {
-            alert("You need to log in to view this lesson");
-            window.location.href = '../Login-Pages/login.html';
-           
+        // Helper function to get the actual URL for a file
+        function getFileUrl(fileUrl, source) {
+            if (!fileUrl) return null;
+            
+            // If it's already a full URL (Firebase or external), return as-is
+            if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+                return fileUrl;
+            }
+            
+            // If it starts with /uploads, prepend the API base URL
+            if (fileUrl.startsWith('/uploads')) {
+                return source + fileUrl;
+            }
+            
+            // Default: prepend API base URL with /uploads
+            return source + '/uploads' + (fileUrl.startsWith('/') ? fileUrl : '/' + fileUrl);
         }
 
-        // Fetch lesson data
+        // Fetch lesson data from both APIs
         async function fetchLesson() {
             const params = new URLSearchParams(window.location.search);
             const lessonId = params.get("id");
             
             if (!lessonId) {
-                document.getElementById("lesson-container").innerHTML = `
-                    <div class="error-state">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <h3>No lesson ID provided</h3>
-                        <p>Please select a lesson from the course page</p>
-                        <a href="my-learning.html" class="nav-btn" style="margin-top: 20px;">
-                            <i class="fas fa-arrow-left"></i> Back to My Lessons
-                        </a>
-                    </div>
-                `;
+                showError("No lesson ID provided", "Please select a lesson from the course page");
                 return;
             }
 
             try {
-                const res = await fetch(`https://cs-eslamhatem-backend-1i25nw.fly.dev/api/users/lessons/${lessonId}`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    }
-                });
-
-                if (res.status === 401 || res.status === 403) {
-                    localStorage.removeItem("token");
-                    window.location.href = '../Login-Pages/login.html';
-                    return;
-                }
-
-                const data = await res.json();
-                const container = document.getElementById("lesson-container");
+                let lessonData = null;
+                let source = API_SOURCES.NEW; // Default to new API
                 
-                if (!data.success) {
-                    container.innerHTML = `
-                        <div class="error-state">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <h3>Lesson not found</h3>
-                            <p>The requested lesson could not be loaded</p>
-                            <a href="my-learning.html" class="nav-btn" style="margin-top: 20px;">
-                                <i class="fas fa-arrow-left"></i> Back to My Lessons
-                            </a>
-                        </div>
-                    `;
+                // Try the new API first
+                try {
+                    console.log("Trying new API:", API_SOURCES.NEW);
+                    const res = await fetch(`${API_SOURCES.NEW}/api/users/lessons/${lessonId}`, {
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    
+                    if (res.status === 401 || res.status === 403) {
+                        localStorage.removeItem("token");
+                        window.location.href = '../Login-Pages/login.html';
+                        return;
+                    }
+                    
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.success) {
+                            lessonData = data.data;
+                            source = API_SOURCES.NEW;
+                            console.log("Found lesson in new API");
+                        }
+                    }
+                } catch (newApiError) {
+                    console.warn("New API error:", newApiError);
+                }
+                
+                // If not found in new API, try the old API
+                if (!lessonData) {
+                    try {
+                        console.log("Trying old API:", API_SOURCES.OLD);
+                        const res = await fetch(`${API_SOURCES.OLD}/api/users/lessons/${lessonId}`, {
+                            headers: {
+                                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                                "Content-Type": "application/json"
+                            }
+                        });
+                        
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.success) {
+                                lessonData = data.data;
+                                source = API_SOURCES.OLD;
+                                console.log("Found lesson in old API");
+                            }
+                        }
+                    } catch (oldApiError) {
+                        console.warn("Old API error:", oldApiError);
+                    }
+                }
+                
+                if (!lessonData) {
+                    showError("Lesson not found", "The requested lesson could not be loaded from any source");
                     return;
                 }
-
-                const lesson = data.data;
                 
                 // Update page content
-                document.getElementById("lesson-name").textContent = lesson.title;
-                document.getElementById("course-name").textContent = lesson.courseId?.title || "Course Content";
+                updatePageContent(lessonData, source);
                 
-                if (lesson.courseId?._id) {
-                    document.getElementById("course-link").href = `lessons.html?id=${lesson.courseId._id}`;
-                }
-
-                // Build lesson HTML
-                container.innerHTML = `
-                    <div class="lesson-container">
-                        <div class="lesson-header">
-                            <h1 class="lesson-title">${lesson.title}</h1>
-                            <p class="lesson-description">${lesson.description || "No description available."}</p>
-                            <div class="lesson-meta">
-                                
-                               
-                                <div class="meta-item">
-                                    <i class="fas fa-calendar"></i>
-                                    <span>${new Date(lesson.createdAt).toLocaleDateString()}</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        ${lesson.video ? `
-                            <div class="video-container">
-                                <div class="video-frame">
-                                    <video class="video-player" id="lesson-video" controls poster="${lesson.thumbnail ? `https://cs-eslamhatem-backend-1i25nw.fly.dev${lesson.thumbnail}` : ''}">
-                                        <source src="https://cs-eslamhatem-backend-1i25nw.fly.dev${lesson.video}" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                    ${lesson.thumbnail ? `
-                                        <img src="https://cs-eslamhatem-backend-1i25nw.fly.dev${lesson.thumbnail}" alt="${lesson.title}" class="video-thumbnail" id="lesson-thumbnail">
-                                        <div class="play-button" id="play-button">
-                                            <i class="fas fa-play"></i>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        ` : `
-                            <div class="error-state" style="padding: 30px; margin-bottom: 25px;">
-                                <i class="fas fa-video-slash"></i>
-                                <h3>No video available</h3>
-                                <p>The video for this lesson is not available yet</p>
-                            </div>
-                        `}
-                        
-                        ${lesson.material ? `
-                            <div class="material-section">
-                                <h2 class="section-title"><i class="fas fa-file-download"></i> Lesson Materials</h2>
-                                <div class="material-card">
-                                    <div class="material-icon">
-                                        <i class="fas fa-file-pdf"></i>
-                                    </div>
-                                    <div class="material-info">
-                                        <h3 class="material-name">Lesson Materials</h3>
-                                        <p class="material-desc">Download the supplementary materials for this lesson</p>
-                                    </div>
-                                    <a href="https://cs-eslamhatem-backend-1i25nw.fly.dev${lesson.material}" class="download-btn" target="_blank">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
-                                </div>
-                            </div>
-                        ` : ''}
-                        
-                        <div class="lesson-navigation">
-                            <a href="javascript:history.back()" class="nav-btn outline">
-                                <i class="fas fa-arrow-left"></i> Back to Course
-                            </a>
-                            <a href="my-learning.html" class="nav-btn">
-                                <i class="fas fa-list"></i> My Lessons
-                            </a>
-                        </div>
-                    </div>
-                `;
-                
-                // Add video play functionality if thumbnail exists
-                if (lesson.thumbnail && lesson.video) {
-                    const thumbnail = document.getElementById('lesson-thumbnail');
-                    const playButton = document.getElementById('play-button');
-                    const video = document.getElementById('lesson-video');
-                    
-                    if (thumbnail && playButton && video) {
-                        const playVideo = () => {
-                            thumbnail.style.display = 'none';
-                            playButton.style.display = 'none';
-                            video.play();
-                        };
-                        
-                        thumbnail.addEventListener('click', playVideo);
-                        playButton.addEventListener('click', playVideo);
-                        
-                        // Hide thumbnail when video starts playing
-                        video.addEventListener('play', () => {
-                            thumbnail.style.display = 'none';
-                            playButton.style.display = 'none';
-                        });
-                        
-                        // Show thumbnail when video ends
-                        video.addEventListener('ended', () => {
-                            thumbnail.style.display = 'block';
-                            playButton.style.display = 'flex';
-                        });
-                    }
-                }
             } catch (err) {
                 console.error("Error loading lesson:", err);
-                document.getElementById("lesson-container").innerHTML = `
-                    <div class="error-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Error loading lesson</h3>
-                        <p>There was a problem loading the lesson content. Please try again.</p>
-                        <button class="nav-btn" onclick="fetchLesson()" style="margin-top: 20px;">
+                showError("Error loading lesson", "There was a problem loading the lesson content. Please try again.");
+            }
+        }
+
+        // Update the page with lesson data
+        function updatePageContent(lesson, source) {
+            const container = document.getElementById("lesson-container");
+            
+            // Update page elements
+            document.getElementById("lesson-name").textContent = lesson.title;
+            document.getElementById("course-name").textContent = lesson.courseId?.title || "Course Content";
+            
+            if (lesson.courseId?._id) {
+                document.getElementById("course-link").href = `lessons.html?id=${lesson.courseId._id}`;
+            }
+
+            // Get file URLs with correct source
+            const videoUrl = lesson.video ? getFileUrl(lesson.video, source) : null;
+            const thumbnailUrl = lesson.thumbnail ? getFileUrl(lesson.thumbnail, source) : null;
+            const materialUrl = lesson.material ? getFileUrl(lesson.material, source) : null;
+            
+            // Build lesson HTML
+            container.innerHTML = `
+                <div class="lesson-container">
+                    <div class="lesson-header">
+                        <h1 class="lesson-title">
+                            ${lesson.title}
+                            <span class="source-indicator" title="Loaded from: ${source === API_SOURCES.NEW ? 'New API' : 'Old API'}">
+                                <i class="fas fa-database"></i>
+                                ${source === API_SOURCES.NEW ? 'New' : 'Old'}
+                            </span>
+                        </h1>
+                        <p class="lesson-description">${lesson.description || "No description available."}</p>
+                        <div class="lesson-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${new Date(lesson.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-database"></i>
+                                <span>Source: ${source === API_SOURCES.NEW ? 'New Server' : 'Old Server'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${videoUrl ? `
+                        <div class="video-container">
+                            <div class="video-frame">
+                                <video class="video-player" id="lesson-video" controls ${thumbnailUrl ? `poster="${thumbnailUrl}"` : ''}>
+                                    <source src="${videoUrl}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                ${thumbnailUrl ? `
+                                    <img src="${thumbnailUrl}" alt="${lesson.title}" class="video-thumbnail" id="lesson-thumbnail">
+                                    <div class="play-button" id="play-button">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="error-state" style="padding: 30px; margin-bottom: 25px;">
+                            <i class="fas fa-video-slash"></i>
+                            <h3>No video available</h3>
+                            <p>The video for this lesson is not available yet</p>
+                        </div>
+                    `}
+                    
+                    ${materialUrl ? `
+                        <div class="material-section">
+                            <h2 class="section-title">
+                                <i class="fas fa-file-download"></i> Lesson Materials
+                                <span class="source-indicator">${source === API_SOURCES.NEW ? 'New' : 'Old'}</span>
+                            </h2>
+                            <div class="material-card">
+                                <div class="material-icon">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <div class="material-info">
+                                    <h3 class="material-name">Lesson Materials</h3>
+                                    <p class="material-desc">Download the supplementary materials for this lesson</p>
+                                </div>
+                                <a href="${materialUrl}" class="download-btn" target="_blank" download>
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="lesson-navigation">
+                        <a href="javascript:history.back()" class="nav-btn outline">
+                            <i class="fas fa-arrow-left"></i> Back to Course
+                        </a>
+                        <a href="my-learning.html" class="nav-btn">
+                            <i class="fas fa-list"></i> My Lessons
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            // Add video play functionality if thumbnail exists
+            if (thumbnailUrl && videoUrl) {
+                const thumbnail = document.getElementById('lesson-thumbnail');
+                const playButton = document.getElementById('play-button');
+                const video = document.getElementById('lesson-video');
+                
+                if (thumbnail && playButton && video) {
+                    const playVideo = () => {
+                        thumbnail.style.display = 'none';
+                        playButton.style.display = 'none';
+                        video.play();
+                    };
+                    
+                    thumbnail.addEventListener('click', playVideo);
+                    playButton.addEventListener('click', playVideo);
+                    
+                    // Hide thumbnail when video starts playing
+                    video.addEventListener('play', () => {
+                        thumbnail.style.display = 'none';
+                        playButton.style.display = 'none';
+                    });
+                    
+                    // Show thumbnail when video ends
+                    video.addEventListener('ended', () => {
+                        thumbnail.style.display = 'block';
+                        playButton.style.display = 'flex';
+                    });
+                }
+            }
+        }
+
+        // Show error message
+        function showError(title, message) {
+            const container = document.getElementById("lesson-container");
+            container.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                        <button class="nav-btn outline" onclick="window.history.back()">
+                            <i class="fas fa-arrow-left"></i> Go Back
+                        </button>
+                        <button class="nav-btn" onclick="fetchLesson()">
                             <i class="fas fa-redo"></i> Try Again
                         </button>
                     </div>
-                `;
-            }
+                </div>
+            `;
         }
     </script>
 </body>
