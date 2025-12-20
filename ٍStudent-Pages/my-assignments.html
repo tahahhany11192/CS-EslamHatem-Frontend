@@ -375,6 +375,7 @@
             text-decoration: none;
             display: inline-block;
             text-align: center;
+            position: relative;
         }
 
         .btn-primary {
@@ -403,6 +404,34 @@
 
         .btn-secondary:hover {
             background: rgba(0, 204, 255, 0.1);
+        }
+
+        /* Button Loading State */
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.8;
+            position: relative;
+            color: transparent !important;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: button-spin 0.8s ease infinite;
+        }
+
+        @keyframes button-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* Submission details */
@@ -442,6 +471,65 @@
             background: rgba(0, 0, 0, 0.1);
             border-radius: 6px;
             font-style: italic;
+        }
+
+        /* File Upload Progress */
+        .upload-progress {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: rgba(240, 246, 255, 0.7);
+            text-align: center;
+        }
+
+        /* File Upload Preview */
+        .file-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            display: none;
+        }
+
+        .file-preview i {
+            color: var(--secondary);
+        }
+
+        .file-name {
+            flex: 1;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: #f87171;
+            cursor: pointer;
+            font-size: 1rem;
         }
 
         /* Empty State */
@@ -1084,10 +1172,79 @@
                 
                 container.appendChild(assignmentCard);
                 
+                // Add file preview functionality
+                setupFilePreview(assignment._id);
+                
                 // Start countdown timer if assignment is still pending
                 if (!assignment.submission && dueDate && dueDate > new Date()) {
                     startCountdownTimer(assignment._id, dueDate);
                 }
+            });
+        }
+
+        // Setup file preview for assignment form
+        function setupFilePreview(assignmentId) {
+            const fileInput = document.getElementById(`file-${assignmentId}`);
+            if (!fileInput) return;
+            
+            const form = fileInput.closest('.submission-form');
+            if (!form) return;
+            
+            // Create preview elements
+            const filePreview = document.createElement('div');
+            filePreview.className = 'file-preview';
+            filePreview.innerHTML = `
+                <i class="fas fa-file-pdf"></i>
+                <span class="file-name">No file selected</span>
+                <button type="button" class="remove-file">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            const uploadProgress = document.createElement('div');
+            uploadProgress.className = 'upload-progress';
+            uploadProgress.innerHTML = `
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">Uploading...</div>
+            `;
+            
+            // Insert after file input
+            fileInput.parentNode.insertBefore(filePreview, fileInput.nextSibling);
+            fileInput.parentNode.insertBefore(uploadProgress, filePreview.nextSibling);
+            
+            const fileNameSpan = filePreview.querySelector('.file-name');
+            const removeBtn = filePreview.querySelector('.remove-file');
+            const progressFill = uploadProgress.querySelector('.progress-fill');
+            const progressText = uploadProgress.querySelector('.progress-text');
+            
+            // Handle file selection
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    fileNameSpan.textContent = file.name;
+                    filePreview.style.display = 'flex';
+                    
+                    // Validate file type
+                    const validTypes = ['application/pdf', 'application/msword', 
+                                       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                       'text/plain', 'image/jpeg', 'image/png'];
+                    
+                    if (!validTypes.includes(file.type)) {
+                        alert('Please upload a valid file type (PDF, DOC, DOCX, TXT, JPG, PNG)');
+                        this.value = '';
+                        filePreview.style.display = 'none';
+                    }
+                } else {
+                    filePreview.style.display = 'none';
+                }
+            });
+            
+            // Handle file removal
+            removeBtn.addEventListener('click', function() {
+                fileInput.value = '';
+                filePreview.style.display = 'none';
             });
         }
 
@@ -1154,9 +1311,17 @@
                         >
                     </div>
                     
+                    <div class="upload-progress" id="progress-${assignment._id}" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill-${assignment._id}"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text-${assignment._id}">Uploading...</div>
+                    </div>
+                    
                     <button 
                         type="submit" 
                         class="btn btn-primary"
+                        id="submit-btn-${assignment._id}"
                         ${isOverdue ? 'disabled' : ''}
                     >
                         ${isOverdue ? 'Assignment Closed' : 'Submit Assignment'}
@@ -1209,10 +1374,11 @@
                     clearInterval(timer);
                     
                     // Also disable the submit button if it exists
-                    const submitButton = countdownElement.closest('.assignment-card').querySelector('.btn-primary');
+                    const submitButton = document.getElementById(`submit-btn-${assignmentId}`);
                     if (submitButton) {
                         submitButton.disabled = true;
                         submitButton.textContent = 'Assignment Closed';
+                        submitButton.classList.add('btn-loading');
                     }
                 } else {
                     countdownElement.innerHTML = calculateTimeRemaining(dueDate);
@@ -1220,36 +1386,133 @@
             }, 60000); // Update every minute
         }
 
-        // Submit assignment
+        // Submit assignment with loading state
         async function submitAssignment(e, assignmentId) {
             e.preventDefault();
+            
             const form = e.target;
+            const submitButton = document.getElementById(`submit-btn-${assignmentId}`);
+            const progressElement = document.getElementById(`progress-${assignmentId}`);
+            const progressFill = document.getElementById(`progress-fill-${assignmentId}`);
+            const progressText = document.getElementById(`progress-text-${assignmentId}`);
+            
+            // Check if already submitting
+            if (submitButton.classList.contains('btn-loading')) {
+                return;
+            }
+            
+            // Disable form and show loading state
+            form.querySelectorAll('textarea, input, button').forEach(el => {
+                el.disabled = true;
+            });
+            
+            submitButton.classList.add('btn-loading');
+            if (progressElement) {
+                progressElement.style.display = 'block';
+            }
+            
             const formData = new FormData(form);
             formData.append("assignmentId", assignmentId);
-
+            
             try {
                 const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
-                const res = await fetch(`${API_BASE}/users/submit-assignment`, {
-                    method: "POST",
-                    headers: { "Authorization": "Bearer " + token },
-                    body: formData
+                
+                // Create XMLHttpRequest to track upload progress
+                const xhr = new XMLHttpRequest();
+                
+                // Track upload progress
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        if (progressFill) {
+                            progressFill.style.width = percentComplete + '%';
+                        }
+                        if (progressText) {
+                            progressText.textContent = `Uploading: ${Math.round(percentComplete)}%`;
+                        }
+                    }
                 });
                 
-                const data = await res.json();
+                // Handle completion
+                xhr.addEventListener('load', function() {
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        
+                        if (data.success) {
+                            if (progressText) {
+                                progressText.textContent = 'Upload complete! Processing...';
+                            }
+                            
+                            // Show success message
+                            setTimeout(() => {
+                                alert("Assignment submitted successfully!");
+                                
+                                // Reset form
+                                form.reset();
+                                
+                                // Hide file preview if exists
+                                const filePreview = form.querySelector('.file-preview');
+                                if (filePreview) {
+                                    filePreview.style.display = 'none';
+                                }
+                                
+                                // Reload assignments to update the UI
+                                loadAssignments();
+                            }, 500);
+                            
+                        } else {
+                            throw new Error(data.error || "Unknown error");
+                        }
+                    } catch (parseError) {
+                        console.error("Parse error:", parseError);
+                        handleSubmissionError(submitButton, form, "Error parsing server response");
+                    }
+                });
                 
-                if (data.success) {
-                    alert("Assignment submitted successfully!");
-                    form.reset();
-                    
-                    // Reload assignments to update the UI
-                    loadAssignments();
-                } else {
-                    alert("Error submitting assignment: " + (data.error || "Unknown error"));
-                }
+                // Handle errors
+                xhr.addEventListener('error', function() {
+                    handleSubmissionError(submitButton, form, "Network error. Please check your connection.");
+                });
+                
+                xhr.addEventListener('abort', function() {
+                    handleSubmissionError(submitButton, form, "Upload cancelled");
+                });
+                
+                // Open and send request
+                xhr.open('POST', `${API_BASE}/users/submit-assignment`);
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+                xhr.send(formData);
+                
             } catch (err) {
                 console.error("Submit error:", err);
-                alert("Error submitting assignment. Please try again.");
+                handleSubmissionError(submitButton, form, "Error submitting assignment. Please try again.");
             }
+        }
+
+        // Handle submission errors
+        function handleSubmissionError(submitButton, form, errorMessage) {
+            // Re-enable form
+            form.querySelectorAll('textarea, input, button').forEach(el => {
+                el.disabled = false;
+            });
+            
+            // Remove loading state
+            submitButton.classList.remove('btn-loading');
+            
+            // Hide progress bar
+            const progressElement = form.querySelector('.upload-progress');
+            if (progressElement) {
+                progressElement.style.display = 'none';
+            }
+            
+            // Show error
+            alert(errorMessage);
+            
+            // Reset progress bar if exists
+            const progressFill = form.querySelector('.progress-fill');
+            const progressText = form.querySelector('.progress-text');
+            if (progressFill) progressFill.style.width = '0%';
+            if (progressText) progressText.textContent = 'Uploading...';
         }
 
         // Helper function to get enrolled courses
