@@ -1472,7 +1472,7 @@
       if (!confirm("Are you sure you want to delete this submission? This action cannot be undone.")) return;
       
       try {
-        const res = await fetch(`https://cs-eslamhatem.fly.dev/api/admin/submissions/${id}`, {
+        const res = await fetch(`https://cs-eslamhatem.fly.dev/api/admin/assignments/submissions/${id}`, {
           method: "DELETE",
           headers: headersAuthJSON()
         });
@@ -1513,7 +1513,7 @@
         
         for (const submission of submissions) {
           try {
-            const res = await fetch(`https://cs-eslamhatem.fly.dev/api/admin/submissions/${submission._id}`, {
+            const res = await fetch(`https://cs-eslamhatem.fly.dev/api/admin/assignments/submissions/${submission._id}`, {
               method: "DELETE",
               headers: headersAuthJSON()
             });
