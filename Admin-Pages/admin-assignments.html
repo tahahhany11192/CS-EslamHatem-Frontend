@@ -1513,7 +1513,7 @@
         
         for (const submission of submissions) {
           try {
-            const res = await fetch(`${ASSIGN_API}/submissions/${submission._id}`, {
+            const res = await fetch(`https://cs-eslamhatem.fly.dev/submissions/${submission._id}`, {
               method: "DELETE",
               headers: headersAuthJSON()
             });
