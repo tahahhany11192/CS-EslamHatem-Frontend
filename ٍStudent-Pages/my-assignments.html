@@ -375,6 +375,8 @@
             text-decoration: none;
             display: inline-block;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary {
@@ -403,6 +405,91 @@
 
         .btn-secondary:hover {
             background: rgba(0, 204, 255, 0.1);
+        }
+
+        /* Loading bar styles */
+        .loading-container {
+            display: none;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .loading-bar {
+            height: 4px;
+            background-color: rgba(0, 102, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-progress {
+            height: 100%;
+            width: 0%;
+            background: var(--gradient);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .loading-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--secondary);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Loading spinner for buttons */
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Submission details */
@@ -477,11 +564,6 @@
             height: 40px;
             animation: spin 1s linear infinite;
             margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         /* Bottom Navigation - Mobile */
@@ -1125,7 +1207,7 @@
             `;
         }
 
-        // Render submission form for unsubmitted assignments
+        // Render submission form for unsubmitted assignments - UPDATED WITH LOADING BAR
         function renderSubmissionForm(assignment) {
             const now = new Date();
             const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null;
@@ -1158,9 +1240,18 @@
                         type="submit" 
                         class="btn btn-primary"
                         ${isOverdue ? 'disabled' : ''}
+                        id="submit-btn-${assignment._id}"
                     >
                         ${isOverdue ? 'Assignment Closed' : 'Submit Assignment'}
                     </button>
+                    
+                    <!-- Loading Bar Container -->
+                    <div class="loading-container" id="loading-container-${assignment._id}">
+                        <div class="loading-bar">
+                            <div class="loading-progress" id="loading-progress-${assignment._id}"></div>
+                        </div>
+                        <div class="loading-text" id="loading-text-${assignment._id}">Submitting assignment...</div>
+                    </div>
                     
                     ${isOverdue ? `
                         <div style="margin-top: 10px; color: #f87171;">
@@ -1220,35 +1311,89 @@
             }, 60000); // Update every minute
         }
 
-        // Submit assignment
+        // Submit assignment - UPDATED WITH LOADING BAR
         async function submitAssignment(e, assignmentId) {
             e.preventDefault();
             const form = e.target;
+            const submitBtn = document.getElementById(`submit-btn-${assignmentId}`);
+            const loadingContainer = document.getElementById(`loading-container-${assignmentId}`);
+            const loadingProgress = document.getElementById(`loading-progress-${assignmentId}`);
+            const loadingText = document.getElementById(`loading-text-${assignmentId}`);
+            
+            // Show loading state
+            submitBtn.classList.add("btn-loading");
+            loadingContainer.style.display = "block";
+            loadingProgress.style.width = "30%";
+            loadingText.textContent = "Preparing submission...";
+            
             const formData = new FormData(form);
             formData.append("assignmentId", assignmentId);
 
             try {
+                loadingProgress.style.width = "50%";
+                loadingText.textContent = "Validating data...";
+                
                 const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
+                
+                // Check if file is being uploaded
+                const fileInput = form.querySelector('input[type="file"]');
+                if (fileInput && fileInput.files.length > 0) {
+                    loadingProgress.style.width = "70%";
+                    loadingText.textContent = "Uploading file...";
+                } else {
+                    loadingProgress.style.width = "60%";
+                    loadingText.textContent = "Processing submission...";
+                }
+                
+                loadingProgress.style.width = "80%";
+                loadingText.textContent = "Sending to server...";
+                
                 const res = await fetch(`${API_BASE}/users/submit-assignment`, {
                     method: "POST",
                     headers: { "Authorization": "Bearer " + token },
                     body: formData
                 });
                 
+                loadingProgress.style.width = "95%";
+                loadingText.textContent = "Finalizing...";
+                
                 const data = await res.json();
                 
                 if (data.success) {
+                    loadingProgress.style.width = "100%";
+                    loadingText.textContent = "✅ Assignment submitted successfully!";
+                    
+                    // Wait a moment to show completion
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
                     alert("Assignment submitted successfully!");
                     form.reset();
                     
                     // Reload assignments to update the UI
                     loadAssignments();
                 } else {
-                    alert("Error submitting assignment: " + (data.error || "Unknown error"));
+                    throw new Error(data.error || "Unknown error occurred");
                 }
             } catch (err) {
                 console.error("Submit error:", err);
-                alert("Error submitting assignment. Please try again.");
+                loadingText.textContent = "❌ Error submitting assignment";
+                loadingProgress.style.backgroundColor = "#f87171";
+                
+                alert("Error submitting assignment: " + err.message);
+                
+                // Reset after error
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            } finally {
+                // Reset loading state
+                submitBtn.classList.remove("btn-loading");
+                
+                // Hide loading bar after a delay
+                setTimeout(() => {
+                    loadingContainer.style.display = "none";
+                    loadingProgress.style.width = "0%";
+                    loadingProgress.style.backgroundColor = ""; // Reset color
+                    loadingText.textContent = "Submitting assignment...";
+                }, 500);
             }
         }
 
