@@ -1302,6 +1302,75 @@
     let timeRemaining = 0;
     let quizStarted = false;
 
+    // Timer persistence functions
+    // Save timer state to localStorage
+    function saveTimerState(quizId, endTime, duration) {
+        const timerState = {
+            quizId: quizId,
+            endTime: endTime,
+            duration: duration,
+            startedAt: Date.now()
+        };
+        localStorage.setItem('activeQuizTimer', JSON.stringify(timerState));
+        console.log("Timer state saved:", timerState);
+    }
+
+    // Get timer state from localStorage
+    function getTimerState() {
+        const saved = localStorage.getItem('activeQuizTimer');
+        return saved ? JSON.parse(saved) : null;
+    }
+
+    // Clear timer state from localStorage
+    function clearTimerState() {
+        localStorage.removeItem('activeQuizTimer');
+        console.log("Timer state cleared");
+    }
+
+    // Check if timer should be resumed
+    function shouldResumeTimer(quizId) {
+        const timerState = getTimerState();
+        if (!timerState) return false;
+        
+        // Check if it's for the same quiz
+        if (timerState.quizId !== quizId) {
+            clearTimerState();
+            return false;
+        }
+        
+        // Check if timer is still valid (not expired)
+        const now = Date.now();
+        const endTime = new Date(timerState.endTime).getTime();
+        
+        // If time has expired, clear state and return false
+        if (now >= endTime) {
+            clearTimerState();
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Calculate remaining time from saved state
+    function calculateRemainingTime(quizId) {
+        const timerState = getTimerState();
+        if (!timerState || timerState.quizId !== quizId) return null;
+        
+        const now = Date.now();
+        const endTime = new Date(timerState.endTime).getTime();
+        
+        // Calculate remaining seconds
+        const remainingSeconds = Math.max(0, Math.floor((endTime - now) / 1000));
+        
+        // If less than 5 seconds left, consider it expired
+        if (remainingSeconds < 5) {
+            clearTimerState();
+            return null;
+        }
+        
+        return remainingSeconds;
+    }
+
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
       // Check authentication
@@ -1324,6 +1393,32 @@
       
       // Show loading state initially
       loadingState.style.display = 'flex';
+      
+      // Check for active timer on page load
+      const timerState = getTimerState();
+      if (timerState) {
+          console.log("Found active timer state:", timerState);
+          
+          // Calculate if timer is still valid
+          const now = Date.now();
+          const endTime = new Date(timerState.endTime).getTime();
+          
+          if (now >= endTime) {
+              // Timer has expired, clear it
+              clearTimerState();
+              console.log("Timer expired, cleared state");
+          } else {
+              // Show a notification that a quiz is in progress
+              const remainingSeconds = Math.floor((endTime - now) / 1000);
+              const minutes = Math.floor(remainingSeconds / 60);
+              const seconds = remainingSeconds % 60;
+              console.log(`Quiz timer active: ${minutes}:${seconds.toString().padStart(2, '0')} remaining`);
+              
+              // Show the timer on the page
+              document.getElementById('timerContainer').style.display = 'block';
+              document.getElementById('timerDisplay').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          }
+      }
       
       // Mobile menu toggle
       menuToggle.addEventListener('click', function() {
@@ -1365,6 +1460,15 @@
       const userMenu = document.getElementById("userMenu");
       userMenu.addEventListener("click", () => {
         userMenu.classList.toggle("active");
+      });
+
+      // Warn user before leaving during an active quiz
+      window.addEventListener('beforeunload', function(e) {
+          if (quizStarted || getTimerState()) {
+              e.preventDefault();
+              e.returnValue = 'You have an active quiz in progress. Are you sure you want to leave?';
+              return e.returnValue;
+          }
       });
 
       // Load quizzes
@@ -1441,16 +1545,33 @@
       return `${score}/${maxScore}`;
     }
 
-    // Start the quiz timer
-    function startTimer(duration) {
-      console.log("Starting timer with duration:", duration, "minutes");
+    // Start or resume the quiz timer
+    function startTimer(duration, quizId) {
+      console.log("Starting/Resuming timer for quiz:", quizId, "with duration:", duration, "minutes");
       
       // Clear any existing timer
       if (timerInterval) {
-        clearInterval(timerInterval);
+          clearInterval(timerInterval);
+          timerInterval = null;
       }
       
-      timeRemaining = duration * 60; // Convert minutes to seconds
+      // Check if we should resume from saved state
+      let remainingSeconds = calculateRemainingTime(quizId);
+      
+      if (remainingSeconds !== null && remainingSeconds > 0) {
+          // Resume existing timer
+          console.log("Resuming timer from saved state:", remainingSeconds, "seconds remaining");
+          timeRemaining = remainingSeconds;
+      } else {
+          // Start new timer
+          timeRemaining = duration * 60; // Convert minutes to seconds
+          
+          // Calculate end time and save to localStorage
+          const endTime = new Date(Date.now() + (duration * 60 * 1000));
+          saveTimerState(quizId, endTime.toISOString(), duration);
+          console.log("Started new timer, end time:", endTime);
+      }
+      
       quizStarted = true;
       
       // Show timer
@@ -1466,25 +1587,35 @@
       
       // Set up interval to update timer every second
       timerInterval = setInterval(function() {
-        timeRemaining--;
-        
-        if (timeRemaining <= 0) {
-          // Time's up!
-          clearInterval(timerInterval);
-          timerDisplay.textContent = "00:00";
-          timerDisplay.className = "timer-display timer-danger";
+          timeRemaining--;
           
-          // Auto-submit the quiz
-          if (currentQuiz && currentQuiz.type === "structured") {
-            alert("Time's up! Submitting your answers...");
-            submitAnswers();
-          } else {
-            alert("Time's up! Your quiz has been closed.");
-            closeExamModal();
+          // Update localStorage with remaining time (every 10 seconds to reduce writes)
+          if (timeRemaining % 10 === 0) {
+              const endTime = new Date(Date.now() + (timeRemaining * 1000));
+              saveTimerState(quizId, endTime.toISOString(), duration);
           }
-        } else {
-          updateTimerDisplay();
-        }
+          
+          if (timeRemaining <= 0) {
+              // Time's up!
+              clearInterval(timerInterval);
+              timerInterval = null;
+              timerDisplay.textContent = "00:00";
+              timerDisplay.className = "timer-display timer-danger";
+              
+              // Clear the saved timer state
+              clearTimerState();
+              
+              // Auto-submit the quiz
+              if (currentQuiz && currentQuiz.type === "structured") {
+                  alert("Time's up! Submitting your answers...");
+                  submitAnswers();
+              } else {
+                  alert("Time's up! Your quiz has been closed.");
+                  closeExamModal();
+              }
+          } else {
+              updateTimerDisplay();
+          }
       }, 1000);
     }
     
@@ -1516,6 +1647,9 @@
       // Hide timer
       document.getElementById('timerContainer').style.display = 'none';
       quizStarted = false;
+      
+      // Don't clear timer state here - we only clear it when time expires or quiz is submitted
+      // This allows resuming if page is accidentally refreshed
     }
 
     // User Quizzes functions
@@ -1709,7 +1843,7 @@ ${q.reviewedAt ? `
       examModal.classList.remove('active');
       document.body.style.overflow = ''; // Enable scrolling
       
-      // Stop the timer
+      // Only stop the timer, don't clear state unless we're submitting
       stopTimer();
       
       // Reload quizzes to update status
@@ -1761,7 +1895,7 @@ ${q.reviewedAt ? `
         // Start the timer (always start a new timer when opening a quiz)
         const quizDuration = currentQuiz.duration || 20;
         console.log("Starting timer for quiz duration:", quizDuration);
-        startTimer(quizDuration);
+        startTimer(quizDuration, currentQuizId);
 
         currentQuiz.questions.forEach((q, i) => {
           const div = document.createElement("div");
@@ -1864,6 +1998,9 @@ ${q.reviewedAt ? `
 
         statusEl.textContent = "✅ Answers submitted successfully!";
         
+        // Clear the timer state since quiz is submitted
+        clearTimerState();
+        
         // Stop the timer
         stopTimer();
 
@@ -1945,7 +2082,7 @@ ${q.reviewedAt ? `
         if (!attempt || !attempt.submittedAt) {
           const quizDuration = quiz.duration || 20;
           console.log("Starting timer for PDF quiz duration:", quizDuration);
-          startTimer(quizDuration);
+          startTimer(quizDuration, currentQuizId);
         }
 
         // Open the modal
@@ -2013,6 +2150,9 @@ ${q.reviewedAt ? `
           loadingProgress.style.width = "100%";
           loadingText.textContent = "✅ Answer uploaded successfully!";
           uploadStatus.textContent = "✅ Answer uploaded successfully!";
+          
+          // Clear the timer state since quiz is submitted
+          clearTimerState();
           
           // Wait a moment to show completion
           await new Promise(resolve => setTimeout(resolve, 800));
