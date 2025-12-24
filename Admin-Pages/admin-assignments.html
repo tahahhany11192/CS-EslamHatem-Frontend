@@ -294,6 +294,122 @@
       resize: vertical;
     }
 
+    /* Course Selection Styles */
+    .course-selection-type {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+
+    .selection-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 10px 15px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 153, 0, 0.3);
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+
+    .selection-option:hover {
+      background: rgba(255, 153, 0, 0.1);
+      border-color: var(--admin-accent);
+    }
+
+    .selection-option.active {
+      background: rgba(255, 153, 0, 0.2);
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 10px rgba(255, 153, 0, 0.3);
+    }
+
+    .selection-option input[type="radio"] {
+      display: none;
+    }
+
+    .selection-option .checkmark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--admin-accent);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .selection-option.active .checkmark {
+      background: var(--admin-accent);
+    }
+
+    .selection-option.active .checkmark:after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+    }
+
+    /* Course Selection Container */
+    .course-selection-container {
+      display: none;
+    }
+
+    .course-selection-container.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Single Course Selection */
+    .single-course-selection {
+      margin-top: 10px;
+    }
+
+    /* Multiple Course Selection */
+    .multiple-course-selection {
+      margin-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .course-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .course-checkbox:hover {
+      background: rgba(255, 153, 0, 0.1);
+    }
+
+    .course-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .course-checkbox label {
+      flex: 1;
+      cursor: pointer;
+      margin: 0;
+      font-weight: normal;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+    }
+
     /* Buttons */
     .btn {
       padding: clamp(10px, 1.5vw, 12px) clamp(15px, 2vw, 25px);
@@ -344,6 +460,17 @@
 
     .btn-danger:hover {
       background: rgba(255, 77, 77, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .btn-success {
+      background: transparent;
+      color: #00ff8c;
+      border: 2px solid #00ff8c;
+    }
+
+    .btn-success:hover {
+      background: rgba(0, 255, 140, 0.1);
       transform: translateY(-3px);
     }
 
@@ -769,6 +896,10 @@
       .submission-list {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       }
+      
+      .course-selection-type {
+        flex-direction: column;
+      }
     }
 
     @media (max-width: 768px) {
@@ -818,6 +949,14 @@
         margin-top: 10px;
         justify-content: flex-end;
       }
+      
+      .course-selection-type {
+        flex-direction: column;
+      }
+      
+      .selection-option {
+        width: 100%;
+      }
     }
 
     @media (max-width: 480px) {
@@ -861,6 +1000,10 @@
       .btn {
         padding: 8px 15px;
         min-height: 40px;
+      }
+      
+      .multiple-course-selection {
+        max-height: 150px;
       }
     }
 
@@ -1036,10 +1179,44 @@
           </div>
 
           <div class="form-group">
-            <label for="courseId">Course</label>
-            <select id="courseId" class="form-control" required>
-              <option value="">-- Loading courses... --</option>
-            </select>
+            <label>Course Assignment</label>
+            <div class="course-selection-type">
+              <div class="selection-option active" data-type="single">
+                <div class="checkmark"></div>
+                <input type="radio" name="courseType" value="single" checked>
+                <div>
+                  <strong>Single Course</strong>
+                  <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 2px;">Assign to one course only</div>
+                </div>
+              </div>
+              
+              <div class="selection-option" data-type="multiple">
+                <div class="checkmark"></div>
+                <input type="radio" name="courseType" value="multiple">
+                <div>
+                  <strong>Multiple Courses</strong>
+                  <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 2px;">Create multiple copies (one per course)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Single Course Selection -->
+            <div id="singleCourseContainer" class="course-selection-container active">
+              <select id="singleCourse" class="form-control">
+                <option value="">-- Select Course --</option>
+              </select>
+            </div>
+
+            <!-- Multiple Course Selection -->
+            <div id="multipleCourseContainer" class="course-selection-container">
+              <div id="multipleCourses" class="multiple-course-selection">
+                <!-- Course checkboxes will be loaded here -->
+                <p>Loading courses...</p>
+              </div>
+              <div style="margin-top: 10px; font-size: 0.9rem; color: rgba(240, 246, 255, 0.7);">
+                <i class="fas fa-info-circle"></i> This will create a separate assignment for each selected course
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
@@ -1165,7 +1342,6 @@
       }, 300);
     });
 
-    // Existing JavaScript code continues from here...
     const TOKEN = localStorage.getItem("adminToken");
     if (!TOKEN) {
       showError("⚠️ Not authorized. Please login as admin.");
@@ -1186,11 +1362,17 @@
     const assignmentIdInput = document.getElementById("assignmentId");
     const titleInput = document.getElementById("title");
     const descInput = document.getElementById("description");
-    const courseSelect = document.getElementById("courseId");
     const dueInput = document.getElementById("dueDate");
     const pdfInput = document.getElementById("pdf");
     const pdfFileName = document.getElementById("pdf-file-name");
     const deleteAllSubmissionsBtn = document.getElementById("deleteAllSubmissionsBtn");
+
+    // Course selection elements
+    const singleCourseSelect = document.getElementById("singleCourse");
+    const multipleCoursesContainer = document.getElementById("multipleCourses");
+    const singleCourseContainer = document.getElementById("singleCourseContainer");
+    const multipleCourseContainer = document.getElementById("multipleCourseContainer");
+    const selectionOptions = document.querySelectorAll('.selection-option');
 
     const assignmentsDiv = document.getElementById("assignments");
     const submissionsDiv = document.getElementById("submissions");
@@ -1200,7 +1382,9 @@
     // Local state
     const assignmentMap = new Map();
     const courseMap = new Map();
+    let allCourses = [];
     let submissions = []; // Store submissions for bulk delete
+    let currentAssignmentCourse = null; // For editing mode
 
     // Helper functions
     function headersAuthJSON() {
@@ -1234,6 +1418,8 @@
       formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Create New Assignment';
       cancelEditBtn.style.display = "none";
       pdfFileName.textContent = "";
+      // Reset to single course selection
+      document.querySelector('.selection-option[data-type="single"]').click();
     }
     
     function showSuccess(message) {
@@ -1258,6 +1444,29 @@
       window.location.href = "../Login-Pages/admin-login.html";
     }
 
+    // Handle course selection type toggle
+    selectionOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const type = option.dataset.type;
+        
+        // Update active state
+        selectionOptions.forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+        
+        // Update radio button
+        option.querySelector('input[type="radio"]').checked = true;
+        
+        // Show/hide containers
+        if (type === 'single') {
+          singleCourseContainer.classList.add('active');
+          multipleCourseContainer.classList.remove('active');
+        } else {
+          singleCourseContainer.classList.remove('active');
+          multipleCourseContainer.classList.add('active');
+        }
+      });
+    });
+
     // File name display
     pdfInput.addEventListener("change", function(e) {
       if (this.files.length > 0) {
@@ -1267,7 +1476,7 @@
       }
     });
 
-    // Load courses into dropdown
+    // Load courses for both single and multiple selection
     async function loadCourses() {
       try {
         const res = await fetch(COURSES_API, { headers: headersAuthJSON() });
@@ -1278,18 +1487,72 @@
         }
         
         const data = await res.json();
-        courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
-        (data.data || []).forEach(c => {
-          courseMap.set(c._id, c);
-          const opt = document.createElement("option");
-          opt.value = c._id;
-          opt.textContent = c.title + (c.type ? ` (${c.type})` : "");
-          courseSelect.appendChild(opt);
+        allCourses = data.data || [];
+        
+        // Clear existing options
+        singleCourseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
+        multipleCoursesContainer.innerHTML = '';
+        
+        // Populate single course dropdown
+        allCourses.forEach(course => {
+          // Single course dropdown
+          const singleOpt = document.createElement("option");
+          singleOpt.value = course._id;
+          singleOpt.textContent = course.title + (course.type ? ` (${course.type})` : "");
+          singleCourseSelect.appendChild(singleOpt);
+          
+          // Multiple course checkboxes
+          const checkboxDiv = document.createElement("div");
+          checkboxDiv.className = "course-checkbox";
+          checkboxDiv.innerHTML = `
+            <input type="checkbox" id="course_${course._id}" value="${course._id}">
+            <label for="course_${course._id}">${course.title} ${course.type ? `(${course.type})` : ''}</label>
+          `;
+          multipleCoursesContainer.appendChild(checkboxDiv);
+          
+          // Add to course map
+          courseMap.set(course._id, course);
         });
+        
+        if (allCourses.length === 0) {
+          multipleCoursesContainer.innerHTML = '<p>No courses available. Please create courses first.</p>';
+        }
+        
       } catch (error) {
         console.error("Error loading courses:", error);
         showError("Failed to load courses. Please try again.");
       }
+    }
+
+    // Get selected courses based on current selection type
+    function getSelectedCourses() {
+      const courseType = document.querySelector('input[name="courseType"]:checked').value;
+      
+      if (courseType === 'single') {
+        const selectedCourseId = singleCourseSelect.value;
+        return selectedCourseId ? [selectedCourseId] : [];
+      } else {
+        // Multiple selection - return array of selected course IDs
+        const selectedCheckboxes = multipleCoursesContainer.querySelectorAll('input[type="checkbox"]:checked');
+        return Array.from(selectedCheckboxes).map(cb => cb.value);
+      }
+    }
+
+    // Set selected course in the form (for editing - single course only)
+    function setSelectedCourse(courseId) {
+      currentAssignmentCourse = courseId;
+      
+      // Reset all selections
+      singleCourseSelect.value = '';
+      multipleCoursesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+      });
+      
+      if (!courseId) return;
+      
+      // Always use single course mode for editing
+      singleCourseSelect.value = courseId;
+      document.querySelector('.selection-option[data-type="single"]').click();
     }
 
     // Load assignments list
@@ -1321,7 +1584,7 @@
         data.data.forEach(a => {
           assignmentMap.set(a._id, a);
           const courseTitle = (a.course && a.course.title) ? a.course.title : (courseMap.get(a.course)?.title || a.course || "N/A");
-          const pdfLink = a.pdf ? `<a class="file-link" href="${UPLOADS_BASE}${a.pdf}" target="_blank"><i class="fas fa-file-pdf"></i> Download PDF</a>` : `<span class="muted">No PDF</span>`;
+          const pdfLink = a.pdf ? `<a class="file-link" href="${UPLOADS_BASE}${a.pdf}" target="_blank"><i class="fas fa-file-pdf"></i> Download PDF</a>` : `<span style="color: rgba(240, 246, 255, 0.5);">No PDF</span>`;
 
           const div = document.createElement("div");
           div.className = "assignment-card";
@@ -1336,7 +1599,7 @@
             <p class="assignment-description">${a.description || "No description provided."}</p>
             <div class="assignment-file">${pdfLink}</div>
             <div class="assignment-actions">
-              <button class="btn btn-admin btn-sm" onclick="startEdit('${a._id}')">
+              <button class="btn btn-admin btn-sm" onclick="startEdit('${a._id}', '${a.title}', \`${a.description?.replace(/`/g, '\\`') || ''}\`, '${a.dueDate}', '${a.course?._id || a.course}')">
                 <i class="fas fa-edit"></i> Edit
               </button>
               <button class="btn btn-danger btn-sm" onclick="deleteAssignment('${a._id}')">
@@ -1387,7 +1650,7 @@
           const studentEmail = s.student?.email || "";
           const grade = s.grade ?? "Not graded";
           const feedback = s.feedback || "No feedback";
-          const fileLink = s.fileUrl ? `<a class="file-link" href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${s.fileUrl}" target="_blank"><i class="fas fa-download"></i> Download Submission</a>` : `<span class="muted">No file submitted</span>`;
+          const fileLink = s.fileUrl ? `<a class="file-link" href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${s.fileUrl}" target="_blank"><i class="fas fa-download"></i> Download Submission</a>` : `<span style="color: rgba(240, 246, 255, 0.5);">No file submitted</span>`;
 
           const div = document.createElement("div");
           div.className = "submission-card";
@@ -1406,7 +1669,7 @@
             <div class="submission-details">${fileLink}</div>
             <div class="submission-meta">
               <div><span class="grade-badge">Grade: ${grade}</span></div>
-              <div class="muted">Submitted: ${fmtDate(s.createdAt)}</div>
+              <div style="color: rgba(240, 246, 255, 0.7);">Submitted: ${fmtDate(s.createdAt)}</div>
             </div>
             <div class="submission-review">
               <div class="grade-input-container">
@@ -1554,18 +1817,17 @@
     deleteAllSubmissionsBtn.addEventListener("click", deleteAllSubmissions);
 
     // Start editing an assignment
-    function startEdit(id) {
-      const a = assignmentMap.get(id);
-      if (!a) return;
-
-      assignmentIdInput.value = a._id;
-      titleInput.value = a.title || "";
-      descInput.value = a.description || "";
-      const cId = a.course?._id || a.course;
-      if (cId) courseSelect.value = cId;
-      dueInput.value = isoDateOnly(a.dueDate);
+    function startEdit(id, title, description, dueDate, courseId) {
+      assignmentIdInput.value = id;
+      titleInput.value = title || "";
+      descInput.value = description || "";
+      setSelectedCourse(courseId);
+      dueInput.value = isoDateOnly(dueDate);
       pdfInput.value = "";
-      pdfFileName.textContent = a.pdf ? "Current file will be kept unless changed" : "";
+      
+      // Check if assignment has a PDF
+      const assignment = assignmentMap.get(id);
+      pdfFileName.textContent = assignment?.pdf ? "Current file will be kept unless changed" : "";
 
       formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Assignment';
       cancelEditBtn.style.display = "inline-block";
@@ -1574,7 +1836,7 @@
 
     cancelEditBtn.addEventListener("click", resetForm);
 
-    // Create or update assignment
+    // Create or update assignment (single or multiple)
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       
@@ -1584,36 +1846,125 @@
       submitBtn.disabled = true;
 
       const id = assignmentIdInput.value;
-
-      const fd = new FormData();
-      fd.append("title", titleInput.value);
-      fd.append("description", descInput.value);
-      fd.append("courseId", courseSelect.value);
-      fd.append("dueDate", dueInput.value);
-      if (pdfInput.files[0]) fd.append("pdf", pdfInput.files[0]);
-
-      const url = id ? `${ASSIGN_API}/${id}` : ASSIGN_API;
-      const method = id ? "PUT" : "POST";
+      const selectedCourses = getSelectedCourses();
+      
+      if (selectedCourses.length === 0) {
+        showError("❌ Please select at least one course for this assignment");
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        return;
+      }
 
       try {
-        const res = await fetch(url, {
-          method,
-          headers: headersAuth(),
-          body: fd
-        });
+        if (id) {
+          // Editing - always single course
+          const fd = new FormData();
+          fd.append("title", titleInput.value);
+          fd.append("description", descInput.value);
+          fd.append("courseId", selectedCourses[0]);
+          fd.append("dueDate", dueInput.value);
+          if (pdfInput.files[0]) fd.append("pdf", pdfInput.files[0]);
 
-        if (res.status === 401) {
-          logout();
-          return;
-        }
+          const res = await fetch(`${ASSIGN_API}/${id}`, {
+            method: "PUT",
+            headers: headersAuth(),
+            body: fd
+          });
 
-        if (res.ok) {
-          showSuccess("✅ Assignment saved successfully!");
-          resetForm();
-          await loadAssignments();
+          if (res.status === 401) {
+            logout();
+            return;
+          }
+
+          if (res.ok) {
+            showSuccess("✅ Assignment updated successfully!");
+            resetForm();
+            await loadAssignments();
+          } else {
+            const errText = await res.text();
+            showError("❌ Failed to update assignment: " + errText);
+          }
         } else {
-          const errText = await res.text();
-          showError("❌ Failed to save assignment: " + errText);
+          // Creating - could be single or multiple
+          const courseType = document.querySelector('input[name="courseType"]:checked').value;
+          
+          if (courseType === 'single') {
+            // Single course - one API call
+            const fd = new FormData();
+            fd.append("title", titleInput.value);
+            fd.append("description", descInput.value);
+            fd.append("courseId", selectedCourses[0]);
+            fd.append("dueDate", dueInput.value);
+            if (pdfInput.files[0]) fd.append("pdf", pdfInput.files[0]);
+
+            const res = await fetch(ASSIGN_API, {
+              method: "POST",
+              headers: headersAuth(),
+              body: fd
+            });
+
+            if (res.status === 401) {
+              logout();
+              return;
+            }
+
+            if (res.ok) {
+              showSuccess("✅ Assignment created successfully!");
+              resetForm();
+              await loadAssignments();
+            } else {
+              const errText = await res.text();
+              showError("❌ Failed to create assignment: " + errText);
+            }
+          } else {
+            // Multiple courses - create an assignment for each course
+            let successCount = 0;
+            let errorCount = 0;
+            
+            // Show a progress message
+            showSuccess(`🔄 Creating assignments for ${selectedCourses.length} courses...`);
+            
+            for (const courseId of selectedCourses) {
+              const fd = new FormData();
+              fd.append("title", titleInput.value);
+              fd.append("description", descInput.value);
+              fd.append("courseId", courseId);
+              fd.append("dueDate", dueInput.value);
+              
+              // Need to create a new File object for each iteration if there's a PDF
+              if (pdfInput.files[0]) {
+                // Clone the file for each iteration
+                const file = pdfInput.files[0];
+                fd.append("pdf", file);
+              }
+              
+              try {
+                const res = await fetch(ASSIGN_API, {
+                  method: "POST",
+                  headers: headersAuth(),
+                  body: fd
+                });
+                
+                if (res.ok) {
+                  successCount++;
+                } else {
+                  errorCount++;
+                  console.error(`Failed to create assignment for course ${courseId}`);
+                }
+              } catch (err) {
+                errorCount++;
+                console.error(`Error creating assignment for course ${courseId}:`, err);
+              }
+            }
+            
+            if (errorCount === 0) {
+              showSuccess(`✅ Successfully created ${successCount} assignment(s)!`);
+              resetForm();
+              await loadAssignments();
+            } else {
+              showError(`⚠️ Created ${successCount} assignment(s), failed to create ${errorCount} assignment(s)`);
+            }
+          }
         }
       } catch (error) {
         console.error("Error saving assignment:", error);
