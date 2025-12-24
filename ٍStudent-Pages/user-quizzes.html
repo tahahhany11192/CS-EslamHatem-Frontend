@@ -461,6 +461,8 @@
       text-decoration: none;
       display: inline-block;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
     .btn-primary {
@@ -493,6 +495,91 @@
     .btn-disabled:hover {
       transform: none;
       box-shadow: none;
+    }
+
+    /* Loading bar styles */
+    .loading-container {
+      display: none;
+      margin-top: 15px;
+      width: 100%;
+    }
+
+    .loading-bar {
+      height: 4px;
+      background-color: rgba(0, 102, 255, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-progress {
+      height: 100%;
+      width: 0%;
+      background: var(--gradient);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-image: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .loading-text {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: var(--secondary);
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* Loading spinner for buttons */
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+    }
+
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 50%;
+      left: 50%;
+      margin-left: -10px;
+      margin-top: -10px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* Exam Modal */
@@ -666,6 +753,8 @@
       border-radius: 5px; 
       cursor: pointer; 
       transition: var(--transition);
+      position: relative;
+      overflow: hidden;
     }
 
     .btn-pdf-upload:hover { 
@@ -751,11 +840,6 @@
       height: 40px;
       animation: spin 1s linear infinite;
       margin: 0 auto 15px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
     }
 
     /* Bottom Navigation - Mobile */
@@ -1171,9 +1255,17 @@
                 <label class="form-label" for="answerFile">Upload Your Answer (PDF):</label>
                 <input type="file" id="answerFile" name="answer" accept="application/pdf" required />
               </div>
-              <button type="submit" class="btn-pdf-upload">
+              <button type="submit" class="btn-pdf-upload" id="uploadPdfBtn">
                 <i class="fas fa-upload"></i> Upload Answer
               </button>
+              
+              <!-- Loading Bar Container -->
+              <div class="loading-container" id="pdfLoadingContainer">
+                <div class="loading-bar">
+                  <div class="loading-progress" id="pdfLoadingProgress"></div>
+                </div>
+                <div class="loading-text" id="pdfLoadingText">Uploading PDF...</div>
+              </div>
             </form>
             <p id="uploadStatus" class="status"></p>
           </div>
@@ -1865,6 +1957,7 @@ ${q.reviewedAt ? `
       }
     }
 
+    // PDF answer upload with loading bar - UPDATED FUNCTION
     async function uploadPdfAnswer() {
       const file = document.getElementById("answerFile").files[0];
       if (!file) {
@@ -1873,19 +1966,56 @@ ${q.reviewedAt ? `
       }
 
       const token = localStorage.getItem("token");
+      const uploadBtn = document.getElementById("uploadPdfBtn");
+      const loadingContainer = document.getElementById("pdfLoadingContainer");
+      const loadingProgress = document.getElementById("pdfLoadingProgress");
+      const loadingText = document.getElementById("pdfLoadingText");
+      const uploadStatus = document.getElementById("uploadStatus");
+
+      // Show loading state
+      uploadBtn.classList.add("btn-loading");
+      loadingContainer.style.display = "block";
+      loadingProgress.style.width = "30%";
+      loadingText.textContent = "Preparing file...";
+
       const formData = new FormData();
       formData.append("answer", file);
 
       try {
+        loadingProgress.style.width = "50%";
+        loadingText.textContent = "Validating PDF...";
+
+        // Check file size (limit to 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          throw new Error("File size exceeds 10MB limit");
+        }
+
+        // Check file type
+        if (!file.type.includes('pdf')) {
+          throw new Error("Please upload a PDF file only");
+        }
+
+        loadingProgress.style.width = "70%";
+        loadingText.textContent = "Uploading file...";
+
         const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/upload`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData
         });
 
+        loadingProgress.style.width = "95%";
+        loadingText.textContent = "Processing...";
+
         const data = await res.json();
+        
         if (res.ok) {
-          document.getElementById("uploadStatus").textContent = "✅ Answer uploaded successfully!";
+          loadingProgress.style.width = "100%";
+          loadingText.textContent = "✅ Answer uploaded successfully!";
+          uploadStatus.textContent = "✅ Answer uploaded successfully!";
+          
+          // Wait a moment to show completion
+          await new Promise(resolve => setTimeout(resolve, 800));
           
           // Stop the timer
           stopTimer();
@@ -1895,11 +2025,27 @@ ${q.reviewedAt ? `
             closeExamModal();
           }, 2000);
         } else {
-          document.getElementById("uploadStatus").textContent = "⚠ Upload failed: " + (data.error || "Unknown error");
+          throw new Error(data.error || "Upload failed");
         }
       } catch (err) {
-        document.getElementById("uploadStatus").textContent = "❌ Upload error: " + err.message;
         console.error("Upload error:", err);
+        loadingText.textContent = "❌ Upload error";
+        loadingProgress.style.backgroundColor = "#f87171";
+        uploadStatus.textContent = "❌ Upload error: " + err.message;
+        
+        // Reset after error
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } finally {
+        // Reset loading state
+        uploadBtn.classList.remove("btn-loading");
+        
+        // Hide loading bar after a delay
+        setTimeout(() => {
+          loadingContainer.style.display = "none";
+          loadingProgress.style.width = "0%";
+          loadingProgress.style.backgroundColor = ""; // Reset color
+          loadingText.textContent = "Uploading PDF...";
+        }, 500);
       }
     }
 
