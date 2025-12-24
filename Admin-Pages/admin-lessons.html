@@ -240,6 +240,121 @@
       resize: vertical;
     }
 
+    /* Course Selection Styles */
+    .course-selection-type {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+
+    .selection-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 10px 15px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 153, 0, 0.3);
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+
+    .selection-option:hover {
+      background: rgba(255, 153, 0, 0.1);
+      border-color: var(--admin-accent);
+    }
+
+    .selection-option.active {
+      background: rgba(255, 153, 0, 0.2);
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 10px rgba(255, 153, 0, 0.3);
+    }
+
+    .selection-option input[type="radio"] {
+      display: none;
+    }
+
+    .selection-option .checkmark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--admin-accent);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .selection-option.active .checkmark {
+      background: var(--admin-accent);
+    }
+
+    .selection-option.active .checkmark:after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+    }
+
+    /* Course Selection Container */
+    .course-selection-container {
+      display: none;
+    }
+
+    .course-selection-container.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Single Course Selection */
+    .single-course-selection {
+      margin-top: 10px;
+    }
+
+    /* Multiple Course Selection */
+    .multiple-course-selection {
+      margin-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .course-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .course-checkbox:hover {
+      background: rgba(255, 153, 0, 0.1);
+    }
+
+    .course-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .course-checkbox label {
+      flex: 1;
+      cursor: pointer;
+      margin: 0;
+      font-weight: normal;
+    }
+
     /* Buttons */
     .btn {
       padding: 12px 25px;
@@ -460,13 +575,21 @@
       .lesson-actions {
         flex-wrap: wrap;
       }
+      
+      .course-selection-type {
+        flex-direction: column;
+      }
+      
+      .selection-option {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="dashboard">
     <!-- Sidebar -->
-    <aside class="sidebar"  style="width: 280px;">
+    <aside class="sidebar" style="width: 280px;">
       <div class="sidebar-header">
         <div class="sidebar-logo">
           <i class="fas fa-code"></i>
@@ -548,18 +671,54 @@
           </div>
 
           <div class="form-group">
-            <label for="course">Course</label>
-            <select id="course" name="course" class="form-control" required>
-              <option value="">-- Loading courses... --</option>
-            </select>
+            <label>Course Assignment</label>
+            <div class="course-selection-type">
+              <div class="selection-option active" data-type="single">
+                <div class="checkmark"></div>
+                <input type="radio" name="courseType" value="single" checked>
+                <div>
+                  <strong>Single Course</strong>
+                  <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 2px;">Assign to one course only</div>
+                </div>
+              </div>
+              
+              <div class="selection-option" data-type="multiple">
+                <div class="checkmark"></div>
+                <input type="radio" name="courseType" value="multiple">
+                <div>
+                  <strong>Multiple Courses</strong>
+                  <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 2px;">Assign to multiple courses</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Single Course Selection -->
+            <div id="singleCourseContainer" class="course-selection-container active">
+              <select id="singleCourse" name="singleCourse" class="form-control">
+                <option value="">-- Select Course --</option>
+              </select>
+            </div>
+
+            <!-- Multiple Course Selection -->
+            <div id="multipleCourseContainer" class="course-selection-container">
+              <div id="multipleCourses" class="multiple-course-selection">
+                <!-- Course checkboxes will be loaded here -->
+                <p>Loading courses...</p>
+              </div>
+              <div style="margin-top: 10px; font-size: 0.9rem; color: rgba(240, 246, 255, 0.7);">
+                <i class="fas fa-info-circle"></i> Select one or more courses for this lesson
+              </div>
+            </div>
           </div>
 
-          <button type="submit" class="btn btn-admin">
-            <i class="fas fa-save"></i> Save Lesson
-          </button>
-          <button type="button" id="cancelEditBtn" class="btn btn-secondary" style="display:none;">
-            <i class="fas fa-times"></i> Cancel Edit
-          </button>
+          <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 25px;">
+            <button type="submit" class="btn btn-admin">
+              <i class="fas fa-save"></i> Save Lesson
+            </button>
+            <button type="button" id="cancelEditBtn" class="btn btn-secondary" style="display:none;">
+              <i class="fas fa-times"></i> Cancel Edit
+            </button>
+          </div>
         </form>
       </div>
 
@@ -567,6 +726,9 @@
       <div class="content-card">
         <div class="card-header">
           <h2><i class="fas fa-list"></i> All Lessons</h2>
+          <div style="font-size: 0.9rem; color: rgba(240, 246, 255, 0.7);">
+            <i class="fas fa-info-circle"></i> Click "Manage Files" to upload lesson materials
+          </div>
         </div>
 
         <div class="lesson-list" id="lessons">
@@ -603,10 +765,19 @@
     const descInput = document.getElementById("description");
     const typeInput = document.getElementById("type");
     const priceInput = document.getElementById("price");
-    const courseSelect = document.getElementById("course");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
     const alertSuccess = document.getElementById("alertSuccess");
     const alertError = document.getElementById("alertError");
+
+    // Course selection elements
+    const singleCourseSelect = document.getElementById("singleCourse");
+    const multipleCoursesContainer = document.getElementById("multipleCourses");
+    const singleCourseContainer = document.getElementById("singleCourseContainer");
+    const multipleCourseContainer = document.getElementById("multipleCourseContainer");
+    const selectionOptions = document.querySelectorAll('.selection-option');
+
+    let allCourses = [];
+    let currentLessonCourses = []; // For editing mode
 
     // Helper functions
     function showSuccess(message) {
@@ -631,7 +802,30 @@
       window.location.href = "../Login-Pages/admin-login.html";
     }
 
-    // Load courses
+    // Handle course selection type toggle
+    selectionOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const type = option.dataset.type;
+        
+        // Update active state
+        selectionOptions.forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+        
+        // Update radio button
+        option.querySelector('input[type="radio"]').checked = true;
+        
+        // Show/hide containers
+        if (type === 'single') {
+          singleCourseContainer.classList.add('active');
+          multipleCourseContainer.classList.remove('active');
+        } else {
+          singleCourseContainer.classList.remove('active');
+          multipleCourseContainer.classList.add('active');
+        }
+      });
+    });
+
+    // Load courses for both single and multiple selection
     async function loadCourses() {
       try {
         const res = await fetch(COURSE_API, { 
@@ -644,16 +838,81 @@
         }
         
         const data = await res.json();
-        courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
-        (data.data || []).forEach(c => {
-          const opt = document.createElement("option");
-          opt.value = c._id;
-          opt.textContent = c.title;
-          courseSelect.appendChild(opt);
+        allCourses = data.data || [];
+        
+        // Clear existing options
+        singleCourseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
+        multipleCoursesContainer.innerHTML = '';
+        
+        // Populate single course dropdown
+        allCourses.forEach(course => {
+          // Single course dropdown
+          const singleOpt = document.createElement("option");
+          singleOpt.value = course._id;
+          singleOpt.textContent = course.title;
+          singleCourseSelect.appendChild(singleOpt);
+          
+          // Multiple course checkboxes
+          const checkboxDiv = document.createElement("div");
+          checkboxDiv.className = "course-checkbox";
+          checkboxDiv.innerHTML = `
+            <input type="checkbox" id="course_${course._id}" value="${course._id}">
+            <label for="course_${course._id}">${course.title}</label>
+          `;
+          multipleCoursesContainer.appendChild(checkboxDiv);
         });
+        
+        if (allCourses.length === 0) {
+          multipleCoursesContainer.innerHTML = '<p>No courses available. Please create courses first.</p>';
+        }
+        
       } catch (error) {
         console.error("Error loading courses:", error);
         showError("Failed to load courses. Please try again.");
+      }
+    }
+
+    // Get selected courses based on current selection type
+    function getSelectedCourses() {
+      const courseType = document.querySelector('input[name="courseType"]:checked').value;
+      
+      if (courseType === 'single') {
+        const selectedCourseId = singleCourseSelect.value;
+        return selectedCourseId ? [selectedCourseId] : [];
+      } else {
+        // Multiple selection
+        const selectedCheckboxes = multipleCoursesContainer.querySelectorAll('input[type="checkbox"]:checked');
+        return Array.from(selectedCheckboxes).map(cb => cb.value);
+      }
+    }
+
+    // Set selected courses in the form (for editing)
+    function setSelectedCourses(courseIds) {
+      if (!Array.isArray(courseIds)) {
+        courseIds = [courseIds]; // Convert single course to array
+      }
+      
+      currentLessonCourses = courseIds;
+      
+      // Reset all selections
+      singleCourseSelect.value = '';
+      multipleCoursesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+      });
+      
+      if (courseIds.length === 0) return;
+      
+      if (courseIds.length === 1) {
+        // Single course - show in single mode
+        singleCourseSelect.value = courseIds[0];
+        document.querySelector('.selection-option[data-type="single"]').click();
+      } else {
+        // Multiple courses - show in multiple mode
+        document.querySelector('.selection-option[data-type="multiple"]').click();
+        courseIds.forEach(courseId => {
+          const checkbox = document.getElementById(`course_${courseId}`);
+          if (checkbox) checkbox.checked = true;
+        });
       }
     }
 
@@ -686,6 +945,21 @@
         }
 
         lessons.forEach(l => {
+          // Get course names
+          let courseText = "Not assigned to any course";
+          if (l.courses && l.courses.length > 0) {
+            if (l.courses.length === 1) {
+              courseText = `Course: ${l.courses[0].title || l.courses[0]}`;
+            } else {
+              courseText = `Courses: ${l.courses.length} courses`;
+            }
+          } else if (l.course) {
+            courseText = `Course: ${l.course.title || l.course}`;
+          }
+          
+          // Prepare course data for editing
+          const courseData = l.courses || (l.course ? [l.course._id || l.course] : []);
+          
           const div = document.createElement("div");
           div.className = "lesson-card";
           div.innerHTML = `
@@ -697,11 +971,11 @@
               <div class="lesson-price">$${l.price || 0}</div>
             </div>
             <div class="lesson-course">
-              <i class="fas fa-book"></i> Course: ${l.course?.title || l.course || "Not assigned"}
+              <i class="fas fa-book"></i> ${courseText}
             </div>
             <p class="lesson-description">${l.description || "No description provided."}</p>
             <div class="lesson-actions">
-              <button class="btn btn-admin btn-sm" onclick="editLesson('${l._id}', '${l.title}', \`${l.description?.replace(/`/g, '\\`') || ''}\`, '${l.type}', '${l.price}', '${l.course?._id || l.course}')">
+              <button class="btn btn-admin btn-sm" onclick="editLesson('${l._id}', '${l.title}', \`${l.description?.replace(/`/g, '\\`') || ''}\`, '${l.type}', '${l.price}', ${JSON.stringify(courseData)})">
                 <i class="fas fa-edit"></i> Edit
               </button>
               <button class="btn btn-danger btn-sm" onclick="deleteLesson('${l._id}')">
@@ -732,12 +1006,21 @@
       submitBtn.disabled = true;
 
       const id = lessonIdInput.value;
+      const selectedCourses = getSelectedCourses();
+      
+      if (selectedCourses.length === 0) {
+        showError("❌ Please select at least one course for this lesson");
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        return;
+      }
+
       const payload = {
         title: titleInput.value,
         description: descInput.value,
         type: typeInput.value,
         price: priceInput.value,
-        course: courseSelect.value,
+        courses: selectedCourses, // Always send as array
       };
 
       try {
@@ -761,6 +1044,8 @@
           lessonIdInput.value = "";
           formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Create New Lesson';
           cancelEditBtn.style.display = "none";
+          // Reset to single course selection
+          document.querySelector('.selection-option[data-type="single"]').click();
           loadLessons();
         } else {
           const errorData = await res.json();
@@ -776,13 +1061,21 @@
     });
 
     // Edit lesson
-    function editLesson(id, title, description, type, price, courseId) {
+    function editLesson(id, title, description, type, price, courseIds) {
       lessonIdInput.value = id;
       titleInput.value = title;
       descInput.value = description;
       typeInput.value = type;
       priceInput.value = price;
-      courseSelect.value = courseId;
+      
+      // Set course selection
+      if (courseIds && courseIds.length > 0) {
+        setSelectedCourses(courseIds);
+      } else {
+        // If no courses, set to single mode with no selection
+        document.querySelector('.selection-option[data-type="single"]').click();
+      }
+      
       formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Lesson';
       cancelEditBtn.style.display = "inline-block";
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -794,6 +1087,8 @@
       lessonIdInput.value = "";
       formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Create New Lesson';
       cancelEditBtn.style.display = "none";
+      // Reset to single course selection
+      document.querySelector('.selection-option[data-type="single"]').click();
     });
 
     // Delete lesson
