@@ -1324,7 +1324,7 @@
     // Clear timer state from localStorage
 // Clear all quiz-related states
 function clearAllQuizStates() {
-    clearAllQuizStates();
+    clearTimerState();
     localStorage.removeItem('currentQuizType');
     currentQuizId = null;
     currentQuiz = null;
@@ -1345,7 +1345,7 @@ function clearTimerState() {
         
         // Check if it's for the same quiz
         if (timerState.quizId !== quizId) {
-            clearAllQuizStates();
+            clearTimerState();
             return false;
         }
         
@@ -1355,7 +1355,7 @@ function clearTimerState() {
         
         // If time has expired, clear state and return false
         if (now >= endTime) {
-            clearAllQuizStates();
+            clearTimerState();
             return false;
         }
         
@@ -1375,7 +1375,7 @@ function clearTimerState() {
         
         // If less than 5 seconds left, consider it expired
         if (remainingSeconds < 5) {
-            clearAllQuizStates();
+            clearTimerState();
             return null;
         }
         
@@ -1416,7 +1416,7 @@ function clearTimerState() {
           
           if (now >= endTime) {
               // Timer has expired, clear it
-              clearAllQuizStates();
+              clearTimerState();
               console.log("Timer expired, cleared state");
           } else {
               // Show a notification that a quiz is in progress
@@ -1621,7 +1621,7 @@ function startTimer(duration, quizId, quizType = null) {
             timerDisplay.className = "timer-display timer-danger";
             
             // Clear the saved timer state
-            clearAllQuizStates();
+            clearTimerState();
             
             // Auto-submit the quiz based on type
             setTimeout(() => {
