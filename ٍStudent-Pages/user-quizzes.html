@@ -1322,10 +1322,21 @@
     }
 
     // Clear timer state from localStorage
-    function clearTimerState() {
-        localStorage.removeItem('activeQuizTimer');
-        console.log("Timer state cleared");
-    }
+// Clear all quiz-related states
+function clearAllQuizStates() {
+    clearAllQuizStates();
+    localStorage.removeItem('currentQuizType');
+    currentQuizId = null;
+    currentQuiz = null;
+    quizStarted = false;
+    console.log("All quiz states cleared");
+}
+
+// Update clearTimerState to also clear quiz type
+function clearTimerState() {
+    localStorage.removeItem('activeQuizTimer');
+    console.log("Timer state cleared");
+}
 
     // Check if timer should be resumed
     function shouldResumeTimer(quizId) {
@@ -1334,7 +1345,7 @@
         
         // Check if it's for the same quiz
         if (timerState.quizId !== quizId) {
-            clearTimerState();
+            clearAllQuizStates();
             return false;
         }
         
@@ -1344,7 +1355,7 @@
         
         // If time has expired, clear state and return false
         if (now >= endTime) {
-            clearTimerState();
+            clearAllQuizStates();
             return false;
         }
         
@@ -1364,7 +1375,7 @@
         
         // If less than 5 seconds left, consider it expired
         if (remainingSeconds < 5) {
-            clearTimerState();
+            clearAllQuizStates();
             return null;
         }
         
@@ -1405,7 +1416,7 @@
           
           if (now >= endTime) {
               // Timer has expired, clear it
-              clearTimerState();
+              clearAllQuizStates();
               console.log("Timer expired, cleared state");
           } else {
               // Show a notification that a quiz is in progress
@@ -1547,8 +1558,9 @@
 
     // Start or resume the quiz timer
     // Start or resume the quiz timer
-function startTimer(duration, quizId) {
-    console.log("Starting/Resuming timer for quiz:", quizId, "with duration:", duration, "minutes");
+// Start or resume the quiz timer
+function startTimer(duration, quizId, quizType = null) {
+    console.log("Starting/Resuming timer for quiz:", quizId, "with duration:", duration, "minutes", "Type:", quizType);
     
     // Clear any existing timer
     if (timerInterval) {
@@ -1586,6 +1598,11 @@ function startTimer(duration, quizId) {
     // Update timer immediately
     updateTimerDisplay();
     
+    // Store quiz type for auto-submission
+    if (quizType) {
+        localStorage.setItem('currentQuizType', quizType);
+    }
+    
     // Set up interval to update timer every second
     timerInterval = setInterval(function() {
         timeRemaining--;
@@ -1604,18 +1621,24 @@ function startTimer(duration, quizId) {
             timerDisplay.className = "timer-display timer-danger";
             
             // Clear the saved timer state
-            clearTimerState();
+            clearAllQuizStates();
             
             // Auto-submit the quiz based on type
-            autoSubmitQuiz();
+            setTimeout(() => {
+                autoSubmitQuiz();
+            }, 1000); // Delay by 1 second to ensure UI updates first
         } else {
             updateTimerDisplay();
         }
     }, 1000);
 }
+    
     // Auto-submit quiz when time is up
+// Auto-submit quiz when time is up
 async function autoSubmitQuiz() {
     console.log("Time's up! Auto-submitting quiz...");
+    console.log("Current Quiz ID:", currentQuizId);
+    console.log("Current Quiz:", currentQuiz);
     
     if (!currentQuizId) {
         console.error("No current quiz ID found for auto-submission");
@@ -1624,102 +1647,142 @@ async function autoSubmitQuiz() {
         return;
     }
     
-    // Determine quiz type from currentQuiz or modal visibility
-    const isStructuredQuiz = document.getElementById("modalStructuredQuiz").style.display !== "none";
-    const isPdfQuiz = document.getElementById("modalPdfQuiz").style.display !== "none";
-    
     const token = localStorage.getItem("token");
     
     try {
-        if (isStructuredQuiz) {
-            // Auto-submit structured quiz
-            console.log("Auto-submitting structured quiz");
-            
-            // Collect any answers the user has provided
-            const answers = [];
-            if (currentQuiz && currentQuiz.questions) {
-                currentQuiz.questions.forEach((q, i) => {
-                    let value = "";
-                    if (q.type === "mcq") {
-                        const selected = document.querySelector(`input[name="q${i}"]:checked`);
-                        value = selected ? selected.value : "";
-                    } else {
-                        const textarea = document.querySelector(`textarea[name="q${i}"]`);
-                        value = textarea ? textarea.value : "";
-                    }
-                    answers.push({ questionId: q._id, answer: value });
-                });
-            }
-            
-            // Submit even if answers are empty
-            const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/submit`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ answers })
-            });
-            
-            if (res.ok) {
-                console.log("Structured quiz auto-submitted successfully");
-                alert("Time's up! Your answers have been submitted automatically.");
-            } else {
-                console.error("Failed to auto-submit structured quiz");
-                alert("Time's up! Unable to submit your answers automatically.");
-            }
-            
-        } else if (isPdfQuiz) {
-            // Auto-submit PDF quiz (submit without file)
-            console.log("Auto-submitting PDF quiz");
-            
-            // Create empty FormData to simulate submission
-            const formData = new FormData();
-            
-            const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/upload`, {
-                method: "POST",
-                headers: { Authorization: `Bearer ${token}` },
-                body: formData
-            });
-            
-            if (res.ok) {
-                console.log("PDF quiz auto-submitted successfully");
-                alert("Time's up! Your quiz has been submitted automatically (no file uploaded).");
-            } else {
-                // Try alternative method - mark as submitted via API if available
-                try {
-                    const altRes = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/mark-submitted`, {
-                        method: "POST",
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    
-                    if (altRes.ok) {
-                        console.log("PDF quiz marked as submitted via alternative method");
-                        alert("Time's up! Your quiz has been marked as submitted.");
-                    } else {
-                        console.error("Failed to auto-submit PDF quiz");
-                        alert("Time's up! Your quiz has been closed.");
-                    }
-                } catch (altErr) {
-                    console.error("Alternative submission failed:", altErr);
-                    alert("Time's up! Your quiz has been closed.");
-                }
-            }
-        } else {
-            console.log("No active quiz type detected, closing modal");
-            alert("Time's up! Your quiz has been closed.");
+        // First, try to determine quiz type from DOM
+        const isStructuredQuiz = document.getElementById("modalStructuredQuiz").style.display !== "none";
+        const isPdfQuiz = document.getElementById("modalPdfQuiz").style.display !== "none";
+        
+        console.log("DOM detection - Structured:", isStructuredQuiz, "PDF:", isPdfQuiz);
+        
+        // If DOM detection fails, check localStorage
+        let quizType = null;
+        if (isStructuredQuiz) quizType = "structured";
+        else if (isPdfQuiz) quizType = "pdf";
+        else {
+            quizType = localStorage.getItem('currentQuizType');
+            console.log("Using quiz type from localStorage:", quizType);
         }
         
-        // Close the exam modal
-        closeExamModal();
+        if (quizType === "structured") {
+            await autoSubmitStructuredQuiz(token);
+        } else if (quizType === "pdf") {
+            await autoSubmitPdfQuiz(token);
+        } else {
+            // Try both methods as fallback
+            console.log("Quiz type unknown, trying structured first...");
+            try {
+                await autoSubmitStructuredQuiz(token);
+            } catch (structErr) {
+                console.log("Structured auto-submit failed, trying PDF...");
+                await autoSubmitPdfQuiz(token);
+            }
+        }
         
     } catch (error) {
         console.error("Error during auto-submission:", error);
         alert("Time's up! There was an error submitting your quiz. Please contact your instructor.");
-        closeExamModal();
+    } finally {
+        // Always close the modal
+        setTimeout(() => {
+            closeExamModal();
+        }, 2000);
     }
 }
-    // Update timer display
+
+// Helper function for structured quiz auto-submission
+async function autoSubmitStructuredQuiz(token) {
+    console.log("Auto-submitting structured quiz");
+    
+    // Collect any answers the user has provided
+    const answers = [];
+    if (currentQuiz && currentQuiz.questions) {
+        currentQuiz.questions.forEach((q, i) => {
+            let value = "";
+            if (q.type === "mcq") {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                value = selected ? selected.value : "";
+            } else {
+                const textarea = document.querySelector(`textarea[name="q${i}"]`);
+                value = textarea ? textarea.value : "";
+            }
+            if (q._id) {
+                answers.push({ questionId: q._id, answer: value });
+            }
+        });
+    }
+    
+    console.log("Submitting answers:", answers);
+    
+    // Submit even if answers are empty
+    const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/submit`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ answers })
+    });
+    
+    if (res.ok) {
+        const result = await res.json();
+        console.log("Structured quiz auto-submitted successfully:", result);
+        alert("Time's up! Your answers have been submitted automatically.");
+    } else {
+        const error = await res.text();
+        console.error("Failed to auto-submit structured quiz:", error);
+        throw new Error("Failed to submit structured quiz");
+    }
+}
+
+// Helper function for PDF quiz auto-submission
+async function autoSubmitPdfQuiz(token) {
+    console.log("Auto-submitting PDF quiz");
+    
+    try {
+        // Try to submit empty form data first
+        const formData = new FormData();
+        formData.append("autoSubmit", "true");
+        
+        const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/upload`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData
+        });
+        
+        if (res.ok) {
+            console.log("PDF quiz auto-submitted successfully");
+            alert("Time's up! Your quiz has been submitted automatically.");
+            return;
+        }
+        
+        // If that fails, try to mark as submitted
+        console.log("Standard PDF upload failed, trying to mark as submitted...");
+        
+        const markRes = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/submit-empty`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ autoSubmitted: true })
+        });
+        
+        if (markRes.ok) {
+            console.log("Quiz marked as auto-submitted");
+            alert("Time's up! Your quiz has been marked as submitted.");
+        } else {
+            throw new Error("All auto-submission methods failed");
+        }
+        
+    } catch (error) {
+        console.error("PDF auto-submission failed:", error);
+        // Even if API fails, we should mark it as submitted locally
+        alert("Time's up! Your quiz has been closed.");
+        throw error;
+    }
+}    // Update timer display
     // Update timer display
 function updateTimerDisplay() {
     const timerDisplay = document.getElementById('timerDisplay');
@@ -1948,6 +2011,7 @@ ${q.reviewedAt ? `
 
     // Close exam modal
     // Close exam modal
+// Close exam modal
 function closeExamModal() {
     const examModal = document.getElementById('examModal');
     examModal.classList.remove('active');
@@ -1955,6 +2019,9 @@ function closeExamModal() {
     
     // Only stop the timer
     stopTimer();
+    
+    // Clear quiz type from localStorage
+    localStorage.removeItem('currentQuizType');
     
     // Reload quizzes to update status
     loadQuizzes();
@@ -2005,7 +2072,7 @@ function closeExamModal() {
         // Start the timer (always start a new timer when opening a quiz)
         const quizDuration = currentQuiz.duration || 20;
         console.log("Starting timer for quiz duration:", quizDuration);
-        startTimer(quizDuration, currentQuizId);
+        startTimer(quizDuration, currentQuizId, "structured");
 
         currentQuiz.questions.forEach((q, i) => {
           const div = document.createElement("div");
@@ -2115,7 +2182,7 @@ function closeExamModal() {
         statusEl.textContent = "✅ Answers submitted successfully!";
         
         // Clear the timer state since quiz is submitted
-        clearTimerState();
+        clearAllQuizStates();
         
         // Stop the timer
         stopTimer();
@@ -2197,7 +2264,7 @@ function closeExamModal() {
         if (!attempt || !attempt.submittedAt) {
           const quizDuration = quiz.duration || 20;
           console.log("Starting timer for PDF quiz duration:", quizDuration);
-          startTimer(quizDuration, currentQuizId);
+          startTimer(quizDuration, currentQuizId, "pdf");
         }
 
         // Open the modal
@@ -2271,7 +2338,7 @@ function closeExamModal() {
           uploadStatus.textContent = "✅ Answer uploaded successfully!";
           
           // Clear the timer state since quiz is submitted
-          clearTimerState();
+          clearAllQuizStates();
           
           // Wait a moment to show completion
           await new Promise(resolve => setTimeout(resolve, 800));
