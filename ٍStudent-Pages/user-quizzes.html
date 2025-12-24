@@ -1546,96 +1546,205 @@
     }
 
     // Start or resume the quiz timer
-    function startTimer(duration, quizId) {
-      console.log("Starting/Resuming timer for quiz:", quizId, "with duration:", duration, "minutes");
-      
-      // Clear any existing timer
-      if (timerInterval) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-      }
-      
-      // Check if we should resume from saved state
-      let remainingSeconds = calculateRemainingTime(quizId);
-      
-      if (remainingSeconds !== null && remainingSeconds > 0) {
-          // Resume existing timer
-          console.log("Resuming timer from saved state:", remainingSeconds, "seconds remaining");
-          timeRemaining = remainingSeconds;
-      } else {
-          // Start new timer
-          timeRemaining = duration * 60; // Convert minutes to seconds
-          
-          // Calculate end time and save to localStorage
-          const endTime = new Date(Date.now() + (duration * 60 * 1000));
-          saveTimerState(quizId, endTime.toISOString(), duration);
-          console.log("Started new timer, end time:", endTime);
-      }
-      
-      quizStarted = true;
-      
-      // Show timer
-      const timerContainer = document.getElementById('timerContainer');
-      const timerDisplay = document.getElementById('timerDisplay');
-      
-      // Make sure timer is visible and on top
-      timerContainer.style.display = 'block';
-      timerContainer.style.zIndex = '2000';
-      
-      // Update timer immediately
-      updateTimerDisplay();
-      
-      // Set up interval to update timer every second
-      timerInterval = setInterval(function() {
-          timeRemaining--;
-          
-          // Update localStorage with remaining time (every 10 seconds to reduce writes)
-          if (timeRemaining % 10 === 0) {
-              const endTime = new Date(Date.now() + (timeRemaining * 1000));
-              saveTimerState(quizId, endTime.toISOString(), duration);
-          }
-          
-          if (timeRemaining <= 0) {
-              // Time's up!
-              clearInterval(timerInterval);
-              timerInterval = null;
-              timerDisplay.textContent = "00:00";
-              timerDisplay.className = "timer-display timer-danger";
-              
-              // Clear the saved timer state
-              clearTimerState();
-              
-              // Auto-submit the quiz
-              if (currentQuiz && currentQuiz.type === "structured") {
-                  alert("Time's up! Submitting your answers...");
-                  submitAnswers();
-              } else {
-                  alert("Time's up! Your quiz has been closed.");
-                  closeExamModal();
-              }
-          } else {
-              updateTimerDisplay();
-          }
-      }, 1000);
+    // Start or resume the quiz timer
+function startTimer(duration, quizId) {
+    console.log("Starting/Resuming timer for quiz:", quizId, "with duration:", duration, "minutes");
+    
+    // Clear any existing timer
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
     }
     
-    // Update timer display
-    function updateTimerDisplay() {
-      const timerDisplay = document.getElementById('timerDisplay');
-      const minutes = Math.floor(timeRemaining / 60);
-      const seconds = timeRemaining % 60;
-      
-      timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      
-      // Change color based on remaining time
-      if (timeRemaining < 60) {
-        timerDisplay.className = "timer-display timer-danger";
-      } else if (timeRemaining < 300) {
-        timerDisplay.className = "timer-display timer-warning";
-      } else {
-        timerDisplay.className = "timer-display timer-normal";
-      }
+    // Check if we should resume from saved state
+    let remainingSeconds = calculateRemainingTime(quizId);
+    
+    if (remainingSeconds !== null && remainingSeconds > 0) {
+        // Resume existing timer
+        console.log("Resuming timer from saved state:", remainingSeconds, "seconds remaining");
+        timeRemaining = remainingSeconds;
+    } else {
+        // Start new timer
+        timeRemaining = duration * 60; // Convert minutes to seconds
+        
+        // Calculate end time and save to localStorage
+        const endTime = new Date(Date.now() + (duration * 60 * 1000));
+        saveTimerState(quizId, endTime.toISOString(), duration);
+        console.log("Started new timer, end time:", endTime);
     }
+    
+    quizStarted = true;
+    
+    // Show timer
+    const timerContainer = document.getElementById('timerContainer');
+    const timerDisplay = document.getElementById('timerDisplay');
+    
+    // Make sure timer is visible and on top
+    timerContainer.style.display = 'block';
+    timerContainer.style.zIndex = '2000';
+    
+    // Update timer immediately
+    updateTimerDisplay();
+    
+    // Set up interval to update timer every second
+    timerInterval = setInterval(function() {
+        timeRemaining--;
+        
+        // Update localStorage with remaining time (every 10 seconds to reduce writes)
+        if (timeRemaining % 10 === 0) {
+            const endTime = new Date(Date.now() + (timeRemaining * 1000));
+            saveTimerState(quizId, endTime.toISOString(), duration);
+        }
+        
+        if (timeRemaining <= 0) {
+            // Time's up!
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timerDisplay.textContent = "00:00";
+            timerDisplay.className = "timer-display timer-danger";
+            
+            // Clear the saved timer state
+            clearTimerState();
+            
+            // Auto-submit the quiz based on type
+            autoSubmitQuiz();
+        } else {
+            updateTimerDisplay();
+        }
+    }, 1000);
+}
+    // Auto-submit quiz when time is up
+async function autoSubmitQuiz() {
+    console.log("Time's up! Auto-submitting quiz...");
+    
+    if (!currentQuizId) {
+        console.error("No current quiz ID found for auto-submission");
+        alert("Time's up! Your quiz has been closed.");
+        closeExamModal();
+        return;
+    }
+    
+    // Determine quiz type from currentQuiz or modal visibility
+    const isStructuredQuiz = document.getElementById("modalStructuredQuiz").style.display !== "none";
+    const isPdfQuiz = document.getElementById("modalPdfQuiz").style.display !== "none";
+    
+    const token = localStorage.getItem("token");
+    
+    try {
+        if (isStructuredQuiz) {
+            // Auto-submit structured quiz
+            console.log("Auto-submitting structured quiz");
+            
+            // Collect any answers the user has provided
+            const answers = [];
+            if (currentQuiz && currentQuiz.questions) {
+                currentQuiz.questions.forEach((q, i) => {
+                    let value = "";
+                    if (q.type === "mcq") {
+                        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                        value = selected ? selected.value : "";
+                    } else {
+                        const textarea = document.querySelector(`textarea[name="q${i}"]`);
+                        value = textarea ? textarea.value : "";
+                    }
+                    answers.push({ questionId: q._id, answer: value });
+                });
+            }
+            
+            // Submit even if answers are empty
+            const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/submit`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ answers })
+            });
+            
+            if (res.ok) {
+                console.log("Structured quiz auto-submitted successfully");
+                alert("Time's up! Your answers have been submitted automatically.");
+            } else {
+                console.error("Failed to auto-submit structured quiz");
+                alert("Time's up! Unable to submit your answers automatically.");
+            }
+            
+        } else if (isPdfQuiz) {
+            // Auto-submit PDF quiz (submit without file)
+            console.log("Auto-submitting PDF quiz");
+            
+            // Create empty FormData to simulate submission
+            const formData = new FormData();
+            
+            const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/upload`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` },
+                body: formData
+            });
+            
+            if (res.ok) {
+                console.log("PDF quiz auto-submitted successfully");
+                alert("Time's up! Your quiz has been submitted automatically (no file uploaded).");
+            } else {
+                // Try alternative method - mark as submitted via API if available
+                try {
+                    const altRes = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/mark-submitted`, {
+                        method: "POST",
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    
+                    if (altRes.ok) {
+                        console.log("PDF quiz marked as submitted via alternative method");
+                        alert("Time's up! Your quiz has been marked as submitted.");
+                    } else {
+                        console.error("Failed to auto-submit PDF quiz");
+                        alert("Time's up! Your quiz has been closed.");
+                    }
+                } catch (altErr) {
+                    console.error("Alternative submission failed:", altErr);
+                    alert("Time's up! Your quiz has been closed.");
+                }
+            }
+        } else {
+            console.log("No active quiz type detected, closing modal");
+            alert("Time's up! Your quiz has been closed.");
+        }
+        
+        // Close the exam modal
+        closeExamModal();
+        
+    } catch (error) {
+        console.error("Error during auto-submission:", error);
+        alert("Time's up! There was an error submitting your quiz. Please contact your instructor.");
+        closeExamModal();
+    }
+}
+    // Update timer display
+    // Update timer display
+function updateTimerDisplay() {
+    const timerDisplay = document.getElementById('timerDisplay');
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    
+    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Change color based on remaining time
+    if (timeRemaining < 60) {
+        timerDisplay.className = "timer-display timer-danger";
+        // Show warning when less than 1 minute remaining
+        if (timeRemaining === 60) {
+            alert("Warning: Less than 1 minute remaining! Your quiz will be auto-submitted when time expires.");
+        }
+    } else if (timeRemaining < 300) {
+        timerDisplay.className = "timer-display timer-warning";
+        // Show warning when less than 5 minutes remaining
+        if (timeRemaining === 300) {
+            alert("Warning: Less than 5 minutes remaining!");
+        }
+    } else {
+        timerDisplay.className = "timer-display timer-normal";
+    }
+}
     
     // Stop the timer
     function stopTimer() {
@@ -1838,17 +1947,18 @@ ${q.reviewedAt ? `
     }
 
     // Close exam modal
-    function closeExamModal() {
-      const examModal = document.getElementById('examModal');
-      examModal.classList.remove('active');
-      document.body.style.overflow = ''; // Enable scrolling
-      
-      // Only stop the timer, don't clear state unless we're submitting
-      stopTimer();
-      
-      // Reload quizzes to update status
-      loadQuizzes();
-    }
+    // Close exam modal
+function closeExamModal() {
+    const examModal = document.getElementById('examModal');
+    examModal.classList.remove('active');
+    document.body.style.overflow = ''; // Enable scrolling
+    
+    // Only stop the timer
+    stopTimer();
+    
+    // Reload quizzes to update status
+    loadQuizzes();
+}
 
     // Structured Quiz functions
     async function loadStructuredQuiz() {
@@ -1966,30 +2076,36 @@ ${q.reviewedAt ? `
       }
     }
 
-    async function submitAnswers() {
-      const token = localStorage.getItem("token");
-      if (!currentQuiz || !currentQuiz.questions) return;
+  async function submitAnswers() {
+    // Check if time is already up
+    if (timeRemaining <= 0) {
+        alert("Time is already up! Your quiz was automatically submitted.");
+        return;
+    }
+    
+    const token = localStorage.getItem("token");
+    if (!currentQuiz || !currentQuiz.questions) return;
 
-      const answers = currentQuiz.questions.map((q, i) => {
+    const answers = currentQuiz.questions.map((q, i) => {
         let value = "";
         if (q.type === "mcq") {
-          const selected = document.querySelector(`input[name="q${i}"]:checked`);
-          value = selected ? selected.value : "";
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            value = selected ? selected.value : "";
         } else {
-          const textarea = document.querySelector(`textarea[name="q${i}"]`);
-          value = textarea ? textarea.value : "";
+            const textarea = document.querySelector(`textarea[name="q${i}"]`);
+            value = textarea ? textarea.value : "";
         }
         return { questionId: q._id, answer: value };
-      });
+    });
 
-      try {
+    try {
         const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/submit`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ answers })
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ answers })
         });
 
         const data = await res.json();
@@ -2006,15 +2122,14 @@ ${q.reviewedAt ? `
 
         // Show success message for 2 seconds then close modal
         setTimeout(() => {
-          closeExamModal();
+            closeExamModal();
         }, 2000);
 
-      } catch (err) {
+    } catch (err) {
         document.getElementById("status").textContent = "❌ Submission failed: " + err.message;
         console.error("Submit error:", err);
-      }
     }
-
+}
     // PDF Quiz functions
     async function loadPdfQuiz() {
       const token = localStorage.getItem("token");
@@ -2096,6 +2211,10 @@ ${q.reviewedAt ? `
 
     // PDF answer upload with loading bar - UPDATED FUNCTION
     async function uploadPdfAnswer() {
+          if (timeRemaining <= 0) {
+        alert("Time is already up! Your quiz was automatically submitted.");
+        return;
+    }
       const file = document.getElementById("answerFile").files[0];
       if (!file) {
         alert("Please select a file first.");
