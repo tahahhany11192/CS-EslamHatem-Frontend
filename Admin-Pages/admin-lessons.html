@@ -687,7 +687,7 @@
                 <input type="radio" name="courseType" value="multiple">
                 <div>
                   <strong>Multiple Courses</strong>
-                  <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 2px;">Assign to multiple courses</div>
+                  <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 2px;">Create multiple copies (one per course)</div>
                 </div>
               </div>
             </div>
@@ -706,7 +706,7 @@
                 <p>Loading courses...</p>
               </div>
               <div style="margin-top: 10px; font-size: 0.9rem; color: rgba(240, 246, 255, 0.7);">
-                <i class="fas fa-info-circle"></i> Select one or more courses for this lesson
+                <i class="fas fa-info-circle"></i> This will create a separate lesson for each selected course
               </div>
             </div>
           </div>
@@ -777,7 +777,7 @@
     const selectionOptions = document.querySelectorAll('.selection-option');
 
     let allCourses = [];
-    let currentLessonCourses = []; // For editing mode
+    let currentLessonCourse = null; // For editing mode (single course only)
 
     // Helper functions
     function showSuccess(message) {
@@ -880,19 +880,15 @@
         const selectedCourseId = singleCourseSelect.value;
         return selectedCourseId ? [selectedCourseId] : [];
       } else {
-        // Multiple selection
+        // Multiple selection - return array of selected course IDs
         const selectedCheckboxes = multipleCoursesContainer.querySelectorAll('input[type="checkbox"]:checked');
         return Array.from(selectedCheckboxes).map(cb => cb.value);
       }
     }
 
-    // Set selected courses in the form (for editing)
-    function setSelectedCourses(courseIds) {
-      if (!Array.isArray(courseIds)) {
-        courseIds = [courseIds]; // Convert single course to array
-      }
-      
-      currentLessonCourses = courseIds;
+    // Set selected course in the form (for editing - single course only)
+    function setSelectedCourse(courseId) {
+      currentLessonCourse = courseId;
       
       // Reset all selections
       singleCourseSelect.value = '';
@@ -900,20 +896,11 @@
         cb.checked = false;
       });
       
-      if (courseIds.length === 0) return;
+      if (!courseId) return;
       
-      if (courseIds.length === 1) {
-        // Single course - show in single mode
-        singleCourseSelect.value = courseIds[0];
-        document.querySelector('.selection-option[data-type="single"]').click();
-      } else {
-        // Multiple courses - show in multiple mode
-        document.querySelector('.selection-option[data-type="multiple"]').click();
-        courseIds.forEach(courseId => {
-          const checkbox = document.getElementById(`course_${courseId}`);
-          if (checkbox) checkbox.checked = true;
-        });
-      }
+      // Always use single course mode for editing
+      singleCourseSelect.value = courseId;
+      document.querySelector('.selection-option[data-type="single"]').click();
     }
 
     // Load lessons
@@ -945,20 +932,11 @@
         }
 
         lessons.forEach(l => {
-          // Get course names
+          // Get course name
           let courseText = "Not assigned to any course";
-          if (l.courses && l.courses.length > 0) {
-            if (l.courses.length === 1) {
-              courseText = `Course: ${l.courses[0].title || l.courses[0]}`;
-            } else {
-              courseText = `Courses: ${l.courses.length} courses`;
-            }
-          } else if (l.course) {
+          if (l.course) {
             courseText = `Course: ${l.course.title || l.course}`;
           }
-          
-          // Prepare course data for editing
-          const courseData = l.courses || (l.course ? [l.course._id || l.course] : []);
           
           const div = document.createElement("div");
           div.className = "lesson-card";
@@ -975,7 +953,7 @@
             </div>
             <p class="lesson-description">${l.description || "No description provided."}</p>
             <div class="lesson-actions">
-              <button class="btn btn-admin btn-sm" onclick="editLesson('${l._id}', '${l.title}', \`${l.description?.replace(/`/g, '\\`') || ''}\`, '${l.type}', '${l.price}', ${JSON.stringify(courseData)})">
+              <button class="btn btn-admin btn-sm" onclick="editLesson('${l._id}', '${l.title}', \`${l.description?.replace(/`/g, '\\`') || ''}\`, '${l.type}', '${l.price}', '${l.course?._id || l.course}')">
                 <i class="fas fa-edit"></i> Edit
               </button>
               <button class="btn btn-danger btn-sm" onclick="deleteLesson('${l._id}')">
@@ -996,7 +974,7 @@
       }
     }
 
-    // Save lesson
+    // Save lesson (single or multiple)
     form.addEventListener("submit", async e => {
       e.preventDefault();
       
@@ -1015,41 +993,116 @@
         return;
       }
 
-      const payload = {
+      const basePayload = {
         title: titleInput.value,
         description: descInput.value,
         type: typeInput.value,
         price: priceInput.value,
-        courses: selectedCourses, // Always send as array
       };
 
       try {
-        const res = await fetch(id ? `${API_BASE}/${id}` : API_BASE, {
-          method: id ? "PUT" : "POST",
-          headers: { 
-            "Content-Type": "application/json", 
-            Authorization: "Bearer " + token 
-          },
-          body: JSON.stringify(payload)
-        });
+        if (id) {
+          // Editing - always single course
+          const payload = {
+            ...basePayload,
+            course: selectedCourses[0]
+          };
+          
+          const res = await fetch(`${API_BASE}/${id}`, {
+            method: "PUT",
+            headers: { 
+              "Content-Type": "application/json", 
+              Authorization: "Bearer " + token 
+            },
+            body: JSON.stringify(payload)
+          });
 
-        if (res.status === 401) {
-          logout();
-          return;
-        }
+          if (res.status === 401) {
+            logout();
+            return;
+          }
 
-        if (res.ok) {
-          showSuccess("✅ Lesson saved successfully!");
-          form.reset();
-          lessonIdInput.value = "";
-          formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Create New Lesson';
-          cancelEditBtn.style.display = "none";
-          // Reset to single course selection
-          document.querySelector('.selection-option[data-type="single"]').click();
-          loadLessons();
+          if (res.ok) {
+            showSuccess("✅ Lesson updated successfully!");
+            resetForm();
+            loadLessons();
+          } else {
+            const errorData = await res.json();
+            showError("❌ Failed to update lesson: " + (errorData.message || "Unknown error"));
+          }
         } else {
-          const errorData = await res.json();
-          showError("❌ Failed to save lesson: " + (errorData.message || "Unknown error"));
+          // Creating - could be single or multiple
+          const courseType = document.querySelector('input[name="courseType"]:checked').value;
+          
+          if (courseType === 'single') {
+            // Single course - one API call
+            const payload = {
+              ...basePayload,
+              course: selectedCourses[0]
+            };
+            
+            const res = await fetch(API_BASE, {
+              method: "POST",
+              headers: { 
+                "Content-Type": "application/json", 
+                Authorization: "Bearer " + token 
+              },
+              body: JSON.stringify(payload)
+            });
+
+            if (res.status === 401) {
+              logout();
+              return;
+            }
+
+            if (res.ok) {
+              showSuccess("✅ Lesson created successfully!");
+                         } else {
+              const errorData = await res.json();
+              showError("❌ Failed to create lesson: " + (errorData.message || "Unknown error"));
+            }
+          } else {
+            // Multiple courses - create a lesson for each course
+            let successCount = 0;
+            let errorCount = 0;
+            
+            // Show a progress message
+            showSuccess(`🔄 Creating lessons for ${selectedCourses.length} courses...`);
+            
+            for (const courseId of selectedCourses) {
+              const payload = {
+                ...basePayload,
+                course: courseId
+              };
+              
+              try {
+                const res = await fetch(API_BASE, {
+                  method: "POST",
+                  headers: { 
+                    "Content-Type": "application/json", 
+                    Authorization: "Bearer " + token 
+                  },
+                  body: JSON.stringify(payload)
+                });
+                
+                if (res.ok) {
+                  successCount++;
+                } else {
+                  errorCount++;
+                  console.error(`Failed to create lesson for course ${courseId}`);
+                }
+              } catch (err) {
+                errorCount++;
+                console.error(`Error creating lesson for course ${courseId}:`, err);
+              }
+            }
+            
+            if (errorCount === 0) {
+              showSuccess(`✅ Successfully created ${successCount} lesson(s)!`);
+            } else {
+              showError(`⚠️ Created ${successCount} lesson(s), failed to create ${errorCount} lesson(s)`);
+            }
+          }
         }
       } catch (error) {
         console.error("Error saving lesson:", error);
@@ -1061,20 +1114,15 @@
     });
 
     // Edit lesson
-    function editLesson(id, title, description, type, price, courseIds) {
+    function editLesson(id, title, description, type, price, courseId) {
       lessonIdInput.value = id;
       titleInput.value = title;
       descInput.value = description;
       typeInput.value = type;
       priceInput.value = price;
       
-      // Set course selection
-      if (courseIds && courseIds.length > 0) {
-        setSelectedCourses(courseIds);
-      } else {
-        // If no courses, set to single mode with no selection
-        document.querySelector('.selection-option[data-type="single"]').click();
-      }
+      // Set course selection (editing only works with single course)
+      setSelectedCourse(courseId);
       
       formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Lesson';
       cancelEditBtn.style.display = "inline-block";
@@ -1082,14 +1130,17 @@
     }
 
     // Cancel edit
-    cancelEditBtn.addEventListener("click", function() {
+    cancelEditBtn.addEventListener("click", resetForm);
+
+    // Reset form function
+    function resetForm() {
       form.reset();
       lessonIdInput.value = "";
       formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Create New Lesson';
       cancelEditBtn.style.display = "none";
       // Reset to single course selection
       document.querySelector('.selection-option[data-type="single"]').click();
-    });
+    }
 
     // Delete lesson
     async function deleteLesson(id) {
