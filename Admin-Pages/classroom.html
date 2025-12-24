@@ -1500,80 +1500,109 @@
       }
     }
 
-    function displayAssignmentSubmissions(submissions) {
-      const container = document.getElementById('assignmentSubmissionsList');
-      
-      if (submissions && submissions.length > 0) {
-        container.innerHTML = submissions.map(submission => {
-          // Fix file URL
-          let fileUrl = '';
-          if (submission.fileUrl) {
-            if (submission.fileUrl.startsWith('http') || submission.fileUrl.startsWith('https')) {
-              fileUrl = submission.fileUrl;
-            } else if (submission.fileUrl.startsWith('/')) {
-              fileUrl = `https://cs-eslamhatem-backend-1i25nw.fly.dev${submission.fileUrl}`;
-            } else {
-              fileUrl = `https://cs-eslamhatem-backend-1i25nw.fly.dev/${submission.fileUrl}`;
-            }
-          }
-          
-          return `
-          <div class="submission-card">
-            <div class="submission-actions">
-              <button class="delete-submission-btn" onclick="deleteSubmission('${submission._id}', 'assignment')" title="Delete this submission">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-            <div class="submission-header">
-              <div>
-                <h3 class="submission-title">${submission.assignment ? submission.assignment.title : 'Unknown Assignment'}</h3>
-                <div class="student-info">${submission.student ? submission.student.name : 'Unknown'} (${submission.student ? submission.student.email : ''})</div>
-              </div>
-            </div>
-            <div class="submission-details">
-              ${fileUrl ? `
-                <p style="margin-bottom: 10px;">
-                  <i class="fas fa-file"></i> 
-                  <a href="${fileUrl}" target="_blank" style="color: var(--admin-accent); text-decoration: underline;">
-                    View Submitted File
-                  </a>
-                </p>
-              ` : ''}
-              ${submission.textAnswer ? `
-                <p style="margin-bottom: 10px;">
-                  <strong>Text Answer:</strong> ${submission.textAnswer.substring(0, 100)}...
-                </p>
-              ` : ''}
-            </div>
-            <div class="submission-meta">
-              <div><span class="grade-badge">Grade: ${submission.grade !== undefined ? submission.grade : 'Not Graded'}</span></div>
-              <div style="color: rgba(240, 246, 255, 0.5);">Submitted: ${formatDate(submission.createdAt)}</div>
-            </div>
-            <div class="submission-review">
-              <div class="grade-input-container">
-                <label class="grade-input-label">Grade (0-100)</label>
-                <input type="number" class="grade-input" placeholder="Enter grade (0-100)" value="${submission.grade !== undefined ? submission.grade : ''}" min="0" max="100" data-submission-id="${submission._id}">
-              </div>
-              <div class="grade-input-container">
-                <label class="grade-input-label">Feedback</label>
-                <textarea class="feedback-input" placeholder="Enter feedback for the student..." data-submission-id="${submission._id}">${submission.feedback || ''}</textarea>
-              </div>
-              <button class="review-btn" data-id="${submission._id}">
-                <i class="fas fa-check-circle"></i> Save Review
-              </button>
-            </div>
-          </div>
-        `}).join('');
+  function displayAssignmentSubmissions(data) {
+  const container = document.getElementById('assignmentSubmissionsList');
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-file-alt"></i>
+        <h3>No Assignment Submissions</h3>
+        <p>This student hasn't submitted any assignments for this course</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = data.map(item => {
+    const assignment = item.assignment;
+    const submission = item.submission;
+    const isSubmitted = !!submission;
+
+    let fileUrl = '';
+    if (isSubmitted && submission.fileUrl) {
+      if (submission.fileUrl.startsWith('http')) {
+        fileUrl = submission.fileUrl;
       } else {
-        container.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-file-alt"></i>
-            <h3>No Assignment Submissions</h3>
-            <p>This student hasn't submitted any assignments for this course</p>
-          </div>
-        `;
+        fileUrl = `https://cs-eslamhatem-backend-1i25nw.fly.dev/${submission.fileUrl}`;
       }
     }
+
+    return `
+      <div class="submission-card">
+
+        <div class="submission-header">
+          <div>
+            <h3 class="submission-title">${assignment.title}</h3>
+            <div class="student-info">
+              ${isSubmitted ? 'Submitted' : 'Not Submitted'}
+            </div>
+          </div>
+        </div>
+
+        <div class="submission-details">
+          ${
+            isSubmitted && fileUrl
+              ? `
+                <p>
+                  <i class="fas fa-file"></i>
+                  <a href="${fileUrl}" target="_blank">View Submitted File</a>
+                </p>
+              `
+              : `<p style="opacity:0.6;">No file submitted</p>`
+          }
+
+          ${
+            isSubmitted && submission.textAnswer
+              ? `<p><strong>Text Answer:</strong> ${submission.textAnswer}</p>`
+              : ''
+          }
+        </div>
+
+        <div class="submission-meta">
+          <div>
+            <span class="grade-badge">
+              Grade: ${isSubmitted && submission.grade !== undefined ? submission.grade : 'Not Graded'}
+            </span>
+          </div>
+          <div style="opacity:0.7;">
+            ${isSubmitted ? `Submitted: ${new Date(submission.createdAt).toLocaleDateString()}` : 'Not Submitted'}
+          </div>
+        </div>
+
+        <div class="submission-review">
+          <div class="grade-input-container">
+            <label>Grade (0–100)</label>
+            <input 
+              type="number"
+              class="grade-input"
+              ${!isSubmitted ? 'disabled' : ''}
+              value="${isSubmitted && submission.grade !== undefined ? submission.grade : ''}"
+              data-id="${submission?._id || ''}"
+            />
+          </div>
+
+          <div class="grade-input-container">
+            <label>Feedback</label>
+            <textarea 
+              class="feedback-input"
+              ${!isSubmitted ? 'disabled' : ''}
+            >${isSubmitted ? submission.feedback || '' : ''}</textarea>
+          </div>
+
+          <button 
+            class="review-btn"
+            ${!isSubmitted ? 'disabled' : ''}
+            data-id="${submission?._id || ''}"
+          >
+            <i class="fas fa-check-circle"></i> Save Review
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 
     async function loadQuizSubmissions() {
       try {
