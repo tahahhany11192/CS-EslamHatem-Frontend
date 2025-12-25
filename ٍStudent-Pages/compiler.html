@@ -472,6 +472,55 @@
             min-height: 100px;
             font-family: 'Fira Code', monospace;
             white-space: pre-wrap;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-prompt {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(20, 30, 50, 0.8);
+            border-radius: 5px;
+            border: 1px solid rgba(0, 204, 255, 0.3);
+            display: none;
+        }
+
+        .input-label {
+            margin-bottom: 5px;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 8px;
+            background: rgba(30, 40, 60, 0.9);
+            border: 1px solid rgba(0, 204, 255, 0.5);
+            border-radius: 4px;
+            color: var(--light);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.3);
+        }
+
+        .submit-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+
+        .submit-btn:hover {
+            background: var(--gradient-accent);
         }
 
         .explanation-panel {
@@ -779,7 +828,14 @@ OUTPUT x"></textarea>
                     
                     <div id="codeDisplay" class="code-display"></div>
                     
-                    <div class="output-panel" id="outputBox"></div>
+                    <div class="output-panel" id="outputBox">
+                        <div id="outputContent">Output will appear here...</div>
+                        <div id="inputPrompt" class="input-prompt">
+                            <div class="input-label" id="inputLabel">Enter value:</div>
+                            <input type="text" id="inputField" class="input-field" placeholder="Type your input here...">
+                            <button id="submitInput" class="submit-btn">Submit</button>
+                        </div>
+                    </div>
                     <div class="explanation-panel" id="explanationBox"></div>
                     
                     <div class="examples-section">
@@ -830,7 +886,18 @@ WHILE num <= 10
     total <- total + num
     num <- num + 1
 ENDWHILE
-OUTPUT "Sum of 1 to 10: ", total`
+OUTPUT "Sum of 1 to 10: ", total`,
+
+            inputExample: `// Input Example
+// Try multiple inputs
+INPUT name, age
+OUTPUT "Hello ", name
+OUTPUT "You are ", age, " years old"
+
+// Input with calculation
+INPUT num1, num2
+sum <- num1 + num2
+OUTPUT "Sum: ", sum`
         };
 
         function loadExample(exampleName) {
@@ -847,7 +914,10 @@ OUTPUT "Sum of 1 to 10: ", total`
             stack: [],
             isRunning: false,
             autoRunInterval: null,
-            rawLines: []
+            rawLines: [],
+            waitingForInput: false,
+            inputVariables: [],
+            inputCallback: null
         };
 
         function initCompiler() {
@@ -860,18 +930,89 @@ OUTPUT "Sum of 1 to 10: ", total`
                 stack: [],
                 isRunning: false,
                 autoRunInterval: null,
-                rawLines: []
+                rawLines: [],
+                waitingForInput: false,
+                inputVariables: [],
+                inputCallback: null
             };
+
+            // Setup input submit handler
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'submitInput') {
+                    handleInputSubmit();
+                }
+            });
+
+            // Setup enter key handler for input field
+            document.addEventListener('keydown', function(e) {
+                if (e.target && e.target.id === 'inputField' && e.key === 'Enter') {
+                    handleInputSubmit();
+                }
+            });
+        }
+
+        function handleInputSubmit() {
+            if (!executionState.waitingForInput || !executionState.inputCallback) return;
+
+            const inputField = document.getElementById('inputField');
+            const inputValue = inputField.value.trim();
+
+            if (inputValue === '') {
+                alert('Please enter a value');
+                return;
+            }
+
+            // Hide input prompt
+            document.getElementById('inputPrompt').style.display = 'none';
+            inputField.value = '';
+
+            // Call the callback with the input value
+            executionState.inputCallback(inputValue);
+
+            // Reset waiting state
+            executionState.waitingForInput = false;
+            executionState.inputVariables = [];
+            executionState.inputCallback = null;
+
+            // Continue execution
+            if (executionState.autoRunInterval) {
+                executeNextStep();
+            }
+        }
+
+        function showInputPrompt(variables) {
+            executionState.waitingForInput = true;
+            const prompt = document.getElementById('inputPrompt');
+            const label = document.getElementById('inputLabel');
+            const inputField = document.getElementById('inputField');
+            
+            if (variables.length === 1) {
+                label.textContent = `Enter value for ${variables[0]}:`;
+            } else {
+                label.textContent = `Enter ${variables.length} values separated by commas:`;
+            }
+            
+            prompt.style.display = 'block';
+            inputField.focus();
+            
+            // Return a promise-like callback system
+            return new Promise((resolve) => {
+                executionState.inputCallback = function(value) {
+                    resolve(value);
+                };
+            });
         }
 
         function prepareExecution() {
             const codeArea = document.getElementById('codeInput');
             const rawLines = codeArea.value.split('\n');
             const codeDisplay = document.getElementById('codeDisplay');
+            const outputContent = document.getElementById('outputContent');
 
             codeDisplay.innerHTML = '';
-            document.getElementById('outputBox').textContent = '';
+            outputContent.textContent = '';
             document.getElementById('explanationBox').textContent = 'Starting execution...';
+            document.getElementById('inputPrompt').style.display = 'none';
 
             executionState = {
                 lineElements: [],
@@ -881,7 +1022,10 @@ OUTPUT "Sum of 1 to 10: ", total`
                 stack: [],
                 isRunning: true,
                 autoRunInterval: null,
-                rawLines
+                rawLines,
+                waitingForInput: false,
+                inputVariables: [],
+                inputCallback: null
             };
 
             executionState.lineElements = rawLines.map((line, index) => {
@@ -951,7 +1095,11 @@ OUTPUT "Sum of 1 to 10: ", total`
             }
         }
 
-        function executeNextStep() {
+        async function executeNextStep() {
+            if (executionState.waitingForInput) {
+                return false; // Don't proceed while waiting for input
+            }
+
             if (executionState.currentLine >= executionState.rawLines.length) {
                 executionState.isRunning = false;
                 document.getElementById('explanationBox').textContent += '\n\nExecution complete.';
@@ -1014,21 +1162,34 @@ OUTPUT "Sum of 1 to 10: ", total`
                     return true;
                 }
 
-                // INPUT
+                // INPUT - Modified to use input field instead of prompt
                 if (/^INPUT\s+(.+)$/i.test(line)) {
                     const varList = line.match(/^INPUT\s+(.+)$/i)[1].split(',').map(v => v.trim());
-                    for (let v of varList) {
-                        let val = prompt(`Enter value for ${v}:`);
-                        if (val === null) {
-                            exBox.textContent = "Execution canceled by user";
-                            stopExecution();
-                            return false;
+                    
+                    // Store the variables we're waiting for
+                    executionState.inputVariables = varList;
+                    
+                    // Show the input prompt
+                    showInputPrompt(varList).then(inputValue => {
+                        // Process the input
+                        const values = inputValue.split(',').map(v => v.trim());
+                        
+                        for (let i = 0; i < varList.length; i++) {
+                            const v = varList[i];
+                            const val = i < values.length ? values[i] : "";
+                            executionState.variables[v] = isNaN(val) ? val : Number(val);
                         }
-                        executionState.variables[v] = isNaN(val) ? val : Number(val);
-                    }
-                    exBox.textContent = `Input received for: ${varList.join(', ')}`;
-                    executionState.currentLine++;
-                    return true;
+                        
+                        exBox.textContent = `Input received for: ${varList.join(', ')}`;
+                        executionState.currentLine++;
+                        
+                        // Continue with next step if auto-running
+                        if (executionState.autoRunInterval) {
+                            setTimeout(() => executeNextStep(), 500);
+                        }
+                    });
+                    
+                    return false; // Pause execution until input is received
                 }
 
                 // OUTPUT - Enhanced to handle both strings and variables
@@ -1049,7 +1210,7 @@ OUTPUT "Sum of 1 to 10: ", total`
                     });
                     const combined = values.join(' ');
                     executionState.output += combined + '\n';
-                    document.getElementById('outputBox').textContent = executionState.output;
+                    document.getElementById('outputContent').textContent = executionState.output;
                     exBox.textContent = `Outputting: ${combined}`;
                     executionState.currentLine++;
                     return true;
@@ -1299,16 +1460,20 @@ OUTPUT "Sum of 1 to 10: ", total`
                 clearInterval(executionState.autoRunInterval || 0);
                 executionState.autoRunInterval = null;
                 executionState.isRunning = false;
+                document.querySelector('.compiler-btn.run').textContent = 'Run Automatically';
                 return;
             }
 
             prepareExecution();
+            document.querySelector('.compiler-btn.run').textContent = 'Stop';
 
             executionState.autoRunInterval = setInterval(() => {
                 const continueExecution = executeNextStep();
                 if (!continueExecution) {
                     clearInterval(executionState.autoRunInterval);
                     executionState.autoRunInterval = null;
+                    executionState.isRunning = false;
+                    document.querySelector('.compiler-btn.run').textContent = 'Run Automatically';
                 }
             }, 1500);
         }
@@ -1317,12 +1482,7 @@ OUTPUT "Sum of 1 to 10: ", total`
             if (!executionState.isRunning) {
                 prepareExecution();
             }
-            if (executionState.currentLine < executionState.rawLines.length) {
-                executeNextStep();
-            } else {
-                document.getElementById('explanationBox').textContent += '\n\nExecution complete.';
-                executionState.isRunning = false;
-            }
+            executeNextStep();
         }
         
         function stopExecution() {
@@ -1331,14 +1491,16 @@ OUTPUT "Sum of 1 to 10: ", total`
                 executionState.autoRunInterval = null;
             }
             executionState.isRunning = false;
+            document.querySelector('.compiler-btn.run').textContent = 'Run Automatically';
             document.getElementById('explanationBox').textContent += '\n\nExecution stopped by user.';
         }
         
         function resetCompiler() {
             stopExecution();
             document.getElementById('codeDisplay').innerHTML = '';
-            document.getElementById('outputBox').textContent = '';
+            document.getElementById('outputContent').textContent = 'Output will appear here...';
             document.getElementById('explanationBox').textContent = 'Enter your pseudocode and click "Run Next Step" or "Run Automatically"';
+            document.getElementById('inputPrompt').style.display = 'none';
             executionState = {
                 lineElements: [],
                 variables: {},
@@ -1347,7 +1509,10 @@ OUTPUT "Sum of 1 to 10: ", total`
                 stack: [],
                 isRunning: false,
                 autoRunInterval: null,
-                rawLines: []
+                rawLines: [],
+                waitingForInput: false,
+                inputVariables: [],
+                inputCallback: null
             };
         }
     </script>
