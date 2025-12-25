@@ -484,12 +484,14 @@
       
       td:nth-of-type(1):before { content: "Title"; }
       td:nth-of-type(2):before { content: "Course"; }
-      td:nth-of-type(3):before { content: "Total Marks"; }
-      td:nth-of-type(4):before { content: "Duration"; }
-      td:nth-of-type(5):before { content: "Created"; }
-      td:nth-of-type(6):before { content: "Actions"; }
+      td:nth-of-type(3):before { content: "Type"; }
+      td:nth-of-type(4):before { content: "Total Marks"; }
+      td:nth-of-type(5):before { content: "Duration"; }
+      td:nth-of-type(6):before { content: "Created"; }
+      td:nth-of-type(7):before { content: "Actions"; }
     }
-        .exam-type-selector {
+    
+    .exam-type-selector {
       display: flex;
       gap: 20px;
       margin-bottom: 20px;
@@ -537,8 +539,8 @@
 </head>
 <body>
   <div class="dashboard">
-    <!-- Sidebar (unchanged) -->
-    <aside class="sidebar"style="width: 280px;">
+    <!-- Sidebar -->
+    <aside class="sidebar" style="width: 280px;">
       <div class="sidebar-header">
         <div class="sidebar-logo">
           <i class="fas fa-code"></i>
@@ -561,14 +563,13 @@
         <li><a href="admin-students.html" ><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
         <li><a href="admin-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
         <li><a href="admin-profile.html" ><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
-        <li><a href="upload.html"><i class="fas fa-share-alt"></i> <span>Upload Videos</span></a></li>
-         <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
+        <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
       </ul>
     </aside>
 
     <!-- Main Content -->
     <main class="main-content">
-      <!-- Header (unchanged) -->
+      <!-- Header -->
       <header class="header">
         <h1><i class="fas fa-question-circle"></i> Manage Quizzes</h1>
         <div class="user-menu">
@@ -652,6 +653,12 @@
               <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Icon">
               <div id="pdfFileName"></div>
             </div>
+            
+            <!-- Add total marks input for PDF exams -->
+            <div class="form-group" style="margin-top: 15px;">
+              <label for="pdfTotalMarks">Total Marks for PDF Quiz</label>
+              <input type="number" id="pdfTotalMarks" name="pdfTotalMarks" class="form-control" placeholder="Enter total marks for this PDF quiz" min="1" value="100">
+            </div>
           </div>
 
           <button type="submit" class="btn btn-admin">
@@ -730,6 +737,12 @@
             <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Icon">
             <div id="editPdfFileName"></div>
             <a href="#" id="editPdfDownloadLink" target="_blank">Download Current PDF</a>
+          </div>
+          
+          <!-- Add total marks input for PDF exams in edit mode -->
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="editPdfTotalMarks">Total Marks for PDF Quiz</label>
+            <input type="number" id="editPdfTotalMarks" name="pdfTotalMarks" class="form-control" placeholder="Enter total marks for this PDF quiz" min="1">
           </div>
         </div>
 
@@ -902,48 +915,56 @@
 
     // ===== Submit Quiz =====
     document.getElementById("quizForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-  const originalText = submitBtn.innerHTML;
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-  submitBtn.disabled = true;
+      e.preventDefault();
+      
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+      submitBtn.disabled = true;
 
-  try {
-    const examType = document.getElementById("examType").value;
-    let questions = [];
-    
-    if (examType === 'structured') {
-      questions = Array.from(document.querySelectorAll("#questionsContainer .question-block")).map(block => ({
-        question: block.querySelector(".q-text").value,
-        type: block.querySelector(".q-type").value,
-        options: block.querySelector(".q-options").value.split(",").map(o=>o.trim()).filter(Boolean),
-        answer: block.querySelector(".q-answer").value,
-        marks: Number(block.querySelector(".q-marks").value)
-      }));
-    }
+      try {
+        const examType = document.getElementById("examType").value;
+        let questions = [];
+        let totalMarks = 0;
+        
+        if (examType === 'structured') {
+          questions = Array.from(document.querySelectorAll("#questionsContainer .question-block")).map(block => ({
+            question: block.querySelector(".q-text").value,
+            type: block.querySelector(".q-type").value,
+            options: block.querySelector(".q-options").value.split(",").map(o=>o.trim()).filter(Boolean),
+            answer: block.querySelector(".q-answer").value,
+            marks: Number(block.querySelector(".q-marks").value)
+          }));
+          
+          // Calculate total marks for structured exams
+          totalMarks = questions.reduce((sum, q) => sum + q.marks, 0);
+        } else {
+          // For PDF exams, get the total marks from the input field
+          totalMarks = Number(document.getElementById("pdfTotalMarks").value) || 100;
+        }
 
-    const formData = new FormData();
-    formData.append("title", document.getElementById("title").value);
-    formData.append("description", document.getElementById("description").value);
-    formData.append("courseId", document.getElementById("courseId").value);
-    formData.append("duration", document.getElementById("duration").value);
-    formData.append("examType", examType);
-    formData.append("questions", JSON.stringify(questions)); // Stringify the array
-    
-    // Add PDF file if it's a PDF exam
-    if (examType === 'pdf') {
-      const pdfFile = document.getElementById("pdfFile").files[0];
-      if (pdfFile) {
-        formData.append("pdfFile", pdfFile);
-      }
-    }
+        const formData = new FormData();
+        formData.append("title", document.getElementById("title").value);
+        formData.append("description", document.getElementById("description").value);
+        formData.append("courseId", document.getElementById("courseId").value);
+        formData.append("duration", document.getElementById("duration").value);
+        formData.append("examType", examType);
+        formData.append("questions", JSON.stringify(questions));
+        formData.append("totalMarks", totalMarks.toString()); // Add totalMarks to formData
+        
+        // Add PDF file if it's a PDF exam
+        if (examType === 'pdf') {
+          const pdfFile = document.getElementById("pdfFile").files[0];
+          if (pdfFile) {
+            formData.append("pdfFile", pdfFile);
+          }
+        }
 
-    const res = await fetch(`${API_BASE}/quizzes`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData
-    });
+        const res = await fetch(`${API_BASE}/quizzes`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
 
         if (res.status === 401) {
           logout();
@@ -1127,7 +1148,7 @@
     // Load quiz into modal
     async function editQuiz(id) {
       try {
-        const res = await fetch(`${API_BASE}/quizzes`, {
+        const res = await fetch(`https://cs-eslamhatem.fly.dev/api/admin/quizzes`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -1154,6 +1175,9 @@
         if (quiz.examType === 'pdf') {
           document.getElementById("editQuestionsSection").style.display = "none";
           document.getElementById("editPdfSection").style.display = "block";
+          
+          // Set total marks for PDF quiz
+          document.getElementById("editPdfTotalMarks").value = quiz.totalMarks || 100;
           
           // Show current PDF info
           if (quiz.pdfFile) {
@@ -1191,6 +1215,8 @@
         const examType = document.getElementById("editExamType").value;
         
         let questions = [];
+        let totalMarks = 0;
+        
         if (examType === 'structured') {
           questions = Array.from(document.querySelectorAll("#editQuestionsContainer .question-block")).map(block => ({
             question: block.querySelector(".q-text").value,
@@ -1199,6 +1225,12 @@
             answer: block.querySelector(".q-answer").value,
             marks: Number(block.querySelector(".q-marks").value)
           }));
+          
+          // Calculate total marks for structured exams
+          totalMarks = questions.reduce((sum, q) => sum + q.marks, 0);
+        } else {
+          // For PDF exams, get the total marks from the input field
+          totalMarks = Number(document.getElementById("editPdfTotalMarks").value) || 100;
         }
 
         const formData = new FormData();
@@ -1207,6 +1239,7 @@
         formData.append("duration", document.getElementById("editDuration").value);
         formData.append("examType", examType);
         formData.append("questions", JSON.stringify(questions));
+        formData.append("totalMarks", totalMarks.toString()); // Add totalMarks to formData
         
         // Add PDF file if it's a PDF exam and a new file was selected
         if (examType === 'pdf') {
