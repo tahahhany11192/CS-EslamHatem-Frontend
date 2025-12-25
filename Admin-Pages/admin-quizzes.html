@@ -1148,7 +1148,7 @@
     // Load quiz into modal
     async function editQuiz(id) {
       try {
-        const res = await fetch(`https://cs-eslamhatem.fly.dev/api/admin/quizzes`, {
+        const res = await fetch(`${API_BASE}/quizzes`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
