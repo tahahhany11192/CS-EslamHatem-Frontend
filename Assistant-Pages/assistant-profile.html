@@ -48,14 +48,15 @@
     /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
-      background: rgba(10, 17, 40, 0.9);
+      background: rgba(10, 17, 40, 0.95);
       backdrop-filter: blur(10px);
       border-right: 1px solid rgba(0, 255, 204, 0.2);
       padding: 20px 0;
       position: fixed;
       height: 100vh;
       overflow-y: auto;
-      z-index: 100;
+      z-index: 1000;
+      transition: all 0.3s ease;
     }
 
     .sidebar-header {
@@ -124,6 +125,8 @@
       flex: 1;
       margin-left: var(--sidebar-width);
       padding: 20px;
+      transition: all 0.3s ease;
+      min-width: 0; /* Prevents overflow on small screens */
     }
 
     /* Header */
@@ -137,6 +140,8 @@
       justify-content: space-between;
       align-items: center;
       border: 1px solid rgba(0, 255, 204, 0.2);
+      flex-wrap: wrap;
+      gap: 15px;
     }
 
     .header h1 {
@@ -145,12 +150,14 @@
       background: var(--assistant-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin: 0;
     }
 
     .user-menu {
       display: flex;
       align-items: center;
       gap: 15px;
+      flex-wrap: wrap;
     }
 
     .user-info {
@@ -159,6 +166,7 @@
 
     .user-name {
       font-weight: 600;
+      font-size: 1rem;
     }
 
     .user-role {
@@ -174,6 +182,8 @@
       padding: 8px 15px;
       cursor: pointer;
       transition: all 0.3s ease;
+      font-size: 0.9rem;
+      white-space: nowrap;
     }
 
     .logout-btn:hover {
@@ -199,12 +209,15 @@
       margin-bottom: 20px;
       padding-bottom: 15px;
       border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .card-header h2 {
       font-family: 'Orbitron', sans-serif;
       font-size: 1.5rem;
       color: var(--light);
+      margin: 0;
     }
 
     /* Profile Section */
@@ -213,6 +226,7 @@
       flex-direction: column;
       align-items: center;
       margin-bottom: 30px;
+      text-align: center;
     }
 
     .profile-photo-container {
@@ -232,6 +246,7 @@
     .profile-info {
       text-align: center;
       margin-bottom: 20px;
+      width: 100%;
     }
 
     .profile-name {
@@ -239,6 +254,7 @@
       font-size: 1.8rem;
       margin-bottom: 10px;
       color: var(--light);
+      word-wrap: break-word;
     }
 
     .profile-detail {
@@ -247,11 +263,13 @@
       justify-content: center;
       margin-bottom: 8px;
       color: rgba(240, 246, 255, 0.8);
+      flex-wrap: wrap;
     }
 
     .profile-detail i {
       margin-right: 10px;
       color: var(--assistant-accent);
+      min-width: 20px;
     }
 
     /* Form Styles */
@@ -275,6 +293,7 @@
       color: var(--light);
       font-family: 'Exo 2', sans-serif;
       transition: all 0.3s ease;
+      font-size: 16px; /* Prevents zoom on iOS */
     }
 
     .form-control:focus {
@@ -305,6 +324,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      width: 100%; /* Full width on mobile */
     }
 
     .btn-assistant {
@@ -343,6 +363,7 @@
     .btn-sm {
       padding: 8px 15px;
       font-size: 0.9rem;
+      width: auto;
     }
 
     .btn::before {
@@ -399,6 +420,7 @@
       margin-top: 8px;
       font-size: 0.9rem;
       color: var(--assistant-accent);
+      word-break: break-word;
     }
 
     /* Alerts */
@@ -407,6 +429,18 @@
       border-radius: 8px;
       margin-bottom: 20px;
       display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .alert-success {
@@ -421,15 +455,138 @@
       color: #ff4d4d;
     }
 
-    /* Responsive Design */
-    @media (max-width: 992px) {
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--assistant-gradient);
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 255, 204, 0.5);
+    }
+
+    .mobile-menu-btn i {
+      color: var(--dark);
+      font-size: 1.2rem;
+    }
+
+    /* Sidebar Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+    }
+
+    /* ==========================================
+       RESPONSIVE DESIGN BREAKPOINTS
+    ========================================== */
+
+    /* Extra Large Desktops (1440px and up) */
+    @media (min-width: 1440px) {
+      :root {
+        --sidebar-width: 280px;
+      }
+      
+      .main-content {
+        margin-left: 280px;
+        max-width: 1400px;
+        margin-right: auto;
+      }
+      
+      .content-cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 30px;
+      }
+      
+      .content-card {
+        margin-bottom: 0;
+      }
+    }
+
+    /* Large Desktops (1200px to 1439px) */
+    @media (min-width: 1200px) {
+      :root {
+        --sidebar-width: 280px;
+      }
+      
+      .main-content {
+        margin-left: 280px;
+      }
+      
+      .profile-section {
+        flex-direction: row;
+        text-align: left;
+        align-items: flex-start;
+        gap: 30px;
+      }
+      
+      .profile-info {
+        text-align: left;
+        align-items: flex-start;
+      }
+      
+      .profile-detail {
+        justify-content: flex-start;
+      }
+    }
+
+    /* Small Desktops (1024px to 1199px) */
+    @media (min-width: 1024px) and (max-width: 1199px) {
       .sidebar {
-        width: 70px;
+        width: 250px !important;
+      }
+      
+      .main-content {
+        margin-left: 250px;
+      }
+      
+      .btn {
+        width: auto;
+      }
+    }
+
+    /* Tablets (768px to 1023px) */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .sidebar {
+        width: 70px !important;
         overflow: visible;
       }
       
-      .sidebar-logo span, .sidebar-nav span {
+      .sidebar-header {
         display: none;
+      }
+      
+      .sidebar-nav a span {
+        display: none;
+      }
+      
+      .sidebar-nav a {
+        justify-content: center;
+        padding: 12px 10px;
       }
       
       .sidebar-nav i {
@@ -439,40 +596,232 @@
       
       .main-content {
         margin-left: 70px;
+        padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .content-card {
+        padding: 20px;
+      }
+      
+      .btn {
+        width: auto;
       }
     }
 
-    @media (max-width: 768px) {
+    /* Mobile Devices (up to 767px) */
+    @media (max-width: 767px) {
+      .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
       .sidebar {
-        display: none;
+        transform: translateX(-100%);
+        width: 280px !important;
+        z-index: 1000;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .sidebar-overlay {
+        display: block;
+      }
+      
+      .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
       }
       
       .main-content {
         margin-left: 0;
         padding: 15px;
+        width: 100%;
       }
       
       .header {
         flex-direction: column;
         text-align: center;
         gap: 15px;
+        padding: 15px;
+        margin-top: 60px;
+      }
+      
+      .header h1 {
+        font-size: 1.4rem;
+        text-align: center;
       }
       
       .user-menu {
         flex-direction: column;
+        width: 100%;
+      }
+      
+      .user-info {
+        text-align: center;
+        width: 100%;
+      }
+      
+      .content-card {
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+      
+      .card-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      
+      .card-header h2 {
+        font-size: 1.2rem;
       }
       
       .profile-photo {
         width: 120px;
         height: 120px;
       }
+      
+      .profile-name {
+        font-size: 1.4rem;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .form-control {
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+    }
+
+    /* Small Mobile Devices (up to 480px) */
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 1.2rem;
+      }
+      
+      .profile-name {
+        font-size: 1.2rem;
+      }
+      
+      .profile-photo {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .content-card {
+        padding: 12px;
+      }
+      
+      .form-control, .file-input-label, .btn {
+        padding: 10px 12px;
+      }
+    }
+
+    /* ==========================================
+       ORIENTATION QUERIES
+    ========================================== */
+
+    /* Landscape Orientation on Mobile */
+    @media (max-width: 767px) and (orientation: landscape) {
+      .sidebar {
+        width: 250px !important;
+      }
+      
+      .profile-section {
+        flex-direction: row;
+        gap: 20px;
+      }
+      
+      .profile-photo {
+        width: 80px;
+        height: 80px;
+      }
+      
+      .content-card {
+        padding: 15px;
+      }
+    }
+
+    /* ==========================================
+       HIGH RESOLUTION DISPLAYS (Retina)
+    ========================================== */
+
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+      .profile-photo {
+        border-width: 2px;
+      }
+      
+      .btn {
+        font-weight: 500;
+      }
+    }
+
+    /* ==========================================
+       REDUCED MOTION (Accessibility)
+    ========================================== */
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      
+      .btn:hover {
+        transform: none;
+      }
+    }
+
+    /* ==========================================
+       DARK MODE SUPPORT
+    ========================================== */
+
+    @media (prefers-color-scheme: dark) {
+      /* Already dark themed, but can add adjustments */
+    }
+
+    /* ==========================================
+       TOUCH DEVICE OPTIMIZATIONS
+    ========================================== */
+
+    @media (hover: none) and (pointer: coarse) {
+      .btn, .sidebar-nav a, .logout-btn {
+        min-height: 44px; /* Apple's minimum touch target size */
+      }
+      
+      .form-control, .file-input-label {
+        min-height: 44px;
+        line-height: 1.5;
+      }
+      
+      /* Remove hover effects on touch devices */
+      .btn:hover {
+        transform: none;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Mobile Menu Button -->
+  <button class="mobile-menu-btn" id="mobileMenuBtn">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <div class="dashboard">
     <!-- Sidebar -->
-    <aside class="sidebar" style="width: 280px;">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
           <i class="fas fa-code"></i>
@@ -484,11 +833,11 @@
       </div>
 
       <ul class="sidebar-nav">
-        <li><a href="assistant-assignments.html" ><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
-        <li><a href="assistant-quizzess.html" ><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
-        <li><a href="assistant-quiz-submissions.html" ><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
-        <li><a href="assistant-students.html" ><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="assistant-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="assistant-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
+        <li><a href="assistant-quizzess.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="assistant-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
+        <li><a href="assistant-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="assistant-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
         <li><a href="assistant-profile.html" class="active"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
         <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
         <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
@@ -515,86 +864,88 @@
       <div id="alertSuccess" class="alert alert-success"></div>
       <div id="alertError" class="alert alert-error"></div>
 
-      <!-- Profile Info -->
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-user"></i> Profile Information</h2>
-        </div>
-
-        <div class="profile-section">
-          <div class="profile-photo-container">
-            <img id="profilePhoto" class="profile-photo" src="" alt="Profile Photo">
+      <div class="content-cards-container">
+        <!-- Profile Info -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2><i class="fas fa-user"></i> Profile Information</h2>
           </div>
-          
-          <div class="profile-info">
-            <h2 class="profile-name" id="profileName">Loading...</h2>
-            <div class="profile-detail">
-              <i class="fas fa-envelope"></i>
-              <span id="profileEmail">Loading...</span>
+
+          <div class="profile-section">
+            <div class="profile-photo-container">
+              <img id="profilePhoto" class="profile-photo" src="" alt="Profile Photo">
             </div>
-            <div class="profile-detail">
-              <i class="fas fa-phone"></i>
-              <span id="profilePhone">Loading...</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Update Profile -->
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-edit"></i> Update Profile</h2>
-        </div>
-
-        <form id="updateProfileForm" enctype="multipart/form-data">
-          <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" class="form-control" required placeholder="Enter your full name">
-          </div>
-
-          <div class="form-group">
-            <label for="phoneNumber">Phone Number</label>
-            <input type="text" id="phoneNumber" class="form-control" placeholder="Enter your phone number">
-          </div>
-
-          <div class="form-group">
-            <label for="photo">Profile Photo</label>
-            <div class="file-input">
-              <input type="file" id="photo" accept="image/*">
-              <div class="file-input-label">
-                <i class="fas fa-cloud-upload-alt"></i> Choose Profile Photo
+            
+            <div class="profile-info">
+              <h2 class="profile-name" id="profileName">Loading...</h2>
+              <div class="profile-detail">
+                <i class="fas fa-envelope"></i>
+                <span id="profileEmail">Loading...</span>
               </div>
-              <div id="photo-file-name" class="file-name"></div>
+              <div class="profile-detail">
+                <i class="fas fa-phone"></i>
+                <span id="profilePhone">Loading...</span>
+              </div>
             </div>
           </div>
-
-          <button type="submit" class="btn btn-assistant">
-            <i class="fas fa-save"></i> Update Profile
-          </button>
-        </form>
-      </div>
-
-      <!-- Change Password -->
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-lock"></i> Change Password</h2>
         </div>
 
-        <form id="changePasswordForm">
-          <div class="form-group">
-            <label for="currentPassword">Current Password</label>
-            <input type="password" id="currentPassword" class="form-control" required placeholder="Enter current password">
+        <!-- Update Profile -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2><i class="fas fa-edit"></i> Update Profile</h2>
           </div>
 
-          <div class="form-group">
-            <label for="newPassword">New Password</label>
-            <input type="password" id="newPassword" class="form-control" required placeholder="Enter new password">
+          <form id="updateProfileForm" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" class="form-control" required placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input type="text" id="phoneNumber" class="form-control" placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+              <label for="photo">Profile Photo</label>
+              <div class="file-input">
+                <input type="file" id="photo" accept="image/*">
+                <div class="file-input-label">
+                  <i class="fas fa-cloud-upload-alt"></i> Choose Profile Photo
+                </div>
+                <div id="photo-file-name" class="file-name"></div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-assistant">
+              <i class="fas fa-save"></i> Update Profile
+            </button>
+          </form>
+        </div>
+
+        <!-- Change Password -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2><i class="fas fa-lock"></i> Change Password</h2>
           </div>
 
-          <button type="submit" class="btn btn-assistant">
-            <i class="fas fa-key"></i> Change Password
-          </button>
-        </form>
+          <form id="changePasswordForm">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" class="form-control" required placeholder="Enter current password">
+            </div>
+
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" class="form-control" required placeholder="Enter new password">
+            </div>
+
+            <button type="submit" class="btn btn-assistant">
+              <i class="fas fa-key"></i> Change Password
+            </button>
+          </form>
+        </div>
       </div>
     </main>
   </div>
@@ -626,6 +977,27 @@
     const photoFileName = document.getElementById("photo-file-name");
     const alertSuccess = document.getElementById("alertSuccess");
     const alertError = document.getElementById("alertError");
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const sidebar = document.getElementById("sidebar");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+    // Mobile menu toggle
+    mobileMenuBtn.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('active');
+      sidebarOverlay.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking on a link (for mobile)
+    document.querySelectorAll('.sidebar-nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 767) {
+          toggleSidebar();
+        }
+      });
+    });
 
     // Helper functions
     function showSuccess(message) {
@@ -787,8 +1159,19 @@
       }
     });
 
+    // Handle window resize for responsive behavior
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 767) {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+      }
+    });
+
     // Initialize
     loadProfile();
+
+    // Add touch event listeners for better mobile experience
+    document.addEventListener('touchstart', function() {}, {passive: true});
   </script>
 </body>
 </html>
