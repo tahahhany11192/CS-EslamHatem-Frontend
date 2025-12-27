@@ -843,6 +843,7 @@ OUTPUT x"></textarea>
                         <button class="example-btn" onclick="loadExample('forLoop')">For Loop Example</button>
                         <button class="example-btn" onclick="loadExample('outputExample')">Output Example</button>
                         <button class="example-btn" onclick="loadExample('whileLoop')">While Loop Example</button>
+                        <button class="example-btn" onclick="loadExample('inputExample')">Input Example</button>
                     </div>
                 </div>
             `;
@@ -888,13 +889,17 @@ WHILE num <= 10
 ENDWHILE
 OUTPUT "Sum of 1 to 10: ", total`,
 
-            inputExample: `// Input Example
-// Try multiple inputs
-INPUT name, age
+            inputExample: `// Input Example with custom messages
+INPUT "enter a positive number", x
+OUTPUT "Number is:", x
+
+// Multiple inputs with messages
+INPUT "Enter your name:", name
+INPUT "Enter your age:", age
 OUTPUT "Hello ", name
 OUTPUT "You are ", age, " years old"
 
-// Input with calculation
+// Input without message (default prompt)
 INPUT num1, num2
 sum <- num1 + num2
 OUTPUT "Sum: ", sum`
@@ -986,8 +991,25 @@ OUTPUT "Sum: ", sum`
             const label = document.getElementById('inputLabel');
             const inputField = document.getElementById('inputField');
             
+            // Get the current line to extract the original input message
+            const currentLine = executionState.rawLines[executionState.currentLine];
+            
             if (variables.length === 1) {
-                label.textContent = ``;
+                // For single variable input like "INPUT x", check if there's a custom message
+                if (currentLine.toLowerCase().includes('input "') || currentLine.toLowerCase().includes("input '")) {
+                    // Extract message from input line
+                    const match = currentLine.match(/INPUT\s+["']([^"']+)["']\s*,\s*(\w+)/i) || 
+                                 currentLine.match(/INPUT\s+["']([^"']+)["']\s*$/i);
+                    
+                    if (match) {
+                        label.textContent = match[1]; // Show the custom message
+                        inputField.placeholder = `Enter value for ${variables[0]}...`;
+                    } else {
+                        label.textContent = `Enter value for ${variables[0]}:`;
+                    }
+                } else {
+                    label.textContent = `Enter value for ${variables[0]}:`;
+                }
             } else {
                 label.textContent = `Enter ${variables.length} values separated by commas:`;
             }
@@ -1164,7 +1186,46 @@ OUTPUT "Sum: ", sum`
 
                 // INPUT - Modified to use input field instead of prompt
                 if (/^INPUT\s+(.+)$/i.test(line)) {
-                    const varList = line.match(/^INPUT\s+(.+)$/i)[1].split(',').map(v => v.trim());
+                    // Extract everything after INPUT
+                    const inputPart = line.match(/^INPUT\s+(.+)$/i)[1];
+                    
+                    // Check if there's a quoted message before variables
+                    if (/^["']/.test(inputPart)) {
+                        // Find the message and variables
+                        const match = inputPart.match(/^["']([^"']+)["']\s*,\s*(.+)$/i);
+                        if (match) {
+                            const [, message, varPart] = match;
+                            const varList = varPart.split(',').map(v => v.trim());
+                            
+                            // Store the variables we're waiting for
+                            executionState.inputVariables = varList;
+                            
+                            // Show the input prompt with custom message
+                            showInputPrompt(varList).then(inputValue => {
+                                // Process the input
+                                const values = inputValue.split(',').map(v => v.trim());
+                                
+                                for (let i = 0; i < varList.length; i++) {
+                                    const v = varList[i];
+                                    const val = i < values.length ? values[i] : "";
+                                    executionState.variables[v] = isNaN(val) ? val : Number(val);
+                                }
+                                
+                                exBox.textContent = `Input received for: ${varList.join(', ')}`;
+                                executionState.currentLine++;
+                                
+                                // Continue with next step if auto-running
+                                if (executionState.autoRunInterval) {
+                                    setTimeout(() => executeNextStep(), 500);
+                                }
+                            });
+                            
+                            return false;
+                        }
+                    }
+                    
+                    // Regular INPUT without custom message
+                    const varList = inputPart.split(',').map(v => v.trim());
                     
                     // Store the variables we're waiting for
                     executionState.inputVariables = varList;
@@ -1518,5 +1579,3 @@ OUTPUT "Sum: ", sum`
     </script>
 </body>
 </html>
-
-
