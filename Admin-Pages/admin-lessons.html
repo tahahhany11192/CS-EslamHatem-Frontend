@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Manage Lessons - Admin Dashboard - CS-IslamHatem</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
@@ -19,12 +19,25 @@
       --admin-gradient: linear-gradient(135deg, var(--primary), var(--admin-accent));
       --sidebar-width: 250px;
       --header-height: 70px;
+      --lesson-accent: #00d9ff;
+      --lesson-gradient: linear-gradient(135deg, var(--primary), var(--lesson-accent));
+      --safe-area-top: env(safe-area-inset-top);
+      --safe-area-bottom: env(safe-area-bottom);
+      --safe-area-left: env(safe-area-inset-left);
+      --safe-area-right: env(safe-area-right);
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      font-size: 16px;
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
     }
 
     body {
@@ -33,29 +46,36 @@
       color: var(--light);
       overflow-x: hidden;
       min-height: 100vh;
+      min-height: -webkit-fill-available;
       background-image: 
         radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
         radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
         radial-gradient(circle at 50% 80%, rgba(255, 0, 204, 0.1) 0%, transparent 20%);
+      padding: var(--safe-area-top) var(--safe-area-right) var(--safe-area-bottom) var(--safe-area-left);
     }
 
     /* Dashboard Layout */
     .dashboard {
       display: flex;
       min-height: 100vh;
+      min-height: -webkit-fill-available;
     }
 
     /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
-      background: rgba(10, 17, 40, 0.9);
+      background: rgba(10, 17, 40, 0.95);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-right: 1px solid rgba(255, 153, 0, 0.2);
       padding: 20px 0;
       position: fixed;
       height: 100vh;
+      height: -webkit-fill-available;
       overflow-y: auto;
-      z-index: 100;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      overscroll-behavior: contain;
     }
 
     .sidebar-header {
@@ -70,7 +90,7 @@
       gap: 10px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 700;
-      font-size: 1.5rem;
+      font-size: clamp(1rem, 2vw, 1.5rem);
       color: var(--light);
       text-decoration: none;
     }
@@ -84,7 +104,7 @@
       color: white;
       padding: 3px 8px;
       border-radius: 15px;
-      font-size: 0.7rem;
+      font-size: clamp(0.6rem, 1.5vw, 0.7rem);
       margin-top: 5px;
       display: inline-block;
     }
@@ -100,11 +120,12 @@
     .sidebar-nav a {
       display: flex;
       align-items: center;
-      padding: 12px 20px;
+      padding: clamp(10px, 2vw, 12px) 20px;
       color: rgba(240, 246, 255, 0.7);
       text-decoration: none;
       transition: all 0.3s ease;
       border-left: 3px solid transparent;
+      font-size: clamp(0.9rem, 1.5vw, 1rem);
     }
 
     .sidebar-nav a:hover, .sidebar-nav a.active {
@@ -117,40 +138,66 @@
       margin-right: 10px;
       width: 20px;
       text-align: center;
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+    }
+
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--admin-gradient);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
     }
 
     /* Main Content */
     .main-content {
       flex: 1;
       margin-left: var(--sidebar-width);
-      padding: 20px;
+      padding: clamp(15px, 3vw, 20px);
+      width: calc(100% - var(--sidebar-width));
+      transition: margin-left 0.3s ease, width 0.3s ease;
     }
 
     /* Header */
     .header {
-      background: rgba(10, 17, 40, 0.8);
+      background: rgba(10, 17, 40, 0.9);
       backdrop-filter: blur(10px);
-      padding: 15px 20px;
+      -webkit-backdrop-filter: blur(10px);
+      padding: clamp(12px, 2vw, 15px) clamp(15px, 2vw, 20px);
       border-radius: 15px;
-      margin-bottom: 30px;
+      margin-bottom: clamp(20px, 3vw, 30px);
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
+      gap: 15px;
       border: 1px solid rgba(255, 153, 0, 0.2);
     }
 
     .header h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
       background: var(--admin-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.3;
     }
 
     .user-menu {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: clamp(10px, 2vw, 15px);
+      flex-wrap: wrap;
     }
 
     .user-info {
@@ -159,10 +206,11 @@
 
     .user-name {
       font-weight: 600;
+      font-size: clamp(0.9rem, 1.5vw, 1rem);
     }
 
     .user-role {
-      font-size: 0.8rem;
+      font-size: clamp(0.7rem, 1.2vw, 0.8rem);
       color: var(--admin-accent);
     }
 
@@ -171,9 +219,12 @@
       color: var(--light);
       border: none;
       border-radius: 20px;
-      padding: 8px 15px;
+      padding: clamp(6px, 1vw, 8px) clamp(10px, 1.5vw, 15px);
       cursor: pointer;
       transition: all 0.3s ease;
+      font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+      white-space: nowrap;
+      min-height: 44px;
     }
 
     .logout-btn:hover {
@@ -182,33 +233,37 @@
 
     /* Content Cards */
     .content-card {
-      background: rgba(10, 17, 40, 0.8);
+      background: rgba(10, 17, 40, 0.9);
       backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 30px;
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: clamp(10px, 2vw, 15px);
+      padding: clamp(15px, 3vw, 25px);
+      margin-bottom: clamp(20px, 3vw, 30px);
       border: 1px solid rgba(255, 153, 0, 0.2);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
 
     .card-header {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       padding-bottom: 15px;
       border-bottom: 1px solid rgba(255, 153, 0, 0.2);
+      gap: 10px;
     }
 
     .card-header h2 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
       color: var(--light);
+      line-height: 1.3;
     }
 
     /* Form Styles */
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: clamp(15px, 2vw, 20px);
     }
 
     .form-group label {
@@ -216,17 +271,19 @@
       margin-bottom: 8px;
       font-weight: 600;
       color: var(--light);
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
     }
 
     .form-control {
       width: 100%;
-      padding: 12px 15px;
+      padding: clamp(10px, 1.5vw, 12px) clamp(12px, 1.5vw, 15px);
       border-radius: 8px;
       border: 2px solid rgba(255, 153, 0, 0.3);
       background: rgba(0, 0, 0, 0.3);
       color: var(--light);
       font-family: 'Exo 2', sans-serif;
       transition: all 0.3s ease;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
     }
 
     .form-control:focus {
@@ -236,15 +293,22 @@
     }
 
     textarea.form-control {
-      min-height: 120px;
+      min-height: clamp(100px, 20vh, 120px);
       resize: vertical;
     }
 
     /* Course Selection Styles */
     .course-selection-type {
       display: flex;
-      gap: 20px;
+      gap: clamp(15px, 2vw, 20px);
       margin-bottom: 15px;
+      flex-direction: column;
+    }
+
+    @media (min-width: 768px) {
+      .course-selection-type {
+        flex-direction: row;
+      }
     }
 
     .selection-option {
@@ -252,12 +316,13 @@
       align-items: center;
       gap: 8px;
       cursor: pointer;
-      padding: 10px 15px;
+      padding: clamp(10px, 1.5vw, 12px) clamp(12px, 1.5vw, 15px);
       border-radius: 8px;
       background: rgba(0, 0, 0, 0.3);
       border: 2px solid rgba(255, 153, 0, 0.3);
       transition: all 0.3s ease;
       flex: 1;
+      min-height: 80px;
     }
 
     .selection-option:hover {
@@ -284,6 +349,7 @@
       border-radius: 50%;
       border: 2px solid var(--admin-accent);
       background: rgba(0, 0, 0, 0.3);
+      flex-shrink: 0;
     }
 
     .selection-option.active .checkmark {
@@ -319,7 +385,7 @@
     /* Multiple Course Selection */
     .multiple-course-selection {
       margin-top: 10px;
-      max-height: 200px;
+      max-height: clamp(150px, 30vh, 200px);
       overflow-y: auto;
       background: rgba(0, 0, 0, 0.2);
       border-radius: 8px;
@@ -346,6 +412,7 @@
       width: 18px;
       height: 18px;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     .course-checkbox label {
@@ -353,16 +420,18 @@
       cursor: pointer;
       margin: 0;
       font-weight: normal;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+      word-break: break-word;
     }
 
     /* Buttons */
     .btn {
-      padding: 12px 25px;
+      padding: clamp(10px, 1.5vw, 12px) clamp(15px, 2vw, 25px);
       border: none;
       border-radius: 30px;
       font-family: 'Exo 2', sans-serif;
       font-weight: 600;
-      font-size: 1rem;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -372,6 +441,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      min-height: 44px; /* Minimum touch target size */
     }
 
     .btn-admin {
@@ -418,9 +488,21 @@
       transform: translateY(-3px);
     }
 
+    .btn-lesson {
+      background: transparent;
+      color: var(--lesson-accent);
+      border: 2px solid var(--lesson-accent);
+    }
+
+    .btn-lesson:hover {
+      background: rgba(0, 217, 255, 0.1);
+      transform: translateY(-3px);
+    }
+
     .btn-sm {
-      padding: 8px 15px;
-      font-size: 0.9rem;
+      padding: clamp(6px, 1vw, 8px) clamp(10px, 1.5vw, 15px);
+      font-size: clamp(0.8rem, 1vw, 0.9rem);
+      min-height: 36px;
     }
 
     .btn::before {
@@ -441,15 +523,18 @@
     /* Lesson List */
     .lesson-list {
       display: grid;
-      gap: 20px;
+      gap: clamp(15px, 2vw, 20px);
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
 
     .lesson-card {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
-      padding: 20px;
+      padding: clamp(15px, 2vw, 20px);
       border: 1px solid rgba(255, 153, 0, 0.2);
       transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
 
     .lesson-card:hover {
@@ -460,44 +545,59 @@
 
     .lesson-header {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+      flex-direction: column;
+      gap: 10px;
       margin-bottom: 15px;
+    }
+
+    @media (min-width: 640px) {
+      .lesson-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
     }
 
     .lesson-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
       color: var(--light);
       margin-bottom: 5px;
+      line-height: 1.3;
     }
 
     .lesson-type {
       display: inline-block;
       padding: 3px 10px;
       border-radius: 15px;
-      font-size: 0.8rem;
+      font-size: clamp(0.7rem, 1vw, 0.8rem);
       background: rgba(255, 153, 0, 0.2);
       color: var(--admin-accent);
-      margin-left: 10px;
+      white-space: nowrap;
     }
 
     .lesson-price {
       font-family: 'Orbitron', sans-serif;
-      color: var(--admin-accent);
-      font-size: 1.2rem;
+      color: var(--lesson-accent);
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      font-weight: 700;
     }
 
     .lesson-description {
       color: rgba(240, 246, 255, 0.7);
       margin-bottom: 15px;
       line-height: 1.5;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+      flex-grow: 1;
     }
 
     .lesson-course {
       margin-bottom: 15px;
-      font-size: 0.9rem;
+      font-size: clamp(0.8rem, 1vw, 0.9rem);
       color: var(--secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .lesson-actions {
@@ -506,12 +606,48 @@
       flex-wrap: wrap;
     }
 
+    /* Bulk Delete Container */
+    .bulk-delete-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 15px;
+    }
+
+    /* Stats Overview */
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: rgba(10, 17, 40, 0.8);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
+      color: var(--admin-accent);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: rgba(240, 246, 255, 0.7);
+      font-size: clamp(0.75rem, 1vw, 0.8rem);
+    }
+
     /* Alerts */
     .alert {
       padding: 15px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin-bottom: clamp(15px, 2vw, 20px);
       display: none;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
     }
 
     .alert-success {
@@ -527,10 +663,9 @@
     }
 
     /* Responsive Design */
-    @media (max-width: 992px) {
+    @media (max-width: 1200px) {
       .sidebar {
         width: 70px;
-        overflow: visible;
       }
       
       .sidebar-logo span, .sidebar-nav span {
@@ -544,20 +679,43 @@
       
       .main-content {
         margin-left: 70px;
+        width: calc(100% - 70px);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .lesson-list {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
     @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      
       .sidebar {
-        display: none;
+        transform: translateX(-100%);
+        width: 280px;
+        z-index: 999;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
       }
       
       .main-content {
         margin-left: 0;
-        padding: 15px;
+        width: 100%;
+        padding: clamp(10px, 2vw, 15px);
       }
       
       .header {
+        margin-top: 60px; /* Space for fixed menu toggle */
         flex-direction: column;
         text-align: center;
         gap: 15px;
@@ -565,31 +723,288 @@
       
       .user-menu {
         flex-direction: column;
+        align-items: center;
       }
       
-      .lesson-header {
-        flex-direction: column;
-        gap: 10px;
+      .user-info {
+        text-align: center;
+      }
+      
+      .lesson-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .bulk-delete-container {
+        justify-content: center;
       }
       
       .lesson-actions {
-        flex-wrap: wrap;
-      }
-      
-      .course-selection-type {
         flex-direction: column;
       }
       
-      .selection-option {
+      .stats-overview {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .btn {
         width: 100%;
+        justify-content: center;
+      }
+      
+      .btn-sm {
+        width: 100%;
+      }
+      
+      .card-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .content-card {
+        padding: 15px;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      .selection-option {
+        min-height: 70px;
+        padding: 10px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 600px) {
+      .sidebar {
+        overflow-y: auto;
+        height: 100vh;
+      }
+      
+      .header h1 {
+        font-size: 1.2rem;
+      }
+      
+      .content-card {
+        padding: 15px;
+      }
+      
+      .btn {
+        padding: 8px 15px;
+        min-height: 40px;
+      }
+      
+      .lesson-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .lesson-description {
+        max-height: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+    }
+
+    /* TV and Large Screens */
+    @media (min-width: 1600px) {
+      .lesson-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .sidebar {
+        width: 300px;
+      }
+      
+      .main-content {
+        margin-left: 300px;
+        width: calc(100% - 300px);
+        padding: 30px;
+      }
+      
+      .sidebar-nav a {
+        padding: 15px 25px;
+        font-size: 1.1rem;
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      .sidebar, .menu-toggle, .logout-btn, .lesson-actions, 
+      .bulk-delete-container, .btn {
+        display: none !important;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .content-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+      
+      .lesson-card {
+        break-inside: avoid;
+      }
+    }
+
+    /* High Contrast Mode Support */
+    @media (prefers-contrast: high) {
+      .sidebar {
+        background: var(--dark);
+        border-right: 2px solid var(--admin-accent);
+      }
+      
+      .content-card {
+        border: 2px solid var(--admin-accent);
+      }
+      
+      .form-control {
+        border-width: 2px;
+      }
+      
+      .lesson-type {
+        border: 1px solid var(--admin-accent);
+      }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      
+      .sidebar {
+        transition: none;
+      }
+      
+      .btn:hover, .lesson-card:hover {
+        transform: none;
+      }
+      
+      .btn::before {
+        display: none;
+      }
+      
+      .course-selection-container.active {
+        animation: none;
+      }
+    }
+
+    /* Touch Device Optimizations */
+    @media (hover: none) and (pointer: coarse) {
+      .btn:hover, .sidebar-nav a:hover, .selection-option:hover, .course-checkbox:hover {
+        transform: none;
+      }
+      
+      .btn:hover::before {
+        display: none;
+      }
+      
+      .form-control {
+        font-size: 16px; /* Prevent iOS zoom on focus */
+      }
+      
+      .lesson-card {
+        padding: 15px;
+      }
+      
+      .lesson-actions .btn {
+        padding: 10px 15px;
+      }
+      
+      .selection-option {
+        min-height: 44px;
+      }
+    }
+
+    /* iPad Specific */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      .sidebar {
+        width: 200px;
+      }
+      
+      .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+      }
+      
+      .sidebar-nav span {
+        display: inline;
+        font-size: 0.9rem;
+      }
+      
+      .sidebar-nav i {
+        margin-right: 10px;
+      }
+      
+      .lesson-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Smart TV / 4K Screens */
+    @media (min-width: 2560px) {
+      html {
+        font-size: 20px;
+      }
+      
+      .sidebar {
+        width: 350px;
+      }
+      
+      .main-content {
+        margin-left: 350px;
+        width: calc(100% - 350px);
+        padding: 40px;
+      }
+      
+      .lesson-list {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 25px;
+      }
+      
+      .stat-card {
+        padding: 25px;
+      }
+      
+      .stat-value {
+        font-size: 2.5rem;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Mobile Menu Toggle -->
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <i class="fas fa-bars"></i>
+  </button>
+
   <div class="dashboard">
     <!-- Sidebar -->
-    <aside class="sidebar" style="width: 280px;">
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
           <i class="fas fa-code"></i>
@@ -605,15 +1020,15 @@
         <li><a href="admin-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
         <li><a href="admin-lessons.html" class="active"><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
         <li><a href="admin-lesson-files.html"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
-        <li><a href="admin-quizzes.html" ><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="admin-quizzes.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
         <li><a href="admin-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
-        <li><a href="admin-payment-requests.html" ><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
-        <li><a href="admin-assistants.html" ><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
-        <li><a href="admin-students.html" ><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="admin-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
-        <li><a href="admin-profile.html" ><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="admin-payment-requests.html"><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
+        <li><a href="admin-assistants.html"><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
+        <li><a href="admin-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="admin-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
         <li><a href="upload.html"><i class="fas fa-share-alt"></i> <span>Upload Videos</span></a></li>
-         <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
+        <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
       </ul>
     </aside>
 
@@ -634,8 +1049,28 @@
       </header>
 
       <!-- Alerts -->
-      <div id="alertSuccess" class="alert alert-success"></div>
-      <div id="alertError" class="alert alert-error"></div>
+      <div id="alertSuccess" class="alert alert-success" role="alert"></div>
+      <div id="alertError" class="alert alert-error" role="alert"></div>
+
+      <!-- Stats Overview -->
+      <div class="stats-overview" id="statsOverview">
+        <div class="stat-card">
+          <div class="stat-value" id="totalLessons">0</div>
+          <div class="stat-label">Total Lessons</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="theoreticalLessons">0</div>
+          <div class="stat-label">Theoretical</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="practicalLessons">0</div>
+          <div class="stat-label">Practical</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="withFiles">0</div>
+          <div class="stat-label">With Files</div>
+        </div>
+      </div>
 
       <!-- Create/Edit Lesson Form -->
       <div class="content-card">
@@ -678,7 +1113,7 @@
                 <input type="radio" name="courseType" value="single" checked>
                 <div>
                   <strong>Single Course</strong>
-                  <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 2px;">Assign to one course only</div>
+                  <div style="font-size: clamp(0.75rem, 1vw, 0.85rem); opacity: 0.8; margin-top: 2px;">Assign to one course only</div>
                 </div>
               </div>
               
@@ -687,7 +1122,7 @@
                 <input type="radio" name="courseType" value="multiple">
                 <div>
                   <strong>Multiple Courses</strong>
-                  <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 2px;">Create multiple copies (one per course)</div>
+                  <div style="font-size: clamp(0.75rem, 1vw, 0.85rem); opacity: 0.8; margin-top: 2px;">Create multiple copies (one per course)</div>
                 </div>
               </div>
             </div>
@@ -705,7 +1140,7 @@
                 <!-- Course checkboxes will be loaded here -->
                 <p>Loading courses...</p>
               </div>
-              <div style="margin-top: 10px; font-size: 0.9rem; color: rgba(240, 246, 255, 0.7);">
+              <div style="margin-top: 10px; font-size: clamp(0.8rem, 1vw, 0.9rem); color: rgba(240, 246, 255, 0.7);">
                 <i class="fas fa-info-circle"></i> This will create a separate lesson for each selected course
               </div>
             </div>
@@ -718,6 +1153,9 @@
             <button type="button" id="cancelEditBtn" class="btn btn-secondary" style="display:none;">
               <i class="fas fa-times"></i> Cancel Edit
             </button>
+            <button type="button" class="btn btn-lesson" onclick="clearForm()">
+              <i class="fas fa-eraser"></i> Clear Form
+            </button>
           </div>
         </form>
       </div>
@@ -726,9 +1164,15 @@
       <div class="content-card">
         <div class="card-header">
           <h2><i class="fas fa-list"></i> All Lessons</h2>
-          <div style="font-size: 0.9rem; color: rgba(240, 246, 255, 0.7);">
-            <i class="fas fa-info-circle"></i> Click "Manage Files" to upload lesson materials
+          <div class="bulk-delete-container">
+            <button class="btn btn-danger" id="deleteAllLessonsBtn" style="display: none;">
+              <i class="fas fa-trash-alt"></i> Delete All Lessons
+            </button>
           </div>
+        </div>
+
+        <div style="margin-bottom: 15px; font-size: clamp(0.85rem, 1vw, 0.9rem); color: rgba(240, 246, 255, 0.7); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <i class="fas fa-info-circle"></i> Click "Manage Files" to upload lesson materials, videos, and thumbnails
         </div>
 
         <div class="lesson-list" id="lessons">
@@ -746,6 +1190,57 @@
   </div>
 
   <script>
+    // Mobile menu toggle functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    });
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !menuToggle.contains(e.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+    
+    // Close sidebar on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+    
+    // Handle window resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (window.innerWidth > 768) {
+          sidebar.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }, 250);
+    });
+    
+    // Handle orientation change
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        if (window.innerWidth > 768) {
+          sidebar.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }, 300);
+    });
+
+    // Core variables
     const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/lessons";
     const COURSE_API = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/courses";
     const token = localStorage.getItem("adminToken");
@@ -757,6 +1252,7 @@
       }, 2000);
     }
 
+    // DOM Elements
     const form = document.getElementById("lessonForm");
     const lessonsDiv = document.getElementById("lessons");
     const formTitle = document.getElementById("form-title");
@@ -768,6 +1264,7 @@
     const cancelEditBtn = document.getElementById("cancelEditBtn");
     const alertSuccess = document.getElementById("alertSuccess");
     const alertError = document.getElementById("alertError");
+    const deleteAllLessonsBtn = document.getElementById("deleteAllLessonsBtn");
 
     // Course selection elements
     const singleCourseSelect = document.getElementById("singleCourse");
@@ -776,23 +1273,34 @@
     const multipleCourseContainer = document.getElementById("multipleCourseContainer");
     const selectionOptions = document.querySelectorAll('.selection-option');
 
+    // Stats elements
+    const totalLessonsEl = document.getElementById("totalLessons");
+    const theoreticalLessonsEl = document.getElementById("theoreticalLessons");
+    const practicalLessonsEl = document.getElementById("practicalLessons");
+    const withFilesEl = document.getElementById("withFiles");
+
     let allCourses = [];
-    let currentLessonCourse = null; // For editing mode (single course only)
+    let allLessons = [];
+    let currentLessonCourse = null;
 
     // Helper functions
     function showSuccess(message) {
       alertSuccess.textContent = message;
       alertSuccess.style.display = "block";
+      alertSuccess.setAttribute('aria-live', 'assertive');
       setTimeout(() => {
         alertSuccess.style.display = "none";
+        alertSuccess.removeAttribute('aria-live');
       }, 5000);
     }
 
     function showError(message) {
       alertError.textContent = message;
       alertError.style.display = "block";
+      alertError.setAttribute('aria-live', 'assertive');
       setTimeout(() => {
         alertError.style.display = "none";
+        alertError.removeAttribute('aria-live');
       }, 5000);
     }
 
@@ -800,6 +1308,27 @@
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminInfo");
       window.location.href = "../Login-Pages/admin-login.html";
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+      }).format(amount);
+    }
+
+    // Update stats
+    function updateStats(lessons) {
+      const total = lessons.length;
+      const theoretical = lessons.filter(l => l.type === 'Theoretical').length;
+      const practical = lessons.filter(l => l.type === 'Practical').length;
+      const withFiles = lessons.filter(l => l.video || l.material || l.thumbnail).length;
+      
+      totalLessonsEl.textContent = total;
+      theoreticalLessonsEl.textContent = theoretical;
+      practicalLessonsEl.textContent = practical;
+      withFilesEl.textContent = withFiles;
     }
 
     // Handle course selection type toggle
@@ -863,7 +1392,7 @@
         });
         
         if (allCourses.length === 0) {
-          multipleCoursesContainer.innerHTML = '<p>No courses available. Please create courses first.</p>';
+          multipleCoursesContainer.innerHTML = '<p style="color: rgba(240, 246, 255, 0.7); padding: 10px;">No courses available. Please create courses first.</p>';
         }
         
       } catch (error) {
@@ -916,10 +1445,17 @@
         }
         
         const json = await res.json();
-        const lessons = json.data || [];
+        allLessons = json.data || [];
+        
+        // Update stats
+        updateStats(allLessons);
+        
+        // Show/hide bulk delete button
+        deleteAllLessonsBtn.style.display = allLessons.length > 0 ? 'inline-block' : 'none';
+        
         lessonsDiv.innerHTML = "";
 
-        if (lessons.length === 0) {
+        if (allLessons.length === 0) {
           lessonsDiv.innerHTML = `
             <div class="lesson-card">
               <div class="lesson-header">
@@ -931,29 +1467,35 @@
           return;
         }
 
-        lessons.forEach(l => {
+        allLessons.forEach(l => {
           // Get course name
           let courseText = "Not assigned to any course";
+          let courseId = "";
           if (l.course) {
             courseText = `Course: ${l.course.title || l.course}`;
+            courseId = l.course._id || l.course;
           }
+          
+          // Check if lesson has files
+          const hasFiles = l.video || l.material || l.thumbnail;
+          const filesBadge = hasFiles ? '<span style="color: #00ff8c; margin-left: 8px;"><i class="fas fa-check-circle"></i> Files</span>' : '';
           
           const div = document.createElement("div");
           div.className = "lesson-card";
           div.innerHTML = `
             <div class="lesson-header">
               <div>
-                <h3 class="lesson-title">${l.title}</h3>
-                <span class="lesson-type">${l.type}</span>
+                <h3 class="lesson-title">${l.title || 'Untitled Lesson'} ${filesBadge}</h3>
+                <span class="lesson-type">${l.type || 'Unknown'}</span>
               </div>
-              <div class="lesson-price">$${l.price || 0}</div>
+              <div class="lesson-price">${formatCurrency(l.price || 0)}</div>
             </div>
             <div class="lesson-course">
               <i class="fas fa-book"></i> ${courseText}
             </div>
             <p class="lesson-description">${l.description || "No description provided."}</p>
             <div class="lesson-actions">
-              <button class="btn btn-admin btn-sm" onclick="editLesson('${l._id}', '${l.title}', \`${l.description?.replace(/`/g, '\\`') || ''}\`, '${l.type}', '${l.price}', '${l.course?._id || l.course}')">
+              <button class="btn btn-admin btn-sm" onclick="editLesson('${l._id}')">
                 <i class="fas fa-edit"></i> Edit
               </button>
               <button class="btn btn-danger btn-sm" onclick="deleteLesson('${l._id}')">
@@ -972,6 +1514,74 @@
         console.error("Error loading lessons:", error);
         showError("Failed to load lessons. Please try again.");
       }
+    }
+
+    // Bulk delete all lessons
+    async function deleteAllLessons() {
+      if (allLessons.length === 0) return;
+      
+      const count = allLessons.length;
+      if (!confirm(`Are you sure you want to delete ALL ${count} lessons? This action cannot be undone.`)) return;
+      
+      try {
+        // Show loading state
+        const originalText = deleteAllLessonsBtn.innerHTML;
+        deleteAllLessonsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        deleteAllLessonsBtn.disabled = true;
+        
+        // Delete each lesson
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const lesson of allLessons) {
+          try {
+            const res = await fetch(`${API_BASE}/${lesson._id}`, { 
+              method: "DELETE", 
+              headers: { Authorization: "Bearer " + token } 
+            });
+            
+            if (res.ok) {
+              successCount++;
+            } else {
+              errorCount++;
+            }
+          } catch (error) {
+            errorCount++;
+            console.error(`Error deleting lesson ${lesson._id}:`, error);
+          }
+        }
+        
+        if (errorCount === 0) {
+          showSuccess(`✅ Successfully deleted all ${successCount} lessons`);
+        } else if (successCount > 0) {
+          showError(`⚠️ Deleted ${successCount} lessons, but failed to delete ${errorCount} lessons`);
+        } else {
+          showError("❌ Failed to delete any lessons");
+        }
+        
+        // Refresh the list
+        await loadLessons();
+        
+      } catch (error) {
+        console.error("Error in deleteAllLessons:", error);
+        showError("❌ An error occurred while deleting lessons");
+      } finally {
+        deleteAllLessonsBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete All Lessons';
+        deleteAllLessonsBtn.disabled = false;
+      }
+    }
+
+    // Attach event listener to bulk delete button
+    deleteAllLessonsBtn.addEventListener("click", deleteAllLessons);
+
+    // Clear form function
+    function clearForm() {
+      form.reset();
+      lessonIdInput.value = "";
+      formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Create New Lesson';
+      cancelEditBtn.style.display = 'none';
+      document.querySelector('.selection-option[data-type="single"]').click();
+      showSuccess("Form cleared successfully!");
     }
 
     // Save lesson (single or multiple)
@@ -1024,7 +1634,7 @@
 
           if (res.ok) {
             showSuccess("✅ Lesson updated successfully!");
-            resetForm();
+            clearForm();
             loadLessons();
           } else {
             const errorData = await res.json();
@@ -1057,7 +1667,9 @@
 
             if (res.ok) {
               showSuccess("✅ Lesson created successfully!");
-                         } else {
+              clearForm();
+              loadLessons();
+            } else {
               const errorData = await res.json();
               showError("❌ Failed to create lesson: " + (errorData.message || "Unknown error"));
             }
@@ -1099,6 +1711,8 @@
             
             if (errorCount === 0) {
               showSuccess(`✅ Successfully created ${successCount} lesson(s)!`);
+              clearForm();
+              loadLessons();
             } else {
               showError(`⚠️ Created ${successCount} lesson(s), failed to create ${errorCount} lesson(s)`);
             }
@@ -1113,34 +1727,46 @@
       }
     });
 
-    // Edit lesson
-    function editLesson(id, title, description, type, price, courseId) {
-      lessonIdInput.value = id;
-      titleInput.value = title;
-      descInput.value = description;
-      typeInput.value = type;
-      priceInput.value = price;
-      
-      // Set course selection (editing only works with single course)
-      setSelectedCourse(courseId);
-      
-      formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Lesson';
-      cancelEditBtn.style.display = "inline-block";
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    // Edit lesson - fetch lesson details first
+    async function editLesson(id) {
+      try {
+        const res = await fetch(`${API_BASE}/${id}`, { 
+          headers: { Authorization: "Bearer " + token } 
+        });
+        
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        
+        if (res.ok) {
+          const data = await res.json();
+          const lesson = data.lesson || data.data;
+          
+          if (lesson) {
+            lessonIdInput.value = lesson._id;
+            titleInput.value = lesson.title || "";
+            descInput.value = lesson.description || "";
+            typeInput.value = lesson.type || "";
+            priceInput.value = lesson.price || 0;
+            
+            // Set course selection (editing only works with single course)
+            const courseId = lesson.course?._id || lesson.course;
+            setSelectedCourse(courseId);
+            
+            formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Lesson';
+            cancelEditBtn.style.display = "inline-block";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching lesson details:", error);
+        showError("Failed to load lesson details.");
+      }
     }
 
     // Cancel edit
-    cancelEditBtn.addEventListener("click", resetForm);
-
-    // Reset form function
-    function resetForm() {
-      form.reset();
-      lessonIdInput.value = "";
-      formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Create New Lesson';
-      cancelEditBtn.style.display = "none";
-      // Reset to single course selection
-      document.querySelector('.selection-option[data-type="single"]').click();
-    }
+    cancelEditBtn.addEventListener("click", clearForm);
 
     // Delete lesson
     async function deleteLesson(id) {
