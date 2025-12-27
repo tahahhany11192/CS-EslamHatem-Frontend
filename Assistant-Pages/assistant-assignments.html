@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Assignments - Assistant Dashboard - CS-IslamHatem</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --primary: #0066ff;
@@ -33,7 +36,7 @@
       color: var(--light);
       overflow-x: hidden;
       min-height: 100vh;
-      background-image: 
+      background-image:
         radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
         radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
         radial-gradient(circle at 50% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 20%);
@@ -107,7 +110,8 @@
       border-left: 3px solid transparent;
     }
 
-    .sidebar-nav a:hover, .sidebar-nav a.active {
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
       background: rgba(0, 255, 204, 0.1);
       color: var(--light);
       border-left-color: var(--assistant-accent);
@@ -610,65 +614,301 @@
       color: var(--assistant-accent);
     }
 
-    /* Responsive Design */
-    @media (max-width: 992px) {
+    /* Mobile Devices (up to 768px) */
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--assistant-gradient);
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 255, 204, 0.5);
+    }
+
+    .mobile-menu-btn i {
+      color: var(--dark);
+      font-size: 1.2rem;
+    }
+
+    /* Sidebar Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+    }
+
+    /* Mobile Devices (up to 768px) */
+    @media (max-width: 768px) {
+      :root {
+        --sidebar-width: 70px;
+      }
+
       .sidebar {
-        width: 70px;
+        width: 70px !important;
         overflow: visible;
       }
-      
-      .sidebar-logo span, .sidebar-nav span {
+
+      .sidebar-header {
         display: none;
       }
-      
+
+      .sidebar-nav a span {
+        display: none;
+      }
+
+      .sidebar-logo {
+        font-size: 1.2rem;
+        justify-content: center;
+      }
+
+      .sidebar-nav a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+
       .sidebar-nav i {
         margin-right: 0;
         font-size: 1.2rem;
       }
-      
+
       .main-content {
         margin-left: 70px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        display: none;
-      }
-      
-      .main-content {
-        margin-left: 0;
         padding: 15px;
+        width: auto;
       }
-      
+
       .header {
         flex-direction: column;
         text-align: center;
         gap: 15px;
+        padding: 15px;
       }
-      
+
+      .header h1 {
+        font-size: 1.4rem;
+      }
+
       .user-menu {
         flex-direction: column;
+        width: 100%;
       }
-      
-      .assignment-header, .submission-header {
+
+      .user-info {
+        text-align: center;
+      }
+
+      .content-card {
+        padding: 15px;
+      }
+
+      .card-header {
         flex-direction: column;
         gap: 10px;
       }
-      
+
+      .card-header h2 {
+        font-size: 1.2rem;
+      }
+
+      .assignment-header,
+      .submission-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
       .assignment-actions {
         flex-wrap: wrap;
+        width: 100%;
       }
-      
+
+      .assignment-actions .btn {
+        flex: 1;
+        min-width: 120px;
+      }
+
       .submission-meta {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
       }
+
+      .form-control,
+      .grade-input,
+      .feedback-input {
+        font-size: 16px;
+      }
+    }
+
+    /* Tablets (768px to 1024px) */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      :root {
+        --sidebar-width: 70px;
+      }
+
+      .sidebar {
+        width: 70px !important;
+        overflow: visible;
+      }
+
+      .sidebar-header {
+        display: none;
+      }
+
+      .sidebar-nav a span {
+        display: none;
+      }
+
+      .sidebar-nav a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+
+      .sidebar-nav i {
+        margin-right: 0;
+        font-size: 1.2rem;
+      }
+
+      .main-content {
+        margin-left: 70px;
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .content-card {
+        padding: 20px;
+      }
+    }
+
+    /* Small Desktops (1024px to 1200px) */
+    @media (min-width: 1025px) and (max-width: 1200px) {
+      :root {
+        --sidebar-width: 250px;
+      }
+
+      .main-content {
+        margin-left: 250px;
+      }
+
+      .assignment-list,
+      .submission-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Large Desktops (1200px and up) */
+    @media (min-width: 1200px) {
+      :root {
+        --sidebar-width: 280px;
+      }
+
+      .main-content {
+        margin-left: 280px;
+      }
+
+      .assignment-list,
+      .submission-list {
+        grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+      }
+    }
+
+    /* ==========================================
+   ORIENTATION QUERIES
+   ========================================== */
+
+    /* Landscape Orientation */
+    @media (orientation: landscape) {
+      /* Landscape styles */
+    }
+
+    /* Portrait Orientation */
+    @media (orientation: portrait) {
+      /* Portrait styles */
+    }
+
+    /* ==========================================
+   HIGH RESOLUTION DISPLAYS (Retina)
+   ========================================== */
+
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+      /* Retina display styles */
+    }
+
+    /* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+    @media print {
+      /* Print styles */
+    }
+
+    /* ==========================================
+   REDUCED MOTION (Accessibility)
+   ========================================== */
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ==========================================
+   COMMON DEVICE-SPECIFIC QUERIES
+   ========================================== */
+
+    /* iPhone SE, 5, 5S */
+    @media only screen and (min-device-width: 320px) and (max-device-width: 568px) {
+      /* iPhone SE styles */
+    }
+
+    /* iPhone 12, 13, 14 Pro */
+    @media only screen and (min-device-width: 390px) and (max-device-width: 844px) {
+      /* iPhone 12/13/14 Pro styles */
+    }
+
+    /* iPad (Portrait and Landscape) */
+    @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+      /* iPad styles */
+    }
+
+    /* iPad Pro 12.9" */
+    @media only screen and (min-device-width: 1024px) and (max-device-width: 1366px) {
+      /* iPad Pro styles */
     }
   </style>
 </head>
+
 <body>
+  <!-- Sidebar Overlay -->
+  <!-- <div class="sidebar-overlay" id="sidebarOverlay"></div> -->
   <div class="dashboard">
     <!-- Sidebar -->
     <aside class="sidebar" style="width: 280px;">
@@ -683,16 +923,16 @@
       </div>
 
       <ul class="sidebar-nav">
-        
-        <li><a href="assistant-assignments.html" class="active"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
-        <li><a href="assistant-quizzess.html" ><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
-        <li><a href="assistant-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
-        <li><a href="assistant-students.html" ><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="assistant-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
-        <li><a href="assistant-profile.html" ><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
-        <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
-        <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
 
+        <li><a href="assistant-assignments.html" class="active"><i class="fas fa-tasks"></i>
+            <span>Assignments</span></a></li>
+        <li><a href="assistant-quizzess.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="assistant-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a>
+        </li>
+        <li><a href="assistant-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="assistant-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="assistant-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
 
       </ul>
     </aside>
@@ -733,7 +973,8 @@
 
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea id="description" rows="4" class="form-control" required placeholder="Enter assignment description"></textarea>
+            <textarea id="description" rows="4" class="form-control" required
+              placeholder="Enter assignment description"></textarea>
           </div>
 
           <div class="form-group">
@@ -843,16 +1084,16 @@
 
     // Helper functions
     function headersAuthJSON() {
-      return { 
+      return {
         "Authorization": "Bearer " + TOKEN,
         "Content-Type": "application/json"
       };
     }
-    
+
     function headersAuth() {
       return { "Authorization": "Bearer " + TOKEN };
     }
-    
+
     function fmtDate(dateStr) {
       try {
         const d = new Date(dateStr);
@@ -860,13 +1101,13 @@
         return d.toLocaleDateString();
       } catch { return "-"; }
     }
-    
+
     function isoDateOnly(dateStr) {
       const d = new Date(dateStr);
       if (Number.isNaN(d.getTime())) return "";
       return d.toISOString().split("T")[0];
     }
-    
+
     function resetForm() {
       form.reset();
       assignmentIdInput.value = "";
@@ -874,7 +1115,7 @@
       cancelEditBtn.style.display = "none";
       pdfFileName.textContent = "";
     }
-    
+
     function showSuccess(message) {
       alertSuccess.textContent = message;
       alertSuccess.style.display = "block";
@@ -882,7 +1123,7 @@
         alertSuccess.style.display = "none";
       }, 5000);
     }
-    
+
     function showError(message) {
       alertError.textContent = message;
       alertError.style.display = "block";
@@ -890,7 +1131,7 @@
         alertError.style.display = "none";
       }, 5000);
     }
-    
+
     function logout() {
       localStorage.removeItem("assistantToken");
       localStorage.removeItem("assistantInfo");
@@ -898,7 +1139,7 @@
     }
 
     // File name display
-    pdfInput.addEventListener("change", function(e) {
+    pdfInput.addEventListener("change", function (e) {
       if (this.files.length > 0) {
         pdfFileName.textContent = this.files[0].name;
       } else {
@@ -910,12 +1151,12 @@
     async function loadCourses() {
       try {
         const res = await fetch(COURSES_API, { headers: headersAuthJSON() });
-        
+
         if (res.status === 401) {
           logout();
           return;
         }
-        
+
         const data = await res.json();
         courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
         (data.data || []).forEach(c => {
@@ -935,12 +1176,12 @@
     async function loadAssignments() {
       try {
         const res = await fetch(ASSIGN_API, { headers: headersAuthJSON() });
-        
+
         if (res.status === 401) {
           logout();
           return;
         }
-        
+
         const data = await res.json();
         assignmentsDiv.innerHTML = "";
         assignmentMap.clear();
@@ -995,12 +1236,12 @@
     async function loadSubmissions() {
       try {
         const res = await fetch(ASSIGN_API + "/submissions", { headers: headersAuthJSON() });
-        
+
         if (res.status === 401) {
           logout();
           return;
         }
-        
+
         const data = await res.json();
         submissionsDiv.innerHTML = "";
 
@@ -1119,9 +1360,9 @@
     cancelEditBtn.addEventListener("click", resetForm);
 
     // Create or update assignment
-    form.addEventListener("submit", async (e) =>{
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
+
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
@@ -1171,7 +1412,7 @@
     // Delete assignment
     async function deleteAssignment(id) {
       if (!confirm("Are you sure you want to delete this assignment? This action cannot be undone.")) return;
-      
+
       try {
         const res = await fetch(`${ASSIGN_API}/${id}`, {
           method: "DELETE",
@@ -1195,6 +1436,8 @@
       }
     }
 
+
+
     // Initial load
     (async function init() {
       await loadCourses();
@@ -1203,4 +1446,5 @@
     })();
   </script>
 </body>
+
 </html>
