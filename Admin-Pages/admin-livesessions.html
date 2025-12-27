@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>Manage Live Sessions - Admin Dashboard - CS-IslamHatem</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
@@ -21,12 +21,25 @@
       --header-height: 70px;
       --live-color: #ff3366;
       --live-gradient: linear-gradient(135deg, var(--live-color), #ff66a3);
+      --upcoming-color: #00d9ff;
+      --completed-color: #00ff8c;
+      --safe-area-top: env(safe-area-inset-top);
+      --safe-area-bottom: env(safe-area-bottom);
+      --safe-area-left: env(safe-area-inset-left);
+      --safe-area-right: env(safe-area-right);
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      font-size: 16px;
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
     }
 
     body {
@@ -35,29 +48,36 @@
       color: var(--light);
       overflow-x: hidden;
       min-height: 100vh;
+      min-height: -webkit-fill-available;
       background-image: 
         radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
         radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
         radial-gradient(circle at 50% 80%, rgba(255, 0, 204, 0.1) 0%, transparent 20%);
+      padding: var(--safe-area-top) var(--safe-area-right) var(--safe-area-bottom) var(--safe-area-left);
     }
 
     /* Dashboard Layout */
     .dashboard {
       display: flex;
       min-height: 100vh;
+      min-height: -webkit-fill-available;
     }
 
     /* Sidebar */
     .sidebar {
       width: var(--sidebar-width);
-      background: rgba(10, 17, 40, 0.9);
+      background: rgba(10, 17, 40, 0.95);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-right: 1px solid rgba(255, 153, 0, 0.2);
       padding: 20px 0;
       position: fixed;
       height: 100vh;
+      height: -webkit-fill-available;
       overflow-y: auto;
-      z-index: 100;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      overscroll-behavior: contain;
     }
 
     .sidebar-header {
@@ -72,7 +92,7 @@
       gap: 10px;
       font-family: 'Orbitron', sans-serif;
       font-weight: 700;
-      font-size: 1.5rem;
+      font-size: clamp(1rem, 2vw, 1.5rem);
       color: var(--light);
       text-decoration: none;
     }
@@ -86,7 +106,7 @@
       color: white;
       padding: 3px 8px;
       border-radius: 15px;
-      font-size: 0.7rem;
+      font-size: clamp(0.6rem, 1.5vw, 0.7rem);
       margin-top: 5px;
       display: inline-block;
     }
@@ -102,11 +122,12 @@
     .sidebar-nav a {
       display: flex;
       align-items: center;
-      padding: 12px 20px;
+      padding: clamp(10px, 2vw, 12px) 20px;
       color: rgba(240, 246, 255, 0.7);
       text-decoration: none;
       transition: all 0.3s ease;
       border-left: 3px solid transparent;
+      font-size: clamp(0.9rem, 1.5vw, 1rem);
     }
 
     .sidebar-nav a:hover, .sidebar-nav a.active {
@@ -119,40 +140,66 @@
       margin-right: 10px;
       width: 20px;
       text-align: center;
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+    }
+
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--admin-gradient);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
     }
 
     /* Main Content */
     .main-content {
       flex: 1;
       margin-left: var(--sidebar-width);
-      padding: 20px;
+      padding: clamp(15px, 3vw, 20px);
+      width: calc(100% - var(--sidebar-width));
+      transition: margin-left 0.3s ease, width 0.3s ease;
     }
 
     /* Header */
     .header {
-      background: rgba(10, 17, 40, 0.8);
+      background: rgba(10, 17, 40, 0.9);
       backdrop-filter: blur(10px);
-      padding: 15px 20px;
+      -webkit-backdrop-filter: blur(10px);
+      padding: clamp(12px, 2vw, 15px) clamp(15px, 2vw, 20px);
       border-radius: 15px;
-      margin-bottom: 30px;
+      margin-bottom: clamp(20px, 3vw, 30px);
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
+      gap: 15px;
       border: 1px solid rgba(255, 153, 0, 0.2);
     }
 
     .header h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
       background: var(--admin-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.3;
     }
 
     .user-menu {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: clamp(10px, 2vw, 15px);
+      flex-wrap: wrap;
     }
 
     .user-info {
@@ -161,10 +208,11 @@
 
     .user-name {
       font-weight: 600;
+      font-size: clamp(0.9rem, 1.5vw, 1rem);
     }
 
     .user-role {
-      font-size: 0.8rem;
+      font-size: clamp(0.7rem, 1.2vw, 0.8rem);
       color: var(--admin-accent);
     }
 
@@ -173,9 +221,12 @@
       color: var(--light);
       border: none;
       border-radius: 20px;
-      padding: 8px 15px;
+      padding: clamp(6px, 1vw, 8px) clamp(10px, 1.5vw, 15px);
       cursor: pointer;
       transition: all 0.3s ease;
+      font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+      white-space: nowrap;
+      min-height: 44px;
     }
 
     .logout-btn:hover {
@@ -184,33 +235,37 @@
 
     /* Content Cards */
     .content-card {
-      background: rgba(10, 17, 40, 0.8);
+      background: rgba(10, 17, 40, 0.9);
       backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 30px;
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: clamp(10px, 2vw, 15px);
+      padding: clamp(15px, 3vw, 25px);
+      margin-bottom: clamp(20px, 3vw, 30px);
       border: 1px solid rgba(255, 153, 0, 0.2);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
 
     .card-header {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       padding-bottom: 15px;
       border-bottom: 1px solid rgba(255, 153, 0, 0.2);
+      gap: 10px;
     }
 
     .card-header h2 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
       color: var(--light);
+      line-height: 1.3;
     }
 
     /* Form Styles */
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: clamp(15px, 2vw, 20px);
     }
 
     .form-group label {
@@ -218,17 +273,19 @@
       margin-bottom: 8px;
       font-weight: 600;
       color: var(--light);
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
     }
 
     .form-control {
       width: 100%;
-      padding: 12px 15px;
+      padding: clamp(10px, 1.5vw, 12px) clamp(12px, 1.5vw, 15px);
       border-radius: 8px;
       border: 2px solid rgba(255, 153, 0, 0.3);
       background: rgba(0, 0, 0, 0.3);
       color: var(--light);
       font-family: 'Exo 2', sans-serif;
       transition: all 0.3s ease;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
     }
 
     .form-control:focus {
@@ -238,18 +295,18 @@
     }
 
     textarea.form-control {
-      min-height: 120px;
+      min-height: clamp(100px, 20vh, 120px);
       resize: vertical;
     }
 
     /* Buttons */
     .btn {
-      padding: 12px 25px;
+      padding: clamp(10px, 1.5vw, 12px) clamp(15px, 2vw, 25px);
       border: none;
       border-radius: 30px;
       font-family: 'Exo 2', sans-serif;
       font-weight: 600;
-      font-size: 1rem;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -259,6 +316,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      min-height: 44px; /* Minimum touch target size */
     }
 
     .btn-admin {
@@ -306,8 +364,9 @@
     }
 
     .btn-sm {
-      padding: 8px 15px;
-      font-size: 0.9rem;
+      padding: clamp(6px, 1vw, 8px) clamp(10px, 1.5vw, 15px);
+      font-size: clamp(0.8rem, 1vw, 0.9rem);
+      min-height: 36px;
     }
 
     .btn::before {
@@ -325,7 +384,173 @@
       left: 100%;
     }
 
-    /* Table Styles */
+    /* Stats Overview */
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: rgba(10, 17, 40, 0.8);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid rgba(255, 153, 0, 0.2);
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: rgba(240, 246, 255, 0.7);
+      font-size: clamp(0.75rem, 1vw, 0.8rem);
+    }
+
+    /* Sessions Grid */
+    .sessions-grid {
+      display: grid;
+      gap: clamp(15px, 2vw, 20px);
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .session-card {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: clamp(15px, 2vw, 20px);
+      border: 1px solid rgba(255, 153, 0, 0.2);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .session-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 153, 0, 0.4);
+    }
+
+    .session-status {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: clamp(0.7rem, 0.9vw, 0.8rem);
+      font-weight: 600;
+    }
+
+    .status-live {
+      background: rgba(255, 51, 102, 0.2);
+      color: var(--live-color);
+      animation: pulse 2s infinite;
+    }
+
+    .status-upcoming {
+      background: rgba(0, 217, 255, 0.2);
+      color: var(--upcoming-color);
+    }
+
+    .status-completed {
+      background: rgba(0, 255, 140, 0.2);
+      color: var(--completed-color);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .session-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      color: var(--light);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .session-description {
+      color: rgba(240, 246, 255, 0.7);
+      margin-bottom: 15px;
+      line-height: 1.5;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+      flex-grow: 1;
+    }
+
+    .session-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .session-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: clamp(0.8rem, 1vw, 0.9rem);
+      color: rgba(240, 246, 255, 0.7);
+    }
+
+    .session-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 1100;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      z-index: 1101;
+      background: rgba(10, 17, 40, 0.95);
+      border-radius: 15px;
+      padding: clamp(20px, 3vw, 25px);
+      border: 1px solid rgba(255, 153, 0, 0.3);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--admin-accent);
+      margin-bottom: 20px;
+      font-size: clamp(1.2rem, 2vw, 1.5rem);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* Table Styles (for larger screens) */
     .sessions-table {
       width: 100%;
       border-collapse: collapse;
@@ -333,10 +558,11 @@
       background: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
       overflow: hidden;
+      display: none;
     }
 
     .sessions-table th, .sessions-table td {
-      padding: 15px;
+      padding: clamp(12px, 1.5vw, 15px);
       text-align: left;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
@@ -345,6 +571,7 @@
       background: rgba(255, 153, 0, 0.1);
       font-family: 'Orbitron', sans-serif;
       color: var(--admin-accent);
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
     }
 
     .sessions-table tr:last-child td {
@@ -355,52 +582,20 @@
       background: rgba(255, 153, 0, 0.05);
     }
 
-    /* Modal styles */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
-      z-index: 1000;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 500px;
-      max-width: 90%;
-      z-index: 1001;
-      background: rgba(10, 17, 40, 0.95);
-      border-radius: 15px;
-      padding: 25px;
-      border: 1px solid rgba(255, 153, 0, 0.3);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .modal h3 {
-      font-family: 'Orbitron', sans-serif;
-      color: var(--admin-accent);
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-    }
-
-    .modal-actions {
+    /* Bulk Delete Container */
+    .bulk-delete-container {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
+      margin-bottom: 15px;
     }
 
     /* Alerts */
     .alert {
       padding: 15px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin-bottom: clamp(15px, 2vw, 20px);
       display: none;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
     }
 
     .alert-success {
@@ -415,11 +610,24 @@
       color: #ff4d4d;
     }
 
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(240, 246, 255, 0.7);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: var(--admin-accent);
+      opacity: 0.5;
+    }
+
     /* Responsive Design */
-    @media (max-width: 992px) {
+    @media (max-width: 1200px) {
       .sidebar {
         width: 70px;
-        overflow: visible;
       }
       
       .sidebar-logo span, .sidebar-nav span {
@@ -433,20 +641,53 @@
       
       .main-content {
         margin-left: 70px;
+        width: calc(100% - 70px);
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .sessions-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 992px) {
+      .sessions-table {
+        display: table;
+      }
+      
+      .sessions-grid {
+        display: none;
       }
     }
 
     @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      
       .sidebar {
-        display: none;
+        transform: translateX(-100%);
+        width: 280px;
+        z-index: 999;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
       }
       
       .main-content {
         margin-left: 0;
-        padding: 15px;
+        width: 100%;
+        padding: clamp(10px, 2vw, 15px);
       }
       
       .header {
+        margin-top: 60px; /* Space for fixed menu toggle */
         flex-direction: column;
         text-align: center;
         gap: 15px;
@@ -454,137 +695,292 @@
       
       .user-menu {
         flex-direction: column;
+        align-items: center;
+      }
+      
+      .user-info {
+        text-align: center;
+      }
+      
+      .sessions-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .bulk-delete-container {
+        justify-content: center;
+      }
+      
+      .session-actions {
+        flex-direction: column;
+      }
+      
+      .stats-overview {
+        grid-template-columns: 1fr;
       }
       
       .modal {
-        width: 90%;
+        width: 95%;
+        padding: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .btn-sm {
+        width: 100%;
+      }
+      
+      .card-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .content-card {
         padding: 15px;
       }
       
-      .sessions-table {
-        display: block;
-        overflow-x: auto;
+      .form-group {
+        margin-bottom: 15px;
       }
       
-      .sessions-table .btn {
-        margin-bottom: 5px;
+      .modal-actions {
+        flex-direction: column;
+      }
+      
+      .modal-actions .btn {
+        width: 100%;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 600px) {
+      .sidebar {
+        overflow-y: auto;
+        height: 100vh;
+      }
+      
+      .header h1 {
+        font-size: 1.2rem;
+      }
+      
+      .content-card {
+        padding: 15px;
+      }
+      
+      .btn {
+        padding: 8px 15px;
+        min-height: 40px;
+      }
+      
+      .sessions-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .session-description {
+        max-height: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+    }
+
+    /* TV and Large Screens */
+    @media (min-width: 1600px) {
+      .sessions-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .sessions-table {
+        display: table;
+      }
+      
+      .sidebar {
+        width: 300px;
+      }
+      
+      .main-content {
+        margin-left: 300px;
+        width: calc(100% - 300px);
+        padding: 30px;
+      }
+      
+      .sidebar-nav a {
+        padding: 15px 25px;
+        font-size: 1.1rem;
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      .sidebar, .menu-toggle, .logout-btn, .session-actions, 
+      .bulk-delete-container, .btn, .modal-overlay, .modal {
+        display: none !important;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .content-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+      
+      .session-card {
+        break-inside: avoid;
+      }
+    }
+
+    /* High Contrast Mode Support */
+    @media (prefers-contrast: high) {
+      .sidebar {
+        background: var(--dark);
+        border-right: 2px solid var(--admin-accent);
+      }
+      
+      .content-card {
+        border: 2px solid var(--admin-accent);
+      }
+      
+      .form-control {
+        border-width: 2px;
+      }
+      
+      .session-status {
+        border: 1px solid;
+      }
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      
+      .sidebar {
+        transition: none;
+      }
+      
+      .btn:hover, .session-card:hover {
+        transform: none;
+      }
+      
+      .btn::before {
+        display: none;
+      }
+      
+      .status-live {
+        animation: none;
+      }
+    }
+
+    /* Touch Device Optimizations */
+    @media (hover: none) and (pointer: coarse) {
+      .btn:hover, .sidebar-nav a:hover, .session-card:hover {
+        transform: none;
+      }
+      
+      .btn:hover::before {
+        display: none;
+      }
+      
+      .form-control {
+        font-size: 16px; /* Prevent iOS zoom on focus */
+      }
+      
+      .session-card {
+        padding: 15px;
+      }
+      
+      .session-actions .btn {
+        padding: 10px 15px;
+      }
+    }
+
+    /* iPad Specific */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      .sidebar {
+        width: 200px;
+      }
+      
+      .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+      }
+      
+      .sidebar-nav span {
+        display: inline;
+        font-size: 0.9rem;
+      }
+      
+      .sidebar-nav i {
+        margin-right: 10px;
+      }
+      
+      .sessions-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Smart TV / 4K Screens */
+    @media (min-width: 2560px) {
+      html {
+        font-size: 20px;
+      }
+      
+      .sidebar {
+        width: 350px;
+      }
+      
+      .main-content {
+        margin-left: 350px;
+        width: calc(100% - 350px);
+        padding: 40px;
+      }
+      
+      .sessions-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 25px;
+      }
+      
+      .stat-card {
+        padding: 25px;
+      }
+      
+      .stat-value {
+        font-size: 2.5rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar" style="width: 280px;">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <i class="fas fa-code"></i>
-          CS-<span>IslamHatem</span>
-        </div>
-        <div class="admin-badge">
-          <i class="fas fa-shield-alt"></i> ADMIN PORTAL
-        </div>
-      </div>
-
-      <ul class="sidebar-nav">
-        <li><a href="admin-courses.html"><i class="fas fa-book"></i> <span>Courses</span></a></li>
-        <li><a href="admin-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
-        <li><a href="admin-lessons.html"><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
-        <li><a href="admin-lesson-files.html"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
-        <li><a href="admin-quizzes.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
-        <li><a href="admin-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
-        <li><a href="admin-payment-requests.html" ><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
-        <li><a href="admin-assistants.html"><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
-        <li><a href="admin-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="admin-livesessions.html" class="active"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
-        <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
-        <li><a href="upload.html"><i class="fas fa-share-alt"></i> <span>Upload Videos</span></a></li>
-         <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
-      </ul>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Header -->
-      <header class="header">
-        <h1><i class="fas fa-video"></i> Manage Live Sessions</h1>
-        <div class="user-menu">
-          <div class="user-info">
-            <div class="user-name">Admin User</div>
-            <div class="user-role">Super Administrator</div>
-          </div>
-          <button class="logout-btn" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i> Logout
-          </button>
-        </div>
-      </header>
-
-      <!-- Alerts -->
-      <div id="alertSuccess" class="alert alert-success"></div>
-      <div id="alertError" class="alert alert-error"></div>
-
-      <!-- Create Live Session Form -->
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-plus-circle"></i> Schedule New Session</h2>
-        </div>
-
-        <form id="createSessionForm">
-          <div class="form-group">
-            <label for="title">Session Title</label>
-            <input type="text" id="title" class="form-control" placeholder="Session Title" required>
-          </div>
-
-          <div class="form-group">
-            <label for="description">Description (optional)</label>
-            <textarea id="description" class="form-control" placeholder="Description (optional)"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="scheduledAt">Scheduled Date & Time</label>
-            <input type="datetime-local" id="scheduledAt" class="form-control" required>
-          </div>
-
-          <div class="form-group">
-            <label for="duration">Duration (minutes)</label>
-            <input type="number" id="duration" class="form-control" placeholder="Duration (minutes)">
-          </div>
-
-          <div class="form-group">
-            <label for="courseId">Course</label>
-            <select id="courseId" class="form-control" required>
-              <option value="">-- Loading courses... --</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-admin">
-            <i class="fas fa-save"></i> Create Session
-          </button>
-        </form>
-      </div>
-
-      <!-- Live Sessions List -->
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-list"></i> All Sessions</h2>
-        </div>
-
-        <table class="sessions-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Course</th>
-              <th>Scheduled At</th>
-              <th>Duration</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="sessionsTableBody"></tbody>
-        </table>
-      </div>
-    </main>
-  </div>
+  <!-- Mobile Menu Toggle -->
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <i class="fas fa-bars"></i>
+  </button>
 
   <!-- Edit Session Modal -->
   <div class="modal-overlay" id="modalOverlay"></div>
@@ -624,7 +1020,215 @@
     </form>
   </div>
 
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-code"></i>
+          CS-<span>IslamHatem</span>
+        </div>
+        <div class="admin-badge">
+          <i class="fas fa-shield-alt"></i> ADMIN PORTAL
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li><a href="admin-courses.html"><i class="fas fa-book"></i> <span>Courses</span></a></li>
+        <li><a href="admin-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
+        <li><a href="admin-lessons.html"><i class="fas fa-graduation-cap"></i> <span>Lessons</span></a></li>
+        <li><a href="admin-lesson-files.html"><i class="fas fa-folder"></i> <span>Lesson Files</span></a></li>
+        <li><a href="admin-quizzes.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="admin-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
+        <li><a href="admin-payment-requests.html"><i class="fas fa-credit-card"></i> <span>Payment Requests</span></a></li>
+        <li><a href="admin-assistants.html"><i class="fas fa-chalkboard-teacher"></i> <span>Assistants</span></a></li>
+        <li><a href="admin-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+        <li><a href="admin-livesessions.html" class="active"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="admin-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="upload.html"><i class="fas fa-share-alt"></i> <span>Upload Videos</span></a></li>
+        <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <h1><i class="fas fa-video"></i> Manage Live Sessions</h1>
+        <div class="user-menu">
+          <div class="user-info">
+            <div class="user-name">Admin User</div>
+            <div class="user-role">Super Administrator</div>
+          </div>
+          <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Alerts -->
+      <div id="alertSuccess" class="alert alert-success" role="alert"></div>
+      <div id="alertError" class="alert alert-error" role="alert"></div>
+
+      <!-- Stats Overview -->
+      <div class="stats-overview" id="statsOverview">
+        <div class="stat-card">
+          <div class="stat-value" id="totalSessions">0</div>
+          <div class="stat-label">Total Sessions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="liveSessions">0</div>
+          <div class="stat-label" style="color: var(--live-color);">Live Now</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="upcomingSessions">0</div>
+          <div class="stat-label" style="color: var(--upcoming-color);">Upcoming</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="completedSessions">0</div>
+          <div class="stat-label" style="color: var(--completed-color);">Completed</div>
+        </div>
+      </div>
+
+      <!-- Create Live Session Form -->
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fas fa-plus-circle"></i> Schedule New Session</h2>
+        </div>
+
+        <form id="createSessionForm">
+          <div class="form-group">
+            <label for="title">Session Title</label>
+            <input type="text" id="title" class="form-control" placeholder="Session Title" required>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description (optional)</label>
+            <textarea id="description" class="form-control" placeholder="Description (optional)"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="scheduledAt">Scheduled Date & Time</label>
+            <input type="datetime-local" id="scheduledAt" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="duration">Duration (minutes)</label>
+            <input type="number" id="duration" class="form-control" placeholder="Duration (minutes)">
+          </div>
+
+          <div class="form-group">
+            <label for="courseId">Course</label>
+            <select id="courseId" class="form-control" required>
+              <option value="">-- Loading courses... --</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-admin">
+              <i class="fas fa-save"></i> Create Session
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="clearForm()">
+              <i class="fas fa-times"></i> Clear Form
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Live Sessions List -->
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fas fa-list"></i> All Sessions</h2>
+          <div class="bulk-delete-container">
+            <button class="btn btn-danger" id="deleteAllSessionsBtn" style="display: none;">
+              <i class="fas fa-trash-alt"></i> Delete All Sessions
+            </button>
+          </div>
+        </div>
+
+        <!-- Table View (for larger screens) -->
+        <table class="sessions-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Course</th>
+              <th>Scheduled At</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sessionsTableBody"></tbody>
+        </table>
+
+        <!-- Grid View (for smaller screens) -->
+        <div class="sessions-grid" id="sessionsGrid">
+          <div class="session-card">
+            <div class="session-title">Loading sessions...</div>
+            <div class="session-description">Please wait while we load your live sessions.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
   <script>
+    // Mobile menu toggle functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    });
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !menuToggle.contains(e.target) && 
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+    
+    // Close sidebar and modal on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+        if (document.getElementById('editModal').style.display === 'block') {
+          closeModal();
+        }
+      }
+    });
+    
+    // Handle window resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (window.innerWidth > 768) {
+          sidebar.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }, 250);
+    });
+    
+    // Handle orientation change
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        if (window.innerWidth > 768) {
+          sidebar.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }, 300);
+    });
+
+    // Core variables
     const API_URL = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/livesessions";
     const COURSE_API = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/courses";
     const token = localStorage.getItem("adminToken");
@@ -642,8 +1246,10 @@
       const alertSuccess = document.getElementById("alertSuccess");
       alertSuccess.textContent = message;
       alertSuccess.style.display = "block";
+      alertSuccess.setAttribute('aria-live', 'assertive');
       setTimeout(() => {
         alertSuccess.style.display = "none";
+        alertSuccess.removeAttribute('aria-live');
       }, 5000);
     }
     
@@ -651,8 +1257,10 @@
       const alertError = document.getElementById("alertError");
       alertError.textContent = message;
       alertError.style.display = "block";
+      alertError.setAttribute('aria-live', 'assertive');
       setTimeout(() => {
         alertError.style.display = "none";
+        alertError.removeAttribute('aria-live');
       }, 5000);
     }
     
@@ -660,6 +1268,58 @@
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminInfo");
       window.location.href = "../Login-Pages/admin-login.html";
+    }
+
+    function clearForm() {
+      document.getElementById('createSessionForm').reset();
+      showSuccess("Form cleared successfully!");
+    }
+
+    // Format date and time
+    function formatDateTime(dateString) {
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "Invalid Date";
+        
+        return date.toLocaleString('en-US', {
+          weekday: 'short',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      } catch (error) {
+        return "Invalid Date";
+      }
+    }
+
+    // Update stats
+    function updateStats(sessions) {
+      const now = new Date();
+      let liveCount = 0;
+      let upcomingCount = 0;
+      let completedCount = 0;
+
+      sessions.forEach(session => {
+        const scheduledTime = new Date(session.scheduledAt);
+        const correctedTime = new Date(scheduledTime.getTime() - (2 * 60 * 60 * 1000));
+        const endTime = new Date(correctedTime.getTime() + (session.duration * 60000));
+        
+        if (correctedTime <= now && endTime > now) {
+          liveCount++;
+        } else if (correctedTime > now) {
+          upcomingCount++;
+        } else {
+          completedCount++;
+        }
+      });
+
+      document.getElementById('totalSessions').textContent = sessions.length;
+      document.getElementById('liveSessions').textContent = liveCount;
+      document.getElementById('upcomingSessions').textContent = upcomingCount;
+      document.getElementById('completedSessions').textContent = completedCount;
     }
 
     // Load courses
@@ -691,6 +1351,7 @@
     }
 
     // Load sessions
+    let allSessions = [];
     async function loadSessions() {
       try {
         const res = await fetch(API_URL, {
@@ -703,64 +1364,211 @@
         }
         
         const data = await res.json();
-        const tbody = document.getElementById("sessionsTableBody");
-        tbody.innerHTML = "";
+        allSessions = data.data || [];
         
-        if (!data.data || data.data.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6" style="text-align: center; padding: 20px;">
-                No live sessions found. Create your first session using the form above.
-              </td>
-            </tr>
-          `;
-          return;
-        }
+        // Update stats
+        updateStats(allSessions);
         
-        data.data.forEach(session => {
-          const tr = document.createElement("tr");
-          const now = new Date();
-          const scheduledTime = new Date(session.scheduledAt );
-          const correctedTime = new Date(scheduledTime.getTime()- (2 * 60 * 60 * 1000));
-          const isUpcoming = scheduledTime > now;
-          const isLive = correctedTime <= now && correctedTime.getTime() + (session.duration * 60000) > now.getTime();
-          
-          let statusText = "Completed";
-          let statusClass = "status-completed";
-          
-          if (isLive) {
-            statusText = "Live Now";
-            statusClass = "status-live";
-          } else if (isUpcoming) {
-            statusText = "Upcoming";
-            statusClass = "status-upcoming";
-          }
-          
-          tr.innerHTML = `
-            <td>${session.title}</td>
-            <td>${session.course?.title || "N/A"}</td>
-            <td>${correctedTime.toLocaleString()}</td>
-            <td>${session.duration || "-"} mins</td>
-            <td><span class="${statusClass}">${statusText}</span></td>
-            <td>
-              <a href="room.html" class="btn btn-live btn-sm" ${!isLive ? 'style="opacity: 0.6; pointer-events: none;"' : ''}>
-                <i class="fas fa-broadcast-tower"></i> Go Live / Join
-              </a>
-              <button class="btn btn-admin btn-sm" onclick="openModal('${session._id}', '${session.title}', '${session.description || ""}', '${session.scheduledAt}', '${session.duration || ""}')">
-                <i class="fas fa-edit"></i> Edit
-              </button>
-              <button class="btn btn-danger btn-sm" onclick="deleteSession('${session._id}')">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
+        // Show/hide bulk delete button
+        const deleteAllBtn = document.getElementById('deleteAllSessionsBtn');
+        deleteAllBtn.style.display = allSessions.length > 0 ? 'inline-block' : 'none';
+        
+        // Update table view
+        updateTableView(allSessions);
+        
+        // Update grid view
+        updateGridView(allSessions);
+        
       } catch (err) {
         console.error("Error loading sessions:", err);
         showError("Failed to load sessions. Please try again.");
       }
     }
+
+    // Update table view
+    function updateTableView(sessions) {
+      const tbody = document.getElementById("sessionsTableBody");
+      tbody.innerHTML = "";
+      
+      if (sessions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 20px;">
+              No live sessions found. Create your first session using the form above.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      sessions.forEach(session => {
+        const tr = document.createElement("tr");
+        const now = new Date();
+        const scheduledTime = new Date(session.scheduledAt);
+        const correctedTime = new Date(scheduledTime.getTime() - (2 * 60 * 60 * 1000));
+        const endTime = new Date(correctedTime.getTime() + (session.duration * 60000));
+        
+        let statusText = "Completed";
+        let statusClass = "status-completed";
+        
+        if (correctedTime <= now && endTime > now) {
+          statusText = "Live Now";
+          statusClass = "status-live";
+        } else if (correctedTime > now) {
+          statusText = "Upcoming";
+          statusClass = "status-upcoming";
+        }
+        
+        tr.innerHTML = `
+          <td>${session.title}</td>
+          <td>${session.course?.title || "N/A"}</td>
+          <td>${formatDateTime(correctedTime)}</td>
+          <td>${session.duration || "-"} mins</td>
+          <td><span class="${statusClass}">${statusText}</span></td>
+          <td>
+            <a href="room.html" class="btn btn-live btn-sm" ${!(correctedTime <= now && endTime > now) ? 'style="opacity: 0.6; pointer-events: none;"' : ''}>
+              <i class="fas fa-broadcast-tower"></i> Go Live / Join
+            </a>
+            <button class="btn btn-admin btn-sm" onclick="openModal('${session._id}', '${session.title}', '${session.description || ""}', '${session.scheduledAt}', '${session.duration || ""}')">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSession('${session._id}')">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Update grid view
+    function updateGridView(sessions) {
+      const grid = document.getElementById("sessionsGrid");
+      grid.innerHTML = "";
+      
+      if (sessions.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-video-slash"></i>
+            <h3>No Live Sessions</h3>
+            <p>Create your first live session using the form above.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      sessions.forEach(session => {
+        const now = new Date();
+        const scheduledTime = new Date(session.scheduledAt);
+        const correctedTime = new Date(scheduledTime.getTime() - (2 * 60 * 60 * 1000));
+        const endTime = new Date(correctedTime.getTime() + (session.duration * 60000));
+        
+        let statusText = "Completed";
+        let statusClass = "status-completed";
+        
+        if (correctedTime <= now && endTime > now) {
+          statusText = "Live Now";
+          statusClass = "status-live";
+        } else if (correctedTime > now) {
+          statusText = "Upcoming";
+          statusClass = "status-upcoming";
+        }
+        
+        const card = document.createElement("div");
+        card.className = "session-card";
+        card.innerHTML = `
+          <div class="session-status ${statusClass}">${statusText}</div>
+          <div class="session-title">${session.title}</div>
+          <div class="session-description">${session.description || "No description provided"}</div>
+          <div class="session-meta">
+            <div class="session-meta-item">
+              <i class="fas fa-book"></i>
+              <span>${session.course?.title || "No Course"}</span>
+            </div>
+            <div class="session-meta-item">
+              <i class="fas fa-calendar-alt"></i>
+              <span>${formatDateTime(correctedTime)}</span>
+            </div>
+            <div class="session-meta-item">
+              <i class="fas fa-clock"></i>
+              <span>${session.duration || "-"} minutes</span>
+            </div>
+          </div>
+          <div class="session-actions">
+            <a href="room.html" class="btn btn-live btn-sm" ${!(correctedTime <= now && endTime > now) ? 'style="opacity: 0.6; pointer-events: none;"' : ''}>
+              <i class="fas fa-broadcast-tower"></i> Go Live / Join
+            </a>
+            <button class="btn btn-admin btn-sm" onclick="openModal('${session._id}', '${session.title}', '${session.description || ""}', '${session.scheduledAt}', '${session.duration || ""}')">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSession('${session._id}')">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Bulk delete all sessions
+    async function deleteAllSessions() {
+      if (allSessions.length === 0) return;
+      
+      const count = allSessions.length;
+      if (!confirm(`Are you sure you want to delete ALL ${count} sessions? This action cannot be undone.`)) return;
+      
+      try {
+        // Show loading state
+        const deleteAllBtn = document.getElementById('deleteAllSessionsBtn');
+        const originalText = deleteAllBtn.innerHTML;
+        deleteAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        deleteAllBtn.disabled = true;
+        
+        // Delete each session
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const session of allSessions) {
+          try {
+            const res = await fetch(`${API_URL}/${session._id}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (res.ok) {
+              successCount++;
+            } else {
+              errorCount++;
+            }
+          } catch (error) {
+            errorCount++;
+            console.error(`Error deleting session ${session._id}:`, error);
+          }
+        }
+        
+        if (errorCount === 0) {
+          showSuccess(`✅ Successfully deleted all ${successCount} sessions`);
+        } else if (successCount > 0) {
+          showError(`⚠️ Deleted ${successCount} sessions, but failed to delete ${errorCount} sessions`);
+        } else {
+          showError("❌ Failed to delete any sessions");
+        }
+        
+        // Refresh the list
+        await loadSessions();
+        
+      } catch (error) {
+        console.error("Error in deleteAllSessions:", error);
+        showError("❌ An error occurred while deleting sessions");
+      } finally {
+        const deleteAllBtn = document.getElementById('deleteAllSessionsBtn');
+        deleteAllBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete All Sessions';
+        deleteAllBtn.disabled = false;
+      }
+    }
+
+    // Attach event listener to bulk delete button
+    document.getElementById('deleteAllSessionsBtn').addEventListener('click', deleteAllSessions);
 
     // Create session
     document.getElementById("createSessionForm").addEventListener("submit", async (e) => {
@@ -848,6 +1656,7 @@
 
       document.getElementById("modalOverlay").style.display = "block";
       document.getElementById("editModal").style.display = "block";
+      document.body.style.overflow = "hidden";
       
       // Add click event to close modal when clicking outside
       document.getElementById("modalOverlay").onclick = closeModal;
@@ -857,6 +1666,7 @@
     function closeModal() {
       document.getElementById("modalOverlay").style.display = "none";
       document.getElementById("editModal").style.display = "none";
+      document.body.style.overflow = "";
       document.getElementById("modalOverlay").onclick = null;
     }
 
