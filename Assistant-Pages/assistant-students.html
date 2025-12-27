@@ -207,38 +207,191 @@
       color: var(--light);
     }
 
-    /* Table Styles */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
+    /* Search Bar */
+    .search-container {
+      position: relative;
+      max-width: 400px;
     }
 
-    th, td {
-      padding: 12px 15px;
-      text-align: left;
+    .search-input {
+      width: 100%;
+      padding: 12px 45px 12px 15px;
+      border-radius: 30px;
+      border: 2px solid rgba(0, 255, 204, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--light);
+      font-family: 'Exo 2', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--assistant-accent);
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+    }
+
+    .search-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--assistant-accent);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    /* Student Cards */
+    .student-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+    }
+
+    .student-card {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 25px;
+      border: 1px solid rgba(0, 255, 204, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .student-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+      border-color: rgba(0, 255, 204, 0.4);
+    }
+
+    .student-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
       border-bottom: 1px solid rgba(0, 255, 204, 0.2);
     }
 
-    th {
-      background: rgba(0, 0, 0, 0.2);
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 500;
-      color: var(--assistant-accent);
+    .student-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--assistant-accent);
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
     }
 
-    tr:hover {
-      background: rgba(0, 255, 204, 0.05);
+    .student-info {
+      flex: 1;
+    }
+
+    .student-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      color: var(--light);
+      margin-bottom: 5px;
+    }
+
+    .student-email {
+      color: var(--assistant-accent);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    .student-id {
+      color: rgba(240, 246, 255, 0.6);
+      font-size: 0.85rem;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .student-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+      color: rgba(240, 246, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      color: var(--light);
+      word-break: break-word;
+    }
+
+    .courses-section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      color: var(--assistant-accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .courses-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .course-item {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 12px 15px;
+      border-left: 3px solid var(--assistant-accent);
+      transition: all 0.3s ease;
+    }
+
+    .course-item:hover {
+      background: rgba(0, 255, 204, 0.1);
+      transform: translateX(5px);
+    }
+
+    .course-title {
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 5px;
+    }
+
+    .course-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: rgba(240, 246, 255, 0.7);
+    }
+
+    .student-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
     }
 
     /* Buttons */
     .btn {
-      padding: 8px 15px;
+      padding: 12px 25px;
       border: none;
-      border-radius: 20px;
+      border-radius: 30px;
       font-family: 'Exo 2', sans-serif;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 1rem;
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -247,7 +400,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 8px;
     }
 
     .btn-assistant {
@@ -257,8 +410,8 @@
     }
 
     .btn-assistant:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(0, 255, 204, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 255, 204, 0.4);
     }
 
     .btn-secondary {
@@ -269,7 +422,7 @@
 
     .btn-secondary:hover {
       background: rgba(0, 255, 204, 0.1);
-      transform: translateY(-2px);
+      transform: translateY(-3px);
     }
 
     .btn-danger {
@@ -280,7 +433,13 @@
 
     .btn-danger:hover {
       background: rgba(255, 77, 77, 0.1);
-      transform: translateY(-2px);
+      transform: translateY(-3px);
+    }
+
+    .btn-sm {
+      padding: 8px 15px;
+      font-size: 0.9rem;
+      flex: 1;
     }
 
     .btn::before {
@@ -317,21 +476,21 @@
     .modal-content {
       background: rgba(10, 17, 40, 0.95);
       border-radius: 15px;
-      padding: 25px;
+      padding: 30px;
       width: 100%;
-      max-width: 600px;
+      max-width: 500px;
       max-height: 90vh;
       overflow-y: auto;
       border: 1px solid rgba(0, 255, 204, 0.3);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
+      margin-bottom: 25px;
+      padding-bottom: 20px;
       border-bottom: 1px solid rgba(0, 255, 204, 0.2);
     }
 
@@ -345,8 +504,13 @@
       background: none;
       border: none;
       color: var(--light);
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .close-modal:hover {
+      color: var(--assistant-accent);
     }
 
     /* Form Styles */
@@ -378,43 +542,24 @@
       box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
     }
 
-    /* Student Photo */
-    .student-photo {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--assistant-accent);
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
-    }
-
-    /* Courses List */
-    .courses-list {
-      margin-top: 10px;
-      padding: 15px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
-      border: 1px solid rgba(0, 255, 204, 0.2);
-    }
-
-    .course-item {
-      padding: 10px;
-      margin-bottom: 10px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 6px;
-      border-left: 3px solid var(--assistant-accent);
-    }
-
-    .course-item:last-child {
-      margin-bottom: 0;
-    }
-
     /* Alerts */
     .alert {
       padding: 15px;
       border-radius: 8px;
       margin-bottom: 20px;
       display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .alert-success {
@@ -429,90 +574,329 @@
       color: #ff4d4d;
     }
 
+    /* Loading States */
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(0, 255, 204, 0.3);
+      border-top-color: var(--assistant-accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(240, 246, 255, 0.6);
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: rgba(0, 255, 204, 0.3);
+    }
+
+    .empty-state h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: var(--light);
+    }
+
+    /* Statistics Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(0, 255, 204, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--assistant-accent);
+    }
+
+    .stat-value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      color: var(--assistant-accent);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: rgba(240, 246, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--assistant-gradient);
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 255, 204, 0.5);
+    }
+
+    .mobile-menu-btn i {
+      color: var(--dark);
+      font-size: 1.2rem;
+    }
+
+    /* Sidebar Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+    }
+
     /* Responsive Design */
-    @media (max-width: 992px) {
+
+    /* Mobile Devices (up to 768px) */
+    @media (max-width: 768px) {
       .sidebar {
-        width: 70px;
+        width: 70px !important;
         overflow: visible;
       }
-      
-      .sidebar-logo span, .sidebar-nav span {
+
+      .sidebar-header {
         display: none;
       }
-      
+
+      .sidebar-nav a span {
+        display: none;
+      }
+
+      .sidebar-nav a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+
       .sidebar-nav i {
         margin-right: 0;
         font-size: 1.2rem;
       }
-      
+
       .main-content {
         margin-left: 70px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        display: none;
-      }
-      
-      .main-content {
-        margin-left: 0;
         padding: 15px;
       }
-      
+
       .header {
         flex-direction: column;
         text-align: center;
         gap: 15px;
+        padding: 15px;
       }
-      
+
+      .header h1 {
+        font-size: 1.4rem;
+      }
+
       .user-menu {
         flex-direction: column;
+        width: 100%;
       }
-      
-      table, thead, tbody, th, td, tr {
-        display: block;
+
+      .user-info {
+        text-align: center;
       }
-      
-      thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-      }
-      
-      tr {
-        margin-bottom: 15px;
-        border: 1px solid rgba(0, 255, 204, 0.2);
-        border-radius: 8px;
-        padding: 10px;
-      }
-      
-      td {
-        position: relative;
-        padding-left: 50%;
-        border: none;
-        border-bottom: 1px solid rgba(0, 255, 204, 0.1);
-      }
-      
-      td:before {
-        position: absolute;
-        left: 10px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        font-weight: bold;
-        color: var(--assistant-accent);
-      }
-      
-      td:nth-of-type(1):before { content: "Photo"; }
-      td:nth-of-type(2):before { content: "Name"; }
-      td:nth-of-type(3):before { content: "Email"; }
-      td:nth-of-type(4):before { content: "Phone"; }
-      td:nth-of-type(5):before { content: "Actions"; }
-      
-      .modal-content {
-        width: 90%;
+
+      .content-card {
         padding: 15px;
+      }
+
+      .card-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+      }
+
+      .search-container {
+        max-width: 100%;
+      }
+
+      .student-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .student-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+
+      .student-details {
+        grid-template-columns: 1fr;
+      }
+
+      .student-actions {
+        flex-direction: column;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        padding: 20px;
+        margin: 10px;
+      }
+    }
+
+    /* Tablets (768px to 1024px) */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      .sidebar {
+        width: 70px !important;
+        overflow: visible;
+      }
+
+      .sidebar-header {
+        display: none;
+      }
+
+      .sidebar-nav a span {
+        display: none;
+      }
+
+      .sidebar-nav a {
+        justify-content: center;
+        padding: 12px 10px;
+      }
+
+      .sidebar-nav i {
+        margin-right: 0;
+        font-size: 1.2rem;
+      }
+
+      .main-content {
+        margin-left: 70px;
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .student-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Small Desktops (1024px to 1200px) */
+    @media (min-width: 1025px) and (max-width: 1200px) {
+      .sidebar {
+        width: 250px !important;
+      }
+
+      .main-content {
+        margin-left: 250px;
+      }
+
+      .student-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Large Desktops (1200px and up) */
+    @media (min-width: 1200px) {
+      .sidebar {
+        width: 280px !important;
+      }
+
+      .main-content {
+        margin-left: 280px;
+      }
+
+      .student-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Landscape Orientation */
+    @media (orientation: landscape) and (max-height: 600px) {
+      .student-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Reduced Motion (Accessibility) */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      .sidebar, .header, .student-actions {
+        display: none !important;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .student-card {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
       }
     }
   </style>
@@ -532,14 +916,13 @@
       </div>
 
       <ul class="sidebar-nav">
-        <li><a href="assistant-assignments.html" ><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
-        <li><a href="assistant-quizzess.html" ><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
-        <li><a href="assistant-quiz-submissions.html" ><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
+        <li><a href="assistant-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
+        <li><a href="assistant-quizzess.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+        <li><a href="assistant-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
         <li><a href="assistant-students.html" class="active"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="assistant-livesessions.html" ><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
-        <li><a href="assistant-profile.html" ><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+        <li><a href="assistant-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+        <li><a href="assistant-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
         <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
-        <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
       </ul>
     </aside>
 
@@ -563,24 +946,56 @@
       <div id="alertSuccess" class="alert alert-success"></div>
       <div id="alertError" class="alert alert-error"></div>
 
-      <!-- Students Table -->
+      <!-- Statistics -->
+      <div class="stats-grid" id="statsContainer">
+        <div class="stat-card">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Total Students</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="activeCount">0</div>
+          <div class="stat-label">Active Subscriptions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="courseCount">0</div>
+          <div class="stat-label">Total Courses</div>
+        </div>
+      </div>
+
+      <!-- Search and Filters -->
       <div class="content-card">
         <div class="card-header">
-          <h2><i class="fas fa-list"></i> All Students</h2>
+          <h2><i class="fas fa-search"></i> Search Students</h2>
+          <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search by name, email, or phone...">
+            <button class="search-btn" onclick="searchStudents()">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 15px;">
+          <button class="btn btn-secondary" onclick="clearFilters()">
+            <i class="fas fa-filter-circle-xmark"></i> Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Students Grid -->
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fas fa-users"></i> All Students</h2>
+          <div id="studentCount" class="btn btn-secondary" style="pointer-events: none;">
+            <i class="fas fa-user"></i> <span id="count">0</span> Students
+          </div>
         </div>
 
-        <table id="studentsTable">
-          <thead>
-            <tr>
-              <th>Photo</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div id="studentsGrid" class="student-grid">
+          <div class="student-card">
+            <div class="student-header">
+              <div class="loading"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -601,46 +1016,43 @@
         </div>
 
         <div class="form-group">
-          <label for="editName">Name</label>
+          <label for="editName">Full Name</label>
           <input type="text" id="editName" class="form-control" required>
         </div>
 
         <div class="form-group">
-          <label for="editEmail">Email</label>
+          <label for="editEmail">Email Address</label>
           <input type="email" id="editEmail" class="form-control" required>
         </div>
 
         <div class="form-group">
-          <label for="editPhone">Phone</label>
-          <input type="text" id="editPhone" class="form-control">
+          <label for="editPhone">Phone Number</label>
+          <input type="text" id="editPhone" class="form-control" placeholder="+20 XXXX XXXXX">
         </div>
 
         <div class="form-group">
-          <label for="editParentName">Parent Name</label>
-          <input type="text" id="editParentName" class="form-control">
+          <label for="editParentName">Parent/Guardian Name</label>
+          <input type="text" id="editParentName" class="form-control" placeholder="Optional">
         </div>
 
         <div class="form-group">
           <label for="editParentPhone">Parent Phone</label>
-          <input type="text" id="editParentPhone" class="form-control">
+          <input type="text" id="editParentPhone" class="form-control" placeholder="Optional">
         </div>
 
         <div class="form-group">
           <label for="editSubscriptionCode">Subscription Code</label>
-          <input type="text" id="editSubscriptionCode" class="form-control">
+          <input type="text" id="editSubscriptionCode" class="form-control" placeholder="Enter subscription code">
         </div>
 
-        <div class="form-group">
-          <label>Paid Courses</label>
-          <div id="paidCourses" class="courses-list"></div>
+        <div style="display: flex; gap: 15px; margin-top: 25px;">
+          <button type="submit" class="btn btn-assistant" style="flex: 1;">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+            <i class="fas fa-times"></i> Cancel
+          </button>
         </div>
-
-        <button type="submit" class="btn btn-assistant">
-          <i class="fas fa-save"></i> Save Changes
-        </button>
-        <button type="button" class="btn btn-secondary" onclick="closeModal()">
-          <i class="fas fa-times"></i> Cancel
-        </button>
       </form>
     </div>
   </div>
@@ -649,6 +1061,9 @@
     const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/assistant";
     const UPLOADS_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/";
     const token = localStorage.getItem("assistantToken");
+    
+    let allStudents = [];
+    let filteredStudents = [];
 
     // Check authentication
     if (!token) {
@@ -661,7 +1076,7 @@
     // Helper functions
     function showSuccess(message) {
       const alertSuccess = document.getElementById("alertSuccess");
-      alertSuccess.textContent = message;
+      alertSuccess.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
       alertSuccess.style.display = "block";
       setTimeout(() => {
         alertSuccess.style.display = "none";
@@ -670,7 +1085,7 @@
     
     function showError(message) {
       const alertError = document.getElementById("alertError");
-      alertError.textContent = message;
+      alertError.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
       alertError.style.display = "block";
       setTimeout(() => {
         alertError.style.display = "none";
@@ -681,6 +1096,150 @@
       localStorage.removeItem("assistantToken");
       localStorage.removeItem("assistantInfo");
       window.location.href = "../Login-Pages/assistant-login.html";
+    }
+
+    function closeModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      filteredStudents = [...allStudents];
+      renderStudents();
+    }
+
+    function searchStudents() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      
+      if (!searchTerm) {
+        filteredStudents = [...allStudents];
+      } else {
+        filteredStudents = allStudents.filter(student => 
+          student.name.toLowerCase().includes(searchTerm) ||
+          student.email.toLowerCase().includes(searchTerm) ||
+          (student.phoneNumber && student.phoneNumber.includes(searchTerm)) ||
+          (student.parentName && student.parentName.toLowerCase().includes(searchTerm)) ||
+          (student.parentPhone && student.parentPhone.includes(searchTerm))
+        );
+      }
+      
+      renderStudents();
+    }
+
+    function updateStatistics() {
+      document.getElementById('count').textContent = allStudents.length;
+      document.querySelector('.stat-value').textContent = allStudents.length;
+      
+      const activeSubs = allStudents.filter(s => s.subscriptionCode && s.subscriptionCode.trim() !== '').length;
+      document.getElementById('activeCount').textContent = activeSubs;
+      
+      const totalCourses = allStudents.reduce((sum, student) => {
+        return sum + (student.paidCourses ? student.paidCourses.length : 0);
+      }, 0);
+      document.getElementById('courseCount').textContent = totalCourses;
+    }
+
+    // Render student cards
+    function renderStudents() {
+      const studentsGrid = document.getElementById("studentsGrid");
+      
+      if (filteredStudents.length === 0) {
+        studentsGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-user-slash"></i>
+            <h3>No Students Found</h3>
+            <p>${allStudents.length === 0 ? 'No students in the system yet.' : 'Try adjusting your search terms.'}</p>
+          </div>
+        `;
+        document.getElementById('count').textContent = '0';
+        return;
+      }
+
+      studentsGrid.innerHTML = filteredStudents.map(student => {
+        const photoUrl = student.photo ? `${UPLOADS_BASE}${student.photo}` : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(student.name) + '&background=0a1128&color=00ffcc&size=200';
+        const courses = student.paidCourses || [];
+        
+        return `
+          <div class="student-card" id="student-${student._id}">
+            <div class="student-header">
+              <img class="student-photo" src="${photoUrl}" alt="${student.name}">
+              <div class="student-info">
+                <h3 class="student-name">${student.name}</h3>
+                <div class="student-email">${student.email}</div>
+                <div class="student-id">ID: ${student._id.substring(0, 8)}...</div>
+              </div>
+            </div>
+            
+            <div class="student-details">
+              <div class="detail-item">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value">${student.phoneNumber || 'Not provided'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Parent</span>
+                <span class="detail-value">${student.parentName || 'Not provided'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Parent Phone</span>
+                <span class="detail-value">${student.parentPhone || 'Not provided'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Subscription</span>
+                <span class="detail-value" style="color: ${student.subscriptionCode ? '#00ff8c' : '#ff4d4d'}">
+                  ${student.subscriptionCode ? 'Active' : 'None'}
+                </span>
+              </div>
+            </div>
+            
+            ${courses.length > 0 ? `
+              <div class="courses-section">
+                <div class="section-title">
+                  <i class="fas fa-book-open"></i> Enrolled Courses
+                </div>
+                <div class="courses-list">
+                  ${courses.slice(0, 2).map(course => `
+                    <div class="course-item">
+                      <div class="course-title">${course.title}</div>
+                      <div class="course-meta">
+                        <span>${course.type || 'Course'}</span>
+                        <span>$${course.price || '0'}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                  ${courses.length > 2 ? `
+                    <div class="course-item" style="text-align: center; color: rgba(0, 255, 204, 0.7);">
+                      + ${courses.length - 2} more courses
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            ` : `
+              <div class="courses-section">
+                <div class="section-title">
+                  <i class="fas fa-book-open"></i> Enrolled Courses
+                </div>
+                <div style="text-align: center; padding: 15px; color: rgba(240, 246, 255, 0.5);">
+                  <i class="fas fa-book"></i> No courses enrolled
+                </div>
+              </div>
+            `}
+            
+            <div class="student-actions">
+              <button class="btn btn-assistant btn-sm" onclick="openEditModal('${student._id}')">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="viewStudentDetails('${student._id}')">
+                <i class="fas fa-eye"></i> View
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="deleteStudent('${student._id}')">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('count').textContent = filteredStudents.length;
     }
 
     // Load all students
@@ -698,34 +1257,25 @@
         if (!res.ok) throw new Error("Failed to load students");
         
         const data = await res.json();
-        const tbody = document.querySelector("#studentsTable tbody");
-        tbody.innerHTML = "";
+        allStudents = data.data || [];
+        filteredStudents = [...allStudents];
         
-        if (data.data && data.data.length > 0) {
-          data.data.forEach(s => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${s.photo ? `<img class="student-photo" src="${UPLOADS_BASE}${s.photo}">` : "<i class='fas fa-user-circle' style='font-size: 40px; color: #00ffcc;'></i>"}</td>
-              <td>${s.name}</td>
-              <td>${s.email}</td>
-              <td>${s.phoneNumber || "—"}</td>
-              <td>
-                <button class="btn btn-secondary" onclick="openEditModal('${s._id}')">
-                  <i class="fas fa-edit"></i> View / Edit
-                </button>
-                <button class="btn btn-danger" onclick="deleteStudent('${s._id}')">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
-              </td>
-            `;
-            tbody.appendChild(tr);
-          });
-        } else {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No students found</td></tr>`;
-        }
+        updateStatistics();
+        renderStudents();
       } catch (err) {
         console.error(err);
         showError("Error loading students");
+        const studentsGrid = document.getElementById("studentsGrid");
+        studentsGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Students</h3>
+            <p>Unable to load student data. Please try again later.</p>
+            <button class="btn btn-secondary" onclick="loadStudents()" style="margin-top: 15px;">
+              <i class="fas fa-redo"></i> Retry
+            </button>
+          </div>
+        `;
       }
     }
 
@@ -746,25 +1296,15 @@
         const { student } = await res.json();
 
         document.getElementById("studentId").value = student._id;
-        document.getElementById("studentPhoto").src = student.photo ? `${UPLOADS_BASE}${student.photo}` : "https://via.placeholder.com/80/0a1128/00ffcc?text=No+Photo";
+        document.getElementById("studentPhoto").src = student.photo ? 
+          `${UPLOADS_BASE}${student.photo}` : 
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(student.name)}&background=0a1128&color=00ffcc&size=200`;
         document.getElementById("editName").value = student.name;
         document.getElementById("editEmail").value = student.email;
         document.getElementById("editPhone").value = student.phoneNumber || "";
         document.getElementById("editParentName").value = student.parentName || "";
         document.getElementById("editParentPhone").value = student.parentPhone || "";
         document.getElementById("editSubscriptionCode").value = student.subscriptionCode || "";
-
-        // Populate paid courses
-        const coursesDiv = document.getElementById("paidCourses");
-        if (student.paidCourses && student.paidCourses.length > 0) {
-          coursesDiv.innerHTML = student.paidCourses.map(c => `
-            <div class="course-item">
-              <strong>${c.title}</strong> - ${c.description || "No description"} ($${c.price || 0})
-            </div>
-          `).join("");
-        } else {
-          coursesDiv.innerHTML = "<p style='text-align: center; color: rgba(240, 246, 255, 0.7);'>No courses enrolled</p>";
-        }
 
         document.getElementById("editModal").style.display = "flex";
       } catch (err) {
@@ -773,8 +1313,20 @@
       }
     }
 
-    function closeModal() {
-      document.getElementById("editModal").style.display = "none";
+    function viewStudentDetails(id) {
+      const student = allStudents.find(s => s._id === id);
+      if (student) {
+        const details = `
+Name: ${student.name}
+Email: ${student.email}
+Phone: ${student.phoneNumber || 'Not provided'}
+Parent: ${student.parentName || 'Not provided'}
+Parent Phone: ${student.parentPhone || 'Not provided'}
+Subscription Code: ${student.subscriptionCode || 'None'}
+Courses: ${student.paidCourses ? student.paidCourses.length : 0}
+        `;
+        alert(details);
+      }
     }
 
     // Update student info
@@ -813,12 +1365,12 @@
         
         if (!res.ok) throw new Error("Failed to update");
         
-        showSuccess("✅ Student updated successfully!");
+        showSuccess("Student updated successfully!");
         closeModal();
-        loadStudents();
+        await loadStudents(); // Reload to get updated data
       } catch (err) {
         console.error(err);
-        showError("❌ Error updating student");
+        showError("Error updating student");
       } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
@@ -827,7 +1379,12 @@
 
     // Delete student
     async function deleteStudent(id) {
-      if (!confirm("Are you sure you want to delete this student?")) return;
+      if (!confirm("Are you sure you want to delete this student? All their data will be permanently removed.")) return;
+      
+      const studentCard = document.getElementById(`student-${id}`);
+      if (studentCard) {
+        studentCard.classList.add('loading');
+      }
       
       try {
         const res = await fetch(`${API_BASE}/students/${id}`, {
@@ -842,13 +1399,20 @@
         
         if (!res.ok) throw new Error("Failed to delete");
         
-        showSuccess("🗑 Student deleted successfully!");
-        loadStudents();
+        showSuccess("Student deleted successfully!");
+        await loadStudents();
       } catch (err) {
         console.error(err);
-        showError("❌ Error deleting student");
+        showError("Error deleting student");
       }
     }
+
+    // Search on enter key
+    document.getElementById('searchInput').addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') {
+        searchStudents();
+      }
+    });
 
     // Initial load
     loadStudents();
