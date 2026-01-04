@@ -441,7 +441,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-height: 44px; /* Minimum touch target size */
+      min-height: 44px;
     }
 
     .btn-admin {
@@ -715,7 +715,7 @@
       }
       
       .header {
-        margin-top: 60px; /* Space for fixed menu toggle */
+        margin-top: 60px;
         flex-direction: column;
         text-align: center;
         gap: 15px;
@@ -915,7 +915,7 @@
       }
       
       .form-control {
-        font-size: 16px; /* Prevent iOS zoom on focus */
+        font-size: 16px;
       }
       
       .lesson-card {
@@ -1137,7 +1137,6 @@
             <!-- Multiple Course Selection -->
             <div id="multipleCourseContainer" class="course-selection-container">
               <div id="multipleCourses" class="multiple-course-selection">
-                <!-- Course checkboxes will be loaded here -->
                 <p>Loading courses...</p>
               </div>
               <div style="margin-top: 10px; font-size: clamp(0.8rem, 1vw, 0.9rem); color: rgba(240, 246, 255, 0.7);">
@@ -1730,6 +1729,11 @@
     // Edit lesson - fetch lesson details first
     async function editLesson(id) {
       try {
+        // Wait for courses to load if they haven't yet
+        if (allCourses.length === 0) {
+          await loadCourses();
+        }
+        
         const res = await fetch(`${API_BASE}/${id}`, { 
           headers: { Authorization: "Bearer " + token } 
         });
@@ -1741,9 +1745,10 @@
         
         if (res.ok) {
           const data = await res.json();
-          const lesson = data.lesson || data.data;
+          // Try different response structures
+          const lesson = data.lesson || data.data || data;
           
-          if (lesson) {
+          if (lesson && lesson._id) {
             lessonIdInput.value = lesson._id;
             titleInput.value = lesson.title || "";
             descInput.value = lesson.description || "";
@@ -1751,17 +1756,24 @@
             priceInput.value = lesson.price || 0;
             
             // Set course selection (editing only works with single course)
-            const courseId = lesson.course?._id || lesson.course;
+            let courseId = "";
+            if (lesson.course) {
+              courseId = lesson.course._id || lesson.course;
+            }
             setSelectedCourse(courseId);
             
             formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Lesson';
             cancelEditBtn.style.display = "inline-block";
             window.scrollTo({ top: 0, behavior: 'smooth' });
+          } else {
+            showError("Could not parse lesson data from server");
           }
+        } else {
+          showError(`Failed to fetch lesson: ${res.status} ${res.statusText}`);
         }
       } catch (error) {
         console.error("Error fetching lesson details:", error);
-        showError("Failed to load lesson details.");
+        showError("Failed to load lesson details. Please try again.");
       }
     }
 
