@@ -1303,7 +1303,8 @@
         const tbody = document.getElementById("submissionsTable");
         tbody.innerHTML = "";
         
-        const submissions = data.data.filter(s => s.quiz._id === quizId);
+        // FIX: Added null check for quiz property
+        const submissions = data.data.filter(s => s.quiz && s.quiz._id === quizId);
         
         if (submissions.length === 0) {
           tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No submissions found for this quiz</td></tr>`;
@@ -1313,8 +1314,8 @@
             tr.innerHTML = `
               <td>${s.student?.name || "-"}</td>
               <td>${s.student?.email || "-"}</td>
-              <td>${s.score}</td>
-              <td>${new Date(s.attemptedAt).toLocaleString()}</td>
+              <td>${s.score || "-"}</td>
+              <td>${s.attemptedAt ? new Date(s.attemptedAt).toLocaleString() : "-"}</td>
               <td>${s.pdfAnswerFile ? `<a href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${s.pdfAnswerFile}" target="_blank">Download</a>` : "No file"}</td>
             `;
             tbody.appendChild(tr);
