@@ -1067,11 +1067,14 @@
       <div class="content-card">
         <div class="card-header">
           <h2><i class="fas fa-plus-circle"></i> Create New Quiz</h2>
+          <button type="button" class="btn btn-assistant" onclick="createQuizDirect()">
+            <i class="fas fa-play"></i> Test Create Button
+          </button>
         </div>
 
         <form id="quizForm" enctype="multipart/form-data">
           <div class="form-group">
-            <label for="title">Quiz Title</label>
+            <label for="title">Quiz Title *</label>
             <input type="text" id="title" class="form-control" placeholder="Enter quiz title" required>
           </div>
 
@@ -1081,7 +1084,7 @@
           </div>
 
           <div class="form-group">
-            <label for="courseId">Course</label>
+            <label for="courseId">Course *</label>
             <select id="courseId" class="form-control" required>
               <option value="">-- Loading courses... --</option>
             </select>
@@ -1094,7 +1097,7 @@
 
           <!-- Exam Type Selection -->
           <div class="form-group">
-            <label>Exam Type</label>
+            <label>Exam Type *</label>
             <div class="exam-type-selector">
               <div class="exam-type-option selected" data-type="structured" onclick="selectExamType('structured')">
                 <i class="fas fa-list-ol"></i>
@@ -1112,7 +1115,7 @@
 
           <!-- Questions Section (for structured exams) -->
           <div class="form-group" id="questionsSection">
-            <label>Questions</label>
+            <label>Questions *</label>
             <div id="questionsContainer"></div>
             <button type="button" class="btn btn-secondary" onclick="addQuestion()">
               <i class="fas fa-plus"></i> Add Question
@@ -1121,7 +1124,7 @@
 
           <!-- PDF Upload Section (for PDF exams) -->
           <div class="form-group" id="pdfSection" style="display: none;">
-            <label for="pdfFile">PDF File</label>
+            <label for="pdfFile">PDF File *</label>
             <div class="file-input">
               <input type="file" id="pdfFile" name="pdfFile" accept=".pdf">
               <div class="file-input-label">
@@ -1131,7 +1134,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-assistant" style="width: 100%;">
+          <button type="submit" class="btn btn-assistant" style="width: 100%;" id="createQuizBtn">
             <i class="fas fa-save"></i> Create Quiz
           </button>
         </form>
@@ -1241,6 +1244,7 @@
     let allQuizzes = [];
     let filteredQuizzes = [];
     let courses = [];
+    let questionCounter = 0;
 
     // Check authentication
     if (!token) {
@@ -1390,7 +1394,6 @@
     }
 
     // Add question block
-    let questionCounter = 0;
     function addQuestion(existing = null) {
       const container = document.getElementById("questionsContainer");
       const id = `question-${questionCounter++}`;
@@ -1466,74 +1469,166 @@
       container.appendChild(div);
     }
 
-    // Create quiz
-    document.getElementById("quizForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    // Setup form validation
+    function setupFormValidation() {
+      const form = document.getElementById("quizForm");
+      const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
       
-      const submitBtn = e.target.querySelector('button[type="submit"]');
+      inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+          if (!this.value.trim()) {
+            this.style.borderColor = '#ff4d4d';
+            this.style.boxShadow = '0 0 10px rgba(255, 77, 77, 0.3)';
+          } else {
+            this.style.borderColor = 'rgba(0, 255, 204, 0.3)';
+            this.style.boxShadow = 'none';
+          }
+        });
+        
+        input.addEventListener('input', function() {
+          if (this.value.trim()) {
+            this.style.borderColor = 'rgba(0, 255, 204, 0.3)';
+            this.style.boxShadow = 'none';
+          }
+        });
+      });
+    }
+
+    // Setup quiz form event listener
+    function setupQuizForm() {
+      const quizForm = document.getElementById("quizForm");
+      
+      quizForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        console.log("Form submission triggered by form submit event");
+        await handleCreateQuiz();
+      });
+    }
+
+    // Direct create quiz function for testing
+    function createQuizDirect() {
+      console.log("Direct create quiz function called");
+      document.getElementById("quizForm").dispatchEvent(new Event('submit'));
+    }
+
+    // Main create quiz handler
+    async function handleCreateQuiz() {
+      console.log("handleCreateQuiz function called");
+      
+      const submitBtn = document.querySelector('#quizForm button[type="submit"]');
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
       submitBtn.disabled = true;
 
       try {
+        console.log("Token exists:", !!token);
+        console.log("API Base:", API_BASE);
+        
         const examType = document.getElementById("examType").value;
         let questions = [];
         
         if (examType === 'structured') {
-          questions = Array.from(document.querySelectorAll("#questionsContainer .question-block")).map(block => ({
-            question: block.querySelector(".q-text").value,
-            type: block.querySelector(".q-type").value,
-            options: block.querySelector(".q-options").value.split(",").map(o=>o.trim()).filter(Boolean),
-            answer: block.querySelector(".q-answer").value,
-            marks: Number(block.querySelector(".q-marks").value)
-          }));
+          const questionBlocks = document.querySelectorAll("#questionsContainer .question-block");
+          if (questionBlocks.length === 0) {
+            showError("Please add at least one question for structured exam");
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            return;
+          }
+          
+          questions = Array.from(questionBlocks).map(block => {
+            const optionsText = block.querySelector(".q-options").value;
+            return {
+              question: block.querySelector(".q-text").value.trim(),
+              type: block.querySelector(".q-type").value,
+              options: optionsText ? optionsText.split(",").map(o => o.trim()).filter(Boolean) : [],
+              answer: block.querySelector(".q-answer").value.trim(),
+              marks: Number(block.querySelector(".q-marks").value) || 1
+            };
+          });
         }
 
         const formData = new FormData();
-        formData.append("title", document.getElementById("title").value);
-        formData.append("description", document.getElementById("description").value);
+        formData.append("title", document.getElementById("title").value.trim());
+        formData.append("description", document.getElementById("description").value.trim());
         formData.append("courseId", document.getElementById("courseId").value);
-        formData.append("duration", document.getElementById("duration").value);
+        
+        const duration = document.getElementById("duration").value;
+        if (duration) {
+          formData.append("duration", duration);
+        }
+        
         formData.append("examType", examType);
-        formData.append("questions", JSON.stringify(questions));
+        
+        if (examType === 'structured') {
+          formData.append("questions", JSON.stringify(questions));
+        }
         
         if (examType === 'pdf') {
           const pdfFile = document.getElementById("pdfFile").files[0];
-          if (pdfFile) {
-            formData.append("pdfFile", pdfFile);
+          if (!pdfFile) {
+            showError("Please select a PDF file for PDF exam");
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            return;
           }
+          formData.append("pdfFile", pdfFile);
+        }
+
+        // Validate required fields
+        if (!formData.get("title") || !formData.get("courseId")) {
+          showError("Please fill in all required fields (Title and Course)");
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+          return;
+        }
+
+        // Debug form data
+        console.log("Sending request to:", `${API_BASE}/quizzes`);
+        console.log("FormData contents:");
+        for (let pair of formData.entries()) {
+          console.log(pair[0] + ': ' + (pair[0] === 'pdfFile' ? pair[1].name : pair[1]));
         }
 
         const res = await fetch(`${API_BASE}/quizzes`, {
           method: "POST",
-          headers: { "Authorization": `Bearer ${token}` },
+          headers: { 
+            "Authorization": `Bearer ${token}`
+          },
           body: formData
         });
 
+        console.log("Response status:", res.status);
+        
         if (res.status === 401) {
+          showError("Session expired. Please login again.");
           logout();
           return;
         }
 
         const data = await res.json();
+        console.log("Response data:", data);
+        
         if (data.success) {
           showSuccess("Quiz created successfully!");
           document.getElementById("quizForm").reset();
           document.getElementById("questionsContainer").innerHTML = "";
           document.getElementById("pdfFileName").textContent = "";
           selectExamType('structured');
+          // Add one default question
+          addQuestion();
           await loadQuizzes();
         } else {
           showError("Error: " + (data.error || "Failed to create quiz"));
         }
       } catch (error) {
         console.error("Failed to create quiz:", error);
-        showError("Failed to create quiz. Please try again.");
+        showError("Failed to create quiz. Please try again. Error: " + error.message);
       } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
       }
-    });
+    }
 
     // Render quizzes
     function renderQuizzes() {
@@ -1798,18 +1893,21 @@
         
         let questions = [];
         if (examType === 'structured') {
-          questions = Array.from(document.querySelectorAll("#editQuestionsContainer .question-block")).map(block => ({
-            question: block.querySelector(".q-text").value,
-            type: block.querySelector(".q-type").value,
-            options: block.querySelector(".q-options").value.split(",").map(o=>o.trim()).filter(Boolean),
-            answer: block.querySelector(".q-answer").value,
-            marks: Number(block.querySelector(".q-marks").value)
-          }));
+          questions = Array.from(document.querySelectorAll("#editQuestionsContainer .question-block")).map(block => {
+            const optionsText = block.querySelector(".q-options").value;
+            return {
+              question: block.querySelector(".q-text").value.trim(),
+              type: block.querySelector(".q-type").value,
+              options: optionsText ? optionsText.split(",").map(o => o.trim()).filter(Boolean) : [],
+              answer: block.querySelector(".q-answer").value.trim(),
+              marks: Number(block.querySelector(".q-marks").value) || 1
+            };
+          });
         }
 
         const formData = new FormData();
-        formData.append("title", document.getElementById("editTitle").value);
-        formData.append("description", document.getElementById("editDescription").value);
+        formData.append("title", document.getElementById("editTitle").value.trim());
+        formData.append("description", document.getElementById("editDescription").value.trim());
         formData.append("duration", document.getElementById("editDuration").value);
         formData.append("examType", examType);
         formData.append("questions", JSON.stringify(questions));
@@ -1942,10 +2040,23 @@
     });
 
     // Initialize
-    loadCourses();
-    loadQuizzes();
-    // Add initial question
-    setTimeout(() => addQuestion(), 100);
+    document.addEventListener('DOMContentLoaded', function() {
+      if (token) {
+        loadCourses();
+        loadQuizzes();
+        setupQuizForm();
+        setupFormValidation();
+        // Add initial question
+        setTimeout(() => addQuestion(), 100);
+        
+        // Add click listener to the create button as backup
+        const createBtn = document.getElementById('createQuizBtn');
+        createBtn.addEventListener('click', function(e) {
+          console.log("Create quiz button clicked directly");
+          // Let the form submission handle it
+        });
+      }
+    });
   </script>
 </body>
 </html>
