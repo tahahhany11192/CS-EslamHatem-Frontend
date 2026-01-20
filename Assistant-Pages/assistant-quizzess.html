@@ -1067,9 +1067,6 @@
       <div class="content-card">
         <div class="card-header">
           <h2><i class="fas fa-plus-circle"></i> Create New Quiz</h2>
-          <button type="button" class="btn btn-assistant" onclick="createQuizDirect()">
-            <i class="fas fa-play"></i> Test Create Button
-          </button>
         </div>
 
         <form id="quizForm" enctype="multipart/form-data">
@@ -1134,7 +1131,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-assistant" style="width: 100%;" id="createQuizBtn">
+          <button type="button" class="btn btn-assistant" style="width: 100%;" id="createQuizBtn" onclick="handleCreateQuizButton()">
             <i class="fas fa-save"></i> Create Quiz
           </button>
         </form>
@@ -1494,28 +1491,28 @@
       });
     }
 
-    // Setup quiz form event listener
-    function setupQuizForm() {
-      const quizForm = document.getElementById("quizForm");
+    // Handle Create Quiz button click
+    function handleCreateQuizButton() {
+      console.log("Create Quiz button clicked");
       
-      quizForm.addEventListener("submit", async function(e) {
-        e.preventDefault();
-        console.log("Form submission triggered by form submit event");
-        await handleCreateQuiz();
-      });
-    }
-
-    // Direct create quiz function for testing
-    function createQuizDirect() {
-      console.log("Direct create quiz function called");
-      document.getElementById("quizForm").dispatchEvent(new Event('submit'));
+      // Get the form
+      const form = document.getElementById("quizForm");
+      
+      // Check form validity
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      
+      // Call the main create quiz function
+      handleCreateQuiz();
     }
 
     // Main create quiz handler
     async function handleCreateQuiz() {
       console.log("handleCreateQuiz function called");
       
-      const submitBtn = document.querySelector('#quizForm button[type="submit"]');
+      const submitBtn = document.getElementById("createQuizBtn");
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
       submitBtn.disabled = true;
@@ -2044,17 +2041,9 @@
       if (token) {
         loadCourses();
         loadQuizzes();
-        setupQuizForm();
         setupFormValidation();
         // Add initial question
         setTimeout(() => addQuestion(), 100);
-        
-        // Add click listener to the create button as backup
-        const createBtn = document.getElementById('createQuizBtn');
-        createBtn.addEventListener('click', function(e) {
-          console.log("Create quiz button clicked directly");
-          // Let the form submission handle it
-        });
       }
     });
   </script>
