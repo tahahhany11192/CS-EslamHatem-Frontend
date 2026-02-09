@@ -207,41 +207,6 @@
       color: var(--light);
     }
 
-    /* Search Bar */
-    .search-container {
-      position: relative;
-      max-width: 400px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 12px 45px 12px 15px;
-      border-radius: 30px;
-      border: 2px solid rgba(0, 255, 204, 0.3);
-      background: rgba(0, 0, 0, 0.3);
-      color: var(--light);
-      font-family: 'Exo 2', sans-serif;
-      transition: all 0.3s ease;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--assistant-accent);
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
-    }
-
-    .search-btn {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--assistant-accent);
-      cursor: pointer;
-      font-size: 1.2rem;
-    }
-
     /* Form Styles */
     .form-group {
       margin-bottom: 20px;
@@ -274,148 +239,6 @@
     textarea.form-control {
       min-height: 120px;
       resize: vertical;
-    }
-
-    /* Quiz Cards */
-    .quiz-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-      gap: 25px;
-    }
-
-    .quiz-card {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 15px;
-      padding: 25px;
-      border: 1px solid rgba(0, 255, 204, 0.2);
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    .quiz-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-      border-color: rgba(0, 255, 204, 0.4);
-    }
-
-    .quiz-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-    }
-
-    .quiz-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
-      color: var(--light);
-      margin-bottom: 5px;
-    }
-
-    .quiz-course {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 15px;
-      font-size: 0.8rem;
-      background: rgba(0, 255, 204, 0.2);
-      color: var(--assistant-accent);
-      margin-top: 5px;
-    }
-
-    .quiz-type-badge {
-      display: inline-block;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      background: rgba(0, 102, 255, 0.3);
-      color: var(--light);
-      border: 1px solid rgba(0, 102, 255, 0.5);
-    }
-
-    .pdf-badge {
-      background: rgba(255, 77, 77, 0.2);
-      border-color: rgba(255, 77, 77, 0.5);
-    }
-
-    .quiz-details {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-
-    .detail-item {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .detail-label {
-      font-size: 0.8rem;
-      color: rgba(240, 246, 255, 0.7);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .detail-value {
-      font-weight: 600;
-      color: var(--light);
-      font-size: 1.1rem;
-    }
-
-    .questions-section {
-      margin-bottom: 20px;
-    }
-
-    .section-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1rem;
-      color: var(--assistant-accent);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .questions-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .question-item {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 8px;
-      padding: 12px 15px;
-      border-left: 3px solid var(--assistant-accent);
-      transition: all 0.3s ease;
-    }
-
-    .question-item:hover {
-      background: rgba(0, 255, 204, 0.1);
-      transform: translateX(5px);
-    }
-
-    .question-text {
-      font-weight: 600;
-      color: var(--light);
-      margin-bottom: 5px;
-    }
-
-    .question-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      color: rgba(240, 246, 255, 0.7);
-    }
-
-    .quiz-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
     }
 
     /* Buttons */
@@ -473,7 +296,6 @@
     .btn-sm {
       padding: 8px 15px;
       font-size: 0.9rem;
-      flex: 1;
     }
 
     .btn::before {
@@ -491,22 +313,132 @@
       left: 100%;
     }
 
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+    }
+
+    th {
+      background: rgba(0, 0, 0, 0.2);
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 500;
+      color: var(--assistant-accent);
+    }
+
+    tr:hover {
+      background: rgba(0, 255, 204, 0.05);
+    }
+
+    /* Question Block Styles */
+    .question-block {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(0, 255, 204, 0.2);
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: rgba(10, 17, 40, 0.95);
+      border-radius: 15px;
+      padding: 25px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(0, 255, 204, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+    }
+
+    .modal-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      color: var(--light);
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--light);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .alert-success {
+      background: rgba(0, 255, 140, 0.1);
+      border-left: 4px solid #00ff8c;
+      color: #00ff8c;
+    }
+
+    .alert-error {
+      background: rgba(255, 77, 77, 0.1);
+      border-left: 4px solid #ff4d4d;
+      color: #ff4d4d;
+    }
+
     /* Exam Type Selector */
     .exam-type-selector {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
+      display: flex;
+      gap: 20px;
       margin-bottom: 20px;
     }
     
     .exam-type-option {
+      flex: 1;
       border: 2px solid rgba(0, 255, 204, 0.3);
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 15px;
       text-align: center;
       cursor: pointer;
       transition: all 0.3s ease;
-      background: rgba(0, 0, 0, 0.2);
     }
     
     .exam-type-option:hover {
@@ -517,25 +449,25 @@
     .exam-type-option.selected {
       border-color: var(--assistant-accent);
       background: rgba(0, 255, 204, 0.2);
-      box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
     }
     
     .exam-type-option i {
-      font-size: 2.5rem;
+      font-size: 2rem;
       margin-bottom: 10px;
       display: block;
-      color: var(--assistant-accent);
     }
     
-    .exam-type-option h3 {
-      font-family: 'Orbitron', sans-serif;
-      margin-bottom: 8px;
-      color: var(--light);
+    .pdf-preview {
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px dashed rgba(0, 255, 204, 0.3);
+      border-radius: 8px;
+      text-align: center;
     }
     
-    .exam-type-option p {
-      font-size: 0.9rem;
-      color: rgba(240, 246, 255, 0.7);
+    .pdf-preview img {
+      max-width: 100px;
+      margin-bottom: 10px;
     }
 
     /* File Input Styling */
@@ -558,7 +490,7 @@
 
     .file-input-label {
       display: block;
-      padding: 15px;
+      padding: 12px 15px;
       border-radius: 8px;
       border: 2px dashed rgba(0, 255, 204, 0.3);
       background: rgba(0, 0, 0, 0.3);
@@ -571,7 +503,6 @@
     .file-input-label:hover {
       border-color: var(--assistant-accent);
       color: var(--light);
-      background: rgba(0, 255, 204, 0.1);
     }
 
     .file-name {
@@ -580,401 +511,91 @@
       color: var(--assistant-accent);
     }
 
-    /* Question Block */
-    .question-block {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 15px;
-      border: 1px solid rgba(0, 255, 204, 0.2);
-    }
-
-    .question-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    /* Modal Styles */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .modal-content {
-      background: rgba(10, 17, 40, 0.95);
-      border-radius: 15px;
-      padding: 30px;
-      width: 100%;
-      max-width: 800px;
-      max-height: 90vh;
-      overflow-y: auto;
-      border: 1px solid rgba(0, 255, 204, 0.3);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-    }
-
-    .modal-header h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
-      color: var(--light);
-    }
-
-    .close-modal {
-      background: none;
-      border: none;
-      color: var(--light);
-      font-size: 1.8rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .close-modal:hover {
-      color: var(--assistant-accent);
-    }
-
-    /* Alerts */
-    .alert {
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: none;
-      animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .alert-success {
-      background: rgba(0, 255, 140, 0.1);
-      border-left: 4px solid #00ff8c;
-      color: #00ff8c;
-    }
-
-    .alert-error {
-      background: rgba(255, 77, 77, 0.1);
-      border-left: 4px solid #ff4d4d;
-      color: #ff4d4d;
-    }
-
-    /* Statistics Cards */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .stat-card {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      border: 1px solid rgba(0, 255, 204, 0.2);
-      transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-      border-color: var(--assistant-accent);
-    }
-
-    .stat-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.5rem;
-      color: var(--assistant-accent);
-      margin-bottom: 5px;
-    }
-
-    .stat-label {
-      font-size: 0.9rem;
-      color: rgba(240, 246, 255, 0.7);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: rgba(240, 246, 255, 0.6);
-    }
-
-    .empty-state i {
-      font-size: 4rem;
-      margin-bottom: 20px;
-      color: rgba(0, 255, 204, 0.3);
-    }
-
-    .empty-state h3 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-      color: var(--light);
-    }
-
-    /* PDF Preview */
-    .pdf-preview {
-      margin-top: 15px;
-      padding: 15px;
-      border: 1px dashed rgba(0, 255, 204, 0.3);
-      border-radius: 8px;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.2);
-    }
-
-    .pdf-preview img {
-      width: 60px;
-      margin-bottom: 10px;
-    }
-
-    .pdf-preview a {
-      color: var(--assistant-accent);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 10px;
-    }
-
-    .pdf-preview a:hover {
-      text-decoration: underline;
-    }
-
     /* Responsive Design */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 70px;
+        overflow: visible;
+      }
+      
+      .sidebar-logo span, .sidebar-nav span {
+        display: none;
+      }
+      
+      .sidebar-nav i {
+        margin-right: 0;
+        font-size: 1.2rem;
+      }
+      
+      .main-content {
+        margin-left: 70px;
+      }
+    }
 
-    /* Mobile Devices (up to 768px) */
     @media (max-width: 768px) {
       .sidebar {
-        width: 70px !important;
-        overflow: visible;
-      }
-
-      .sidebar-header {
         display: none;
-      }
-
-      .sidebar-nav a span {
-        display: none;
-      }
-
-      .sidebar-nav a {
-        justify-content: center;
-        padding: 12px 10px;
-      }
-
-      .sidebar-nav i {
-        margin-right: 0;
-        font-size: 1.2rem;
-      }
-
-      .main-content {
-        margin-left: 70px;
-        padding: 15px;
-      }
-
-      .header {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-        padding: 15px;
-      }
-
-      .header h1 {
-        font-size: 1.4rem;
-      }
-
-      .user-menu {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .user-info {
-        text-align: center;
-      }
-
-      .content-card {
-        padding: 15px;
-      }
-
-      .card-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-      }
-
-      .search-container {
-        max-width: 100%;
-      }
-
-      .quiz-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-      }
-
-      .quiz-header {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-      }
-
-      .quiz-details {
-        grid-template-columns: 1fr;
-      }
-
-      .quiz-actions {
-        flex-direction: column;
-      }
-
-      .exam-type-selector {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-content {
-        padding: 20px;
-        margin: 10px;
-      }
-
-      .question-block {
-        padding: 15px;
-      }
-    }
-
-    /* Tablets (768px to 1024px) */
-    @media (min-width: 768px) and (max-width: 1024px) {
-      .sidebar {
-        width: 70px !important;
-        overflow: visible;
-      }
-
-      .sidebar-header {
-        display: none;
-      }
-
-      .sidebar-nav a span {
-        display: none;
-      }
-
-      .sidebar-nav a {
-        justify-content: center;
-        padding: 12px 10px;
-      }
-
-      .sidebar-nav i {
-        margin-right: 0;
-        font-size: 1.2rem;
-      }
-
-      .main-content {
-        margin-left: 70px;
-        padding: 20px;
-      }
-
-      .header h1 {
-        font-size: 1.5rem;
-      }
-
-      .quiz-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Small Desktops (1024px to 1200px) */
-    @media (min-width: 1025px) and (max-width: 1200px) {
-      .sidebar {
-        width: 250px !important;
-      }
-
-      .main-content {
-        margin-left: 250px;
-      }
-
-      .quiz-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Large Desktops (1200px and up) */
-    @media (min-width: 1200px) {
-      .sidebar {
-        width: 280px !important;
-      }
-
-      .main-content {
-        margin-left: 280px;
-      }
-
-      .quiz-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    /* Landscape Orientation */
-    @media (orientation: landscape) and (max-height: 600px) {
-      .quiz-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* Reduced Motion (Accessibility) */
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    /* Print Styles */
-    @media print {
-      .sidebar, .header, .quiz-actions {
-        display: none !important;
       }
       
       .main-content {
         margin-left: 0;
+        padding: 15px;
       }
       
-      .quiz-card {
-        break-inside: avoid;
-        box-shadow: none !important;
-        border: 1px solid #ccc !important;
+      .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+      
+      .user-menu {
+        flex-direction: column;
+      }
+      
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      
+      thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+      
+      tr {
+        margin-bottom: 15px;
+        border: 1px solid rgba(0, 255, 204, 0.2);
+        border-radius: 8px;
+        padding: 10px;
+      }
+      
+      td {
+        position: relative;
+        padding-left: 50%;
+        border: none;
+        border-bottom: 1px solid rgba(0, 255, 204, 0.1);
+      }
+      
+      td:before {
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: bold;
+        color: var(--assistant-accent);
+      }
+      
+      td:nth-of-type(1):before { content: "Title"; }
+      td:nth-of-type(2):before { content: "Course"; }
+      td:nth-of-type(3):before { content: "Type"; }
+      td:nth-of-type(4):before { content: "Total Marks"; }
+      td:nth-of-type(5):before { content: "Duration"; }
+      td:nth-of-type(6):before { content: "Created"; }
+      td:nth-of-type(7):before { content: "Actions"; }
+
+      .exam-type-selector {
+        flex-direction: column;
       }
     }
   </style>
@@ -1001,7 +622,6 @@
         <li><a href="assistant-livesessions.html"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
         <li><a href="assistant-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
         <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
-        <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
       </ul>
     </aside>
 
@@ -1025,44 +645,6 @@
       <div id="alertSuccess" class="alert alert-success"></div>
       <div id="alertError" class="alert alert-error"></div>
 
-      <!-- Statistics -->
-      <div class="stats-grid" id="statsContainer">
-        <div class="stat-card">
-          <div class="stat-value">0</div>
-          <div class="stat-label">Total Quizzes</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="structuredCount">0</div>
-          <div class="stat-label">Structured Exams</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="pdfCount">0</div>
-          <div class="stat-label">PDF Exams</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="totalMarks">0</div>
-          <div class="stat-label">Total Marks</div>
-        </div>
-      </div>
-
-      <!-- Search and Filters -->
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-search"></i> Search Quizzes</h2>
-          <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Search by title, course, or type...">
-            <button class="search-btn" onclick="searchQuizzes()">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </div>
-        <div style="text-align: center; margin-top: 15px;">
-          <button class="btn btn-secondary" onclick="clearFilters()">
-            <i class="fas fa-filter-circle-xmark"></i> Clear Filters
-          </button>
-        </div>
-      </div>
-
       <!-- Create Quiz Form -->
       <div class="content-card">
         <div class="card-header">
@@ -1071,7 +653,7 @@
 
         <form id="quizForm" enctype="multipart/form-data">
           <div class="form-group">
-            <label for="title">Quiz Title *</label>
+            <label for="title">Quiz Title</label>
             <input type="text" id="title" class="form-control" placeholder="Enter quiz title" required>
           </div>
 
@@ -1081,9 +663,9 @@
           </div>
 
           <div class="form-group">
-            <label for="courseId">Course *</label>
+            <label for="courseId">Course</label>
             <select id="courseId" class="form-control" required>
-              <option value="">-- Loading courses... --</option>
+              <option value="">-- Select Course --</option>
             </select>
           </div>
 
@@ -1094,7 +676,7 @@
 
           <!-- Exam Type Selection -->
           <div class="form-group">
-            <label>Exam Type *</label>
+            <label>Exam Type</label>
             <div class="exam-type-selector">
               <div class="exam-type-option selected" data-type="structured" onclick="selectExamType('structured')">
                 <i class="fas fa-list-ol"></i>
@@ -1112,7 +694,7 @@
 
           <!-- Questions Section (for structured exams) -->
           <div class="form-group" id="questionsSection">
-            <label>Questions *</label>
+            <label>Questions</label>
             <div id="questionsContainer"></div>
             <button type="button" class="btn btn-secondary" onclick="addQuestion()">
               <i class="fas fa-plus"></i> Add Question
@@ -1121,44 +703,53 @@
 
           <!-- PDF Upload Section (for PDF exams) -->
           <div class="form-group" id="pdfSection" style="display: none;">
-            <label for="pdfFile">PDF File *</label>
+            <label for="pdfFile">PDF File</label>
             <div class="file-input">
               <input type="file" id="pdfFile" name="pdfFile" accept=".pdf">
               <div class="file-input-label">
-                <i class="fas fa-cloud-upload-alt"></i> Choose PDF file (max 10MB)
+                <i class="fas fa-cloud-upload-alt"></i> Choose PDF file
               </div>
               <div id="pdfFileName" class="file-name"></div>
             </div>
+            <small>Only PDF files are accepted (max 10MB)</small>
           </div>
 
-          <button type="button" class="btn btn-assistant" style="width: 100%;" id="createQuizBtn" onclick="handleCreateQuizButton()">
+          <button type="submit" class="btn btn-assistant">
             <i class="fas fa-save"></i> Create Quiz
           </button>
         </form>
       </div>
 
-      <!-- Quiz Cards -->
+      <!-- Quiz List -->
       <div class="content-card">
         <div class="card-header">
           <h2><i class="fas fa-list"></i> All Quizzes</h2>
-          <div id="quizCount" class="btn btn-secondary" style="pointer-events: none;">
-            <i class="fas fa-question-circle"></i> <span id="count">0</span> Quizzes
-          </div>
         </div>
 
-        <div id="quizzesGrid" class="quiz-grid">
-          <!-- Quizzes will be loaded here -->
-        </div>
+        <table id="quizTable">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Course</th>
+              <th>Type</th>
+              <th>Total Marks</th>
+              <th>Duration</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </main>
   </div>
 
-  <!-- View/Edit Quiz Modal -->
+  <!-- Edit Quiz Modal -->
   <div id="editModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2><i class="fas fa-edit"></i> Edit Quiz</h2>
-        <button class="close-modal" onclick="closeModal()">&times;</button>
+        <h2>Edit Quiz</h2>
+        <button class="close-modal" onclick="closeEditModal()">&times;</button>
       </div>
       
       <form id="editQuizForm" enctype="multipart/form-data">
@@ -1199,7 +790,7 @@
             </div>
             <div id="editPdfFileName" class="file-name"></div>
           </div>
-          <small>Leave empty to keep current file</small>
+          <small>Only PDF files are accepted (max 10MB). Leave empty to keep current file.</small>
           
           <div id="editPdfPreview" class="pdf-preview">
             <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Icon">
@@ -1208,14 +799,12 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 15px; margin-top: 25px;">
-          <button type="submit" class="btn btn-assistant" style="flex: 1;">
-            <i class="fas fa-save"></i> Save Changes
-          </button>
-          <button type="button" class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
-            <i class="fas fa-times"></i> Cancel
-          </button>
-        </div>
+        <button type="submit" class="btn btn-assistant">
+          <i class="fas fa-save"></i> Save Changes
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
       </form>
     </div>
   </div>
@@ -1224,28 +813,36 @@
   <div id="submissionsModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2><i class="fas fa-users"></i> Quiz Submissions</h2>
+        <h2>Quiz Submissions</h2>
         <button class="close-modal" onclick="closeSubmissionsModal()">&times;</button>
       </div>
       
-      <div id="submissionsGrid" class="quiz-grid" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
-        <!-- Submissions will be loaded here -->
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Email</th>
+            <th>Score</th>
+            <th>Attempted At</th>
+            <th>Submission File</th>
+          </tr>
+        </thead>
+        <tbody id="submissionsTable"></tbody>
+      </table>
+      
+      <br>
+      <button class="btn btn-secondary" onclick="closeSubmissionsModal()">
+        <i class="fas fa-times"></i> Close
+      </button>
     </div>
   </div>
 
   <script>
     const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/assistant";
-    const token = localStorage.getItem("assistantToken");
-    
-    let allQuizzes = [];
-    let filteredQuizzes = [];
-    let courses = [];
-    let questionCounter = 0;
+    const token = localStorage.getItem("assistantToken"); // stored after login
 
-    // Check authentication
     if (!token) {
-      showError("⚠️ Not authorized. Please login as assistant.");
+      showError("Not authorized. Please login as assistant.");
       setTimeout(() => {
         window.location.href = "../Login-Pages/assistant-login.html";
       }, 2000);
@@ -1254,7 +851,7 @@
     // Helper functions
     function showSuccess(message) {
       const alertSuccess = document.getElementById("alertSuccess");
-      alertSuccess.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+      alertSuccess.textContent = message;
       alertSuccess.style.display = "block";
       setTimeout(() => {
         alertSuccess.style.display = "none";
@@ -1263,7 +860,7 @@
 
     function showError(message) {
       const alertError = document.getElementById("alertError");
-      alertError.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+      alertError.textContent = message;
       alertError.style.display = "block";
       setTimeout(() => {
         alertError.style.display = "none";
@@ -1274,52 +871,6 @@
       localStorage.removeItem("assistantToken");
       localStorage.removeItem("assistantInfo");
       window.location.href = "../Login-Pages/assistant-login.html";
-    }
-
-    function closeModal() {
-      document.getElementById("editModal").style.display = "none";
-      document.getElementById("editQuizForm").reset();
-      document.getElementById("editQuestionsContainer").innerHTML = "";
-      document.getElementById("editPdfFileName").textContent = "";
-    }
-
-    function closeSubmissionsModal() {
-      document.getElementById("submissionsModal").style.display = "none";
-    }
-
-    function clearFilters() {
-      document.getElementById('searchInput').value = '';
-      filteredQuizzes = [...allQuizzes];
-      renderQuizzes();
-    }
-
-    function searchQuizzes() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-      
-      if (!searchTerm) {
-        filteredQuizzes = [...allQuizzes];
-      } else {
-        filteredQuizzes = allQuizzes.filter(quiz => 
-          quiz.title.toLowerCase().includes(searchTerm) ||
-          (quiz.course && quiz.course.title.toLowerCase().includes(searchTerm)) ||
-          quiz.examType.includes(searchTerm)
-        );
-      }
-      
-      renderQuizzes();
-    }
-
-    function updateStatistics() {
-      document.getElementById('count').textContent = allQuizzes.length;
-      document.querySelector('.stat-value').textContent = allQuizzes.length;
-      
-      const structuredCount = allQuizzes.filter(q => q.examType === 'structured').length;
-      const pdfCount = allQuizzes.filter(q => q.examType === 'pdf').length;
-      const totalMarks = allQuizzes.reduce((sum, quiz) => sum + (quiz.totalMarks || 0), 0);
-      
-      document.getElementById('structuredCount').textContent = structuredCount;
-      document.getElementById('pdfCount').textContent = pdfCount;
-      document.getElementById('totalMarks').textContent = totalMarks;
     }
 
     // Exam type selection
@@ -1361,11 +912,11 @@
       }
     });
 
-    // Load courses for dropdown
+    // ===== Fetch Courses for Dropdown =====
     async function loadCourses() {
       try {
         const res = await fetch(`${API_BASE}/courses`, {
-          headers: { "Authorization": `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         });
         
         if (res.status === 401) {
@@ -1375,10 +926,8 @@
         
         const data = await res.json();
         const select = document.getElementById("courseId");
-        select.innerHTML = '<option value="">-- Select Course --</option>';
-        
-        courses = data.data || [];
-        courses.forEach(c => {
+        select.innerHTML = `<option value="">Select Course</option>`;
+        data.data.forEach(c => {
           const opt = document.createElement("option");
           opt.value = c._id;
           opt.textContent = c.title;
@@ -1390,27 +939,24 @@
       }
     }
 
-    // Add question block
+    // ===== Add Question Block =====
     function addQuestion(existing = null) {
       const container = document.getElementById("questionsContainer");
-      const id = `question-${questionCounter++}`;
-      
       const div = document.createElement("div");
       div.className = "question-block";
-      div.id = id;
       div.innerHTML = `
         <div class="question-header">
-          <h4 style="color: var(--assistant-accent);">Question</h4>
-          <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('${id}').remove()">
+          <h4>Question</h4>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.parentElement.remove()">
             <i class="fas fa-trash"></i> Remove
           </button>
         </div>
         <div class="form-group">
-          <input type="text" placeholder="Question text" class="form-control q-text" value="${existing?.question || ""}" required>
+          <input type="text" placeholder="Question text" class="form-control q-text" value="${existing?.text || ""}" required>
         </div>
         <div class="form-group">
           <select class="form-control q-type">
-            <option value="mcq" ${existing?.type==="mcq"?"selected":""}>Multiple Choice</option>
+            <option value="mcq" ${existing?.type==="mcq"?"selected":""}>MCQ</option>
             <option value="truefalse" ${existing?.type==="truefalse"?"selected":""}>True/False</option>
             <option value="short" ${existing?.type==="short"?"selected":""}>Short Answer</option>
           </select>
@@ -1419,7 +965,7 @@
           <textarea placeholder="Options (comma separated, only for MCQ)" class="form-control q-options">${existing?.options?.join(",") || ""}</textarea>
         </div>
         <div class="form-group">
-          <input type="text" placeholder="Correct Answer" class="form-control q-answer" value="${existing?.answer || ""}" required>
+          <input type="text" placeholder="Correct Answer" class="form-control q-answer" value="${existing?.correctAnswer || ""}" required>
         </div>
         <div class="form-group">
           <input type="number" placeholder="Marks" class="form-control q-marks" value="${existing?.marks || 1}" min="1">
@@ -1428,315 +974,81 @@
       container.appendChild(div);
     }
 
-    // Add question block in edit modal
-    function addEditQuestion(existing = null) {
-      const container = document.getElementById("editQuestionsContainer");
-      const id = `edit-question-${Date.now()}`;
+    // ===== Submit Quiz =====
+    document.getElementById("quizForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
       
-      const div = document.createElement("div");
-      div.className = "question-block";
-      div.id = id;
-      div.innerHTML = `
-        <div class="question-header">
-          <h4 style="color: var(--assistant-accent);">Question</h4>
-          <button type="button" class="btn btn-sm btn-danger" onclick="document.getElementById('${id}').remove()">
-            <i class="fas fa-trash"></i> Remove
-          </button>
-        </div>
-        <div class="form-group">
-          <input type="text" placeholder="Question text" class="form-control q-text" value="${existing?.question || ""}" required>
-        </div>
-        <div class="form-group">
-          <select class="form-control q-type">
-            <option value="mcq" ${existing?.type==="mcq"?"selected":""}>Multiple Choice</option>
-            <option value="truefalse" ${existing?.type==="truefalse"?"selected":""}>True/False</option>
-            <option value="short" ${existing?.type==="short"?"selected":""}>Short Answer</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <textarea placeholder="Options (comma separated, only for MCQ)" class="form-control q-options">${existing?.options?.join(",") || ""}</textarea>
-        </div>
-        <div class="form-group">
-          <input type="text" placeholder="Correct Answer" class="form-control q-answer" value="${existing?.answer || ""}" required>
-        </div>
-        <div class="form-group">
-          <input type="number" placeholder="Marks" class="form-control q-marks" value="${existing?.marks || 1}" min="1">
-        </div>
-      `;
-      container.appendChild(div);
-    }
-
-    // Setup form validation
-    function setupFormValidation() {
-      const form = document.getElementById("quizForm");
-      const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-      
-      inputs.forEach(input => {
-        input.addEventListener('blur', function() {
-          if (!this.value.trim()) {
-            this.style.borderColor = '#ff4d4d';
-            this.style.boxShadow = '0 0 10px rgba(255, 77, 77, 0.3)';
-          } else {
-            this.style.borderColor = 'rgba(0, 255, 204, 0.3)';
-            this.style.boxShadow = 'none';
-          }
-        });
-        
-        input.addEventListener('input', function() {
-          if (this.value.trim()) {
-            this.style.borderColor = 'rgba(0, 255, 204, 0.3)';
-            this.style.boxShadow = 'none';
-          }
-        });
-      });
-    }
-
-    // Handle Create Quiz button click
-    function handleCreateQuizButton() {
-      console.log("Create Quiz button clicked");
-      
-      // Get the form
-      const form = document.getElementById("quizForm");
-      
-      // Check form validity
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-      
-      // Call the main create quiz function
-      handleCreateQuiz();
-    }
-
-    // Main create quiz handler
-    async function handleCreateQuiz() {
-      console.log("handleCreateQuiz function called");
-      
-      const submitBtn = document.getElementById("createQuizBtn");
+      const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
       submitBtn.disabled = true;
 
       try {
-        console.log("Token exists:", !!token);
-        console.log("API Base:", API_BASE);
-        
         const examType = document.getElementById("examType").value;
         let questions = [];
         
         if (examType === 'structured') {
-          const questionBlocks = document.querySelectorAll("#questionsContainer .question-block");
-          if (questionBlocks.length === 0) {
-            showError("Please add at least one question for structured exam");
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-            return;
-          }
-          
-          questions = Array.from(questionBlocks).map(block => {
-            const optionsText = block.querySelector(".q-options").value;
-            return {
-              question: block.querySelector(".q-text").value.trim(),
-              type: block.querySelector(".q-type").value,
-              options: optionsText ? optionsText.split(",").map(o => o.trim()).filter(Boolean) : [],
-              answer: block.querySelector(".q-answer").value.trim(),
-              marks: Number(block.querySelector(".q-marks").value) || 1
-            };
-          });
+          questions = Array.from(document.querySelectorAll("#questionsContainer .question-block")).map(block => ({
+            question: block.querySelector(".q-text").value,
+            type: block.querySelector(".q-type").value,
+            options: block.querySelector(".q-options").value.split(",").map(o=>o.trim()).filter(Boolean),
+            answer: block.querySelector(".q-answer").value,
+            marks: Number(block.querySelector(".q-marks").value)
+          }));
         }
 
         const formData = new FormData();
-        formData.append("title", document.getElementById("title").value.trim());
-        formData.append("description", document.getElementById("description").value.trim());
+        formData.append("title", document.getElementById("title").value);
+        formData.append("description", document.getElementById("description").value);
         formData.append("courseId", document.getElementById("courseId").value);
-        
-        const duration = document.getElementById("duration").value;
-        if (duration) {
-          formData.append("duration", duration);
-        }
-        
+        formData.append("duration", document.getElementById("duration").value);
         formData.append("examType", examType);
+        formData.append("questions", JSON.stringify(questions)); // Stringify the array
         
-        if (examType === 'structured') {
-          formData.append("questions", JSON.stringify(questions));
-        }
-        
+        // Add PDF file if it's a PDF exam
         if (examType === 'pdf') {
           const pdfFile = document.getElementById("pdfFile").files[0];
-          if (!pdfFile) {
-            showError("Please select a PDF file for PDF exam");
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-            return;
+          if (pdfFile) {
+            formData.append("pdfFile", pdfFile);
           }
-          formData.append("pdfFile", pdfFile);
-        }
-
-        // Validate required fields
-        if (!formData.get("title") || !formData.get("courseId")) {
-          showError("Please fill in all required fields (Title and Course)");
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-          return;
-        }
-
-        // Debug form data
-        console.log("Sending request to:", `${API_BASE}/quizzes`);
-        console.log("FormData contents:");
-        for (let pair of formData.entries()) {
-          console.log(pair[0] + ': ' + (pair[0] === 'pdfFile' ? pair[1].name : pair[1]));
         }
 
         const res = await fetch(`${API_BASE}/quizzes`, {
           method: "POST",
-          headers: { 
-            "Authorization": `Bearer ${token}`
-          },
+          headers: { Authorization: `Bearer ${token}` },
           body: formData
         });
 
-        console.log("Response status:", res.status);
-        
         if (res.status === 401) {
-          showError("Session expired. Please login again.");
           logout();
           return;
         }
 
         const data = await res.json();
-        console.log("Response data:", data);
-        
         if (data.success) {
           showSuccess("Quiz created successfully!");
           document.getElementById("quizForm").reset();
           document.getElementById("questionsContainer").innerHTML = "";
           document.getElementById("pdfFileName").textContent = "";
-          selectExamType('structured');
-          // Add one default question
-          addQuestion();
-          await loadQuizzes();
+          selectExamType('structured'); // Reset to default
+          loadQuizzes();
         } else {
           showError("Error: " + (data.error || "Failed to create quiz"));
         }
       } catch (error) {
         console.error("Failed to create quiz:", error);
-        showError("Failed to create quiz. Please try again. Error: " + error.message);
+        showError("Failed to create quiz. Please try again.");
       } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
       }
-    }
+    });
 
-    // Render quizzes
-    function renderQuizzes() {
-      const quizzesGrid = document.getElementById("quizzesGrid");
-      
-      if (filteredQuizzes.length === 0) {
-        quizzesGrid.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-question-circle"></i>
-            <h3>No Quizzes Found</h3>
-            <p>${allQuizzes.length === 0 ? 'No quizzes created yet.' : 'Try adjusting your search terms.'}</p>
-            <button class="btn btn-assistant" onclick="document.getElementById('title').focus()" style="margin-top: 15px;">
-              <i class="fas fa-plus"></i> Create Your First Quiz
-            </button>
-          </div>
-        `;
-        document.getElementById('count').textContent = '0';
-        return;
-      }
-
-      quizzesGrid.innerHTML = filteredQuizzes.map(quiz => {
-        const course = quiz.course || courses.find(c => c._id === quiz.courseId);
-        const createdDate = new Date(quiz.createdAt).toLocaleDateString();
-        
-        return `
-          <div class="quiz-card" id="quiz-${quiz._id}">
-            <div class="quiz-header">
-              <div>
-                <h3 class="quiz-title">${quiz.title}</h3>
-                <div class="quiz-course">${course?.title || 'No Course'}</div>
-              </div>
-              <span class="quiz-type-badge ${quiz.examType === 'pdf' ? 'pdf-badge' : ''}">
-                ${quiz.examType === 'pdf' ? 'PDF Exam' : 'Structured'}
-              </span>
-            </div>
-            
-            <p style="color: rgba(240, 246, 255, 0.8); margin-bottom: 20px; line-height: 1.5;">
-              ${quiz.description || 'No description provided.'}
-            </p>
-            
-            <div class="quiz-details">
-              <div class="detail-item">
-                <span class="detail-label">Total Marks</span>
-                <span class="detail-value" style="color: #00ff8c;">${quiz.totalMarks || 0}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Duration</span>
-                <span class="detail-value">${quiz.duration || 'N/A'} min</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Questions</span>
-                <span class="detail-value">${quiz.questions?.length || 0}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Created</span>
-                <span class="detail-value">${createdDate}</span>
-              </div>
-            </div>
-            
-            ${quiz.questions && quiz.questions.length > 0 ? `
-              <div class="questions-section">
-                <div class="section-title">
-                  <i class="fas fa-list-ol"></i> Sample Questions
-                </div>
-                <div class="questions-list">
-                  ${quiz.questions.slice(0, 2).map(q => `
-                    <div class="question-item">
-                      <div class="question-text">${q.question.substring(0, 60)}${q.question.length > 60 ? '...' : ''}</div>
-                      <div class="question-meta">
-                        <span>${q.type}</span>
-                        <span>${q.marks} marks</span>
-                      </div>
-                    </div>
-                  `).join('')}
-                  ${quiz.questions.length > 2 ? `
-                    <div class="question-item" style="text-align: center; color: rgba(0, 255, 204, 0.7);">
-                      + ${quiz.questions.length - 2} more questions
-                    </div>
-                  ` : ''}
-                </div>
-              </div>
-            ` : ''}
-            
-            <div class="quiz-actions">
-              <button class="btn btn-assistant btn-sm" onclick="editQuiz('${quiz._id}')">
-                <i class="fas fa-edit"></i> Edit
-              </button>
-              <button class="btn btn-secondary btn-sm" onclick="viewSubmissions('${quiz._id}')">
-                <i class="fas fa-eye"></i> Submissions
-              </button>
-              ${quiz.examType === 'pdf' ? `
-              <button class="btn btn-secondary btn-sm" onclick="downloadPDF('${quiz._id}')">
-                <i class="fas fa-download"></i> PDF
-              </button>
-              ` : ''}
-              <button class="btn btn-danger btn-sm" onclick="deleteQuiz('${quiz._id}')">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      document.getElementById('count').textContent = filteredQuizzes.length;
-    }
-
-    // Load all quizzes
+    // ===== Load Quizzes =====
     async function loadQuizzes() {
       try {
         const res = await fetch(`${API_BASE}/quizzes`, {
-          headers: { "Authorization": `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         });
         
         if (res.status === 401) {
@@ -1745,25 +1057,44 @@
         }
         
         const data = await res.json();
-        allQuizzes = data.data || [];
-        filteredQuizzes = [...allQuizzes];
+        const tbody = document.querySelector("#quizTable tbody");
+        tbody.innerHTML = "";
         
-        updateStatistics();
-        renderQuizzes();
-      } catch (err) {
-        console.error(err);
-        showError("Error loading quizzes");
-        const quizzesGrid = document.getElementById("quizzesGrid");
-        quizzesGrid.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error Loading Quizzes</h3>
-            <p>Unable to load quiz data. Please try again later.</p>
-            <button class="btn btn-secondary" onclick="loadQuizzes()" style="margin-top: 15px;">
-              <i class="fas fa-redo"></i> Retry
-            </button>
-          </div>
-        `;
+        if (data.data && data.data.length > 0) {
+          data.data.forEach(q => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${q.title}</td>
+              <td>${q.course?.title || "-"}</td>
+              <td>${q.examType === 'pdf' ? 'PDF Exam' : 'Structured'}</td>
+              <td>${q.totalMarks}</td>
+              <td>${q.duration || "-"}</td>
+              <td>${new Date(q.createdAt).toLocaleDateString()}</td>
+              <td>
+                <button class="btn btn-sm btn-danger" onclick="deleteQuiz('${q._id}')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+                <button class="btn btn-sm btn-secondary" onclick="editQuiz('${q._id}')">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-secondary" onclick="viewSubmissions('${q._id}')">
+                  <i class="fas fa-eye"></i> Submissions
+                </button>
+                ${q.examType === 'pdf' ? `
+                <button class="btn btn-sm btn-secondary" onclick="downloadPDF('${q._id}')">
+                  <i class="fas fa-download"></i> PDF
+                </button>
+                ` : ''}
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No quizzes found</td></tr>`;
+        }
+      } catch (error) {
+        console.error("Failed to load quizzes:", error);
+        showError("Failed to load quizzes. Please try again.");
       }
     }
 
@@ -1771,7 +1102,7 @@
     async function downloadPDF(quizId) {
       try {
         const res = await fetch(`${API_BASE}/quizzes/${quizId}/pdf`, {
-          headers: { "Authorization": `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         });
         
         if (res.status === 401) {
@@ -1780,6 +1111,7 @@
         }
         
         if (res.ok) {
+          // Create a blob from the response and create a download link
           const blob = await res.blob();
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -1789,7 +1121,6 @@
           document.body.appendChild(a);
           a.click();
           window.URL.revokeObjectURL(url);
-          showSuccess("PDF downloaded successfully!");
         } else {
           showError("Failed to download PDF");
         }
@@ -1799,20 +1130,14 @@
       }
     }
 
-    // Delete quiz
+    // ===== Delete Quiz =====
     async function deleteQuiz(id) {
-      if (!confirm("Are you sure you want to delete this quiz? This action cannot be undone.")) return;
-      
-      const quizCard = document.getElementById(`quiz-${id}`);
-      if (quizCard) {
-        quizCard.style.opacity = '0.5';
-        quizCard.style.pointerEvents = 'none';
-      }
+      if (!confirm("Are you sure you want to delete this quiz?")) return;
       
       try {
         const res = await fetch(`${API_BASE}/quizzes/${id}`, {
           method: "DELETE",
-          headers: { "Authorization": `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         });
         
         if (res.status === 401) {
@@ -1823,7 +1148,7 @@
         const data = await res.json();
         if (data.success) {
           showSuccess("Quiz deleted successfully!");
-          await loadQuizzes();
+          loadQuizzes();
         } else {
           showError("Error deleting quiz.");
         }
@@ -1833,10 +1158,60 @@
       }
     }
 
-    // Edit quiz
+    // ===== Edit Quiz Functions =====
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    // Add question block in edit modal
+    function addEditQuestion(existing = null) {
+      const container = document.getElementById("editQuestionsContainer");
+      const div = document.createElement("div");
+      div.className = "question-block";
+      div.innerHTML = `
+        <div class="question-header">
+          <h4>Question</h4>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="this.parentElement.parentElement.remove()">
+            <i class="fas fa-trash"></i> Remove
+          </button>
+        </div>
+        <div class="form-group">
+          <input type="text" placeholder="Question text" class="form-control q-text" value="${existing?.text || ""}" required>
+        </div>
+        <div class="form-group">
+          <select class="form-control q-type">
+            <option value="mcq" ${existing?.type==="mcq"?"selected":""}>MCQ</option>
+            <option value="truefalse" ${existing?.type==="truefalse"?"selected":""}>True/False</option>
+            <option value="short" ${existing?.type==="short"?"selected":""}>Short Answer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <textarea placeholder="Options (comma separated, only for MCQ)" class="form-control q-options">${existing?.options?.join(",") || ""}</textarea>
+        </div>
+        <div class="form-group">
+          <input type="text" placeholder="Correct Answer" class="form-control q-answer" value="${existing?.correctAnswer || ""}" required>
+        </div>
+        <div class="form-group">
+          <input type="number" placeholder="Marks" class="form-control q-marks" value="${existing?.marks || 1}" min="1">
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    // Load quiz into modal
     async function editQuiz(id) {
       try {
-        const quiz = allQuizzes.find(q => q._id === id);
+        const res = await fetch(`${API_BASE}/quizzes`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        
+        const data = await res.json();
+        const quiz = data.data.find(q => q._id === id);
         
         if (!quiz) {
           showError("Quiz not found");
@@ -1865,7 +1240,7 @@
           // Load questions
           const container = document.getElementById("editQuestionsContainer");
           container.innerHTML = "";
-          (quiz.questions || []).forEach(q => addEditQuestion(q));
+          quiz.questions.forEach(q => addEditQuestion(q));
         }
 
         document.getElementById("editModal").style.display = "flex";
@@ -1875,7 +1250,7 @@
       }
     }
 
-    // Update quiz
+    // Submit update
     document.getElementById("editQuizForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       
@@ -1890,25 +1265,23 @@
         
         let questions = [];
         if (examType === 'structured') {
-          questions = Array.from(document.querySelectorAll("#editQuestionsContainer .question-block")).map(block => {
-            const optionsText = block.querySelector(".q-options").value;
-            return {
-              question: block.querySelector(".q-text").value.trim(),
-              type: block.querySelector(".q-type").value,
-              options: optionsText ? optionsText.split(",").map(o => o.trim()).filter(Boolean) : [],
-              answer: block.querySelector(".q-answer").value.trim(),
-              marks: Number(block.querySelector(".q-marks").value) || 1
-            };
-          });
+          questions = Array.from(document.querySelectorAll("#editQuestionsContainer .question-block")).map(block => ({
+            question: block.querySelector(".q-text").value,
+            type: block.querySelector(".q-type").value,
+            options: block.querySelector(".q-options").value.split(",").map(o=>o.trim()).filter(Boolean),
+            answer: block.querySelector(".q-answer").value,
+            marks: Number(block.querySelector(".q-marks").value)
+          }));
         }
 
         const formData = new FormData();
-        formData.append("title", document.getElementById("editTitle").value.trim());
-        formData.append("description", document.getElementById("editDescription").value.trim());
+        formData.append("title", document.getElementById("editTitle").value);
+        formData.append("description", document.getElementById("editDescription").value);
         formData.append("duration", document.getElementById("editDuration").value);
         formData.append("examType", examType);
         formData.append("questions", JSON.stringify(questions));
         
+        // Add PDF file if it's a PDF exam and a new file was selected
         if (examType === 'pdf') {
           const pdfFile = document.getElementById("editPdfFile").files[0];
           if (pdfFile) {
@@ -1918,7 +1291,7 @@
 
         const res = await fetch(`${API_BASE}/quizzes/${id}`, {
           method: "PUT",
-          headers: { "Authorization": `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` },
           body: formData
         });
         
@@ -1930,8 +1303,8 @@
         const data = await res.json();
         if (data.success) {
           showSuccess("Quiz updated successfully!");
-          closeModal();
-          await loadQuizzes();
+          closeEditModal();
+          loadQuizzes();
         } else {
           showError("Update failed: " + (data.error || ""));
         }
@@ -1944,11 +1317,15 @@
       }
     });
 
-    // View submissions
+    // ===== Submissions Functions =====
+    function closeSubmissionsModal() {
+      document.getElementById("submissionsModal").style.display = "none";
+    }
+
     async function viewSubmissions(quizId) {
       try {
         const res = await fetch(`${API_BASE}/quiz-submissions`, {
-          headers: { "Authorization": `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         });
         
         if (res.status === 401) {
@@ -1962,64 +1339,25 @@
           return;
         }
 
-        const submissionsGrid = document.getElementById("submissionsGrid");
+        const tbody = document.getElementById("submissionsTable");
+        tbody.innerHTML = "";
+        
         const submissions = data.data.filter(s => s.quiz._id === quizId);
         
         if (submissions.length === 0) {
-          submissionsGrid.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-users"></i>
-              <h3>No Submissions Found</h3>
-              <p>No students have submitted this quiz yet.</p>
-            </div>
-          `;
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No submissions found for this quiz</td></tr>`;
         } else {
-          submissionsGrid.innerHTML = submissions.map(s => {
-            const attemptedDate = new Date(s.attemptedAt).toLocaleString();
-            
-            return `
-              <div class="quiz-card">
-                <div class="quiz-header">
-                  <div>
-                    <h3 class="quiz-title">${s.student?.name || "Unknown Student"}</h3>
-                    <div class="quiz-course">${s.student?.email || "No email"}</div>
-                  </div>
-                  <span class="quiz-type-badge" style="background: rgba(0, 255, 140, 0.2); border-color: rgba(0, 255, 140, 0.5);">
-                    Score: ${s.score}
-                  </span>
-                </div>
-                
-                <div class="quiz-details">
-                  <div class="detail-item">
-                    <span class="detail-label">Submitted</span>
-                    <span class="detail-value">${attemptedDate}</span>
-                  </div>
-                  <div class="detail-item">
-                    <span class="detail-label">Status</span>
-                    <span class="detail-value" style="color: ${s.score > 0 ? '#00ff8c' : '#ff4d4d'}">
-                      ${s.score > 0 ? 'Graded' : 'Pending'}
-                    </span>
-                  </div>
-                </div>
-                
-                ${s.pdfAnswerFile ? `
-                  <div style="text-align: center; margin: 15px 0;">
-                    <a href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${s.pdfAnswerFile}" 
-                       target="_blank" 
-                       class="btn btn-secondary btn-sm">
-                      <i class="fas fa-download"></i> Download Answer
-                    </a>
-                  </div>
-                ` : ''}
-                
-                ${s.feedback ? `
-                  <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                    <strong>Feedback:</strong> ${s.feedback}
-                  </div>
-                ` : ''}
-              </div>
+          submissions.forEach(s => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${s.student?.name || "-"}</td>
+              <td>${s.student?.email || "-"}</td>
+              <td>${s.score}</td>
+              <td>${new Date(s.attemptedAt).toLocaleString()}</td>
+              <td>${s.pdfAnswerFile ? `<a href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${s.pdfAnswerFile}" target="_blank">Download</a>` : "No file"}</td>
             `;
-          }).join('');
+            tbody.appendChild(tr);
+          });
         }
 
         document.getElementById("submissionsModal").style.display = "flex";
@@ -2029,23 +1367,9 @@
       }
     }
 
-    // Search on enter key
-    document.getElementById('searchInput').addEventListener('keyup', function(e) {
-      if (e.key === 'Enter') {
-        searchQuizzes();
-      }
-    });
-
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-      if (token) {
-        loadCourses();
-        loadQuizzes();
-        setupFormValidation();
-        // Add initial question
-        setTimeout(() => addQuestion(), 100);
-      }
-    });
+    loadCourses();
+    loadQuizzes();
   </script>
 </body>
 </html>
