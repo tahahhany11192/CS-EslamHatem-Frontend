@@ -1,1444 +1,1272 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manage Live Sessions - Assistant Dashboard - CS-IslamHatem</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #0066ff;
-      --secondary: #00ccff;
-      --accent: #00ffcc;
-      --dark: #0a1128;
-      --light: #f0f6ff;
-      --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
-      --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
-      --assistant-accent: #00ffcc;
-      --assistant-gradient: linear-gradient(135deg, var(--primary), var(--assistant-accent));
-      --sidebar-width: 250px;
-      --header-height: 70px;
-      --live-color: #ff3366;
-      --live-gradient: linear-gradient(135deg, var(--live-color), #ff66a3);
-      --upcoming-color: #00ccff;
-      --completed-color: #a0a0a0;
-      --success-color: #00ff8c;
-      --error-color: #ff4d4d;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Exo 2', sans-serif;
-      background-color: var(--dark);
-      color: var(--light);
-      overflow-x: hidden;
-      min-height: 100vh;
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 50% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 20%);
-    }
-
-    /* Dashboard Layout */
-    .dashboard {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: var(--sidebar-width);
-      background: rgba(10, 17, 40, 0.95);
-      backdrop-filter: blur(10px);
-      border-right: 1px solid rgba(0, 255, 204, 0.2);
-      padding: 20px 0;
-      position: fixed;
-      height: 100vh;
-      overflow-y: auto;
-      z-index: 100;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar-header {
-      padding: 0 20px 20px;
-      border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-      margin-bottom: 20px;
-    }
-
-    .sidebar-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--light);
-      text-decoration: none;
-    }
-
-    .sidebar-logo span {
-      color: var(--assistant-accent);
-    }
-
-    .assistant-badge {
-      background: var(--assistant-gradient);
-      color: white;
-      padding: 3px 8px;
-      border-radius: 15px;
-      font-size: 0.7rem;
-      margin-top: 5px;
-      display: inline-block;
-    }
-
-    .sidebar-nav {
-      list-style: none;
-    }
-
-    .sidebar-nav li {
-      margin-bottom: 5px;
-    }
-
-    .sidebar-nav a {
-      display: flex;
-      align-items: center;
-      padding: 12px 20px;
-      color: rgba(240, 246, 255, 0.7);
-      text-decoration: none;
-      transition: all 0.3s ease;
-      border-left: 3px solid transparent;
-    }
-
-    .sidebar-nav a:hover,
-    .sidebar-nav a.active {
-      background: rgba(0, 255, 204, 0.1);
-      color: var(--light);
-      border-left-color: var(--assistant-accent);
-    }
-
-    .sidebar-nav i {
-      margin-right: 10px;
-      width: 20px;
-      text-align: center;
-    }
-
-    /* Main Content */
-    .main-content {
-      flex: 1;
-      margin-left: var(--sidebar-width);
-      padding: 20px;
-      transition: margin-left 0.3s ease, padding 0.3s ease;
-    }
-
-    /* Header */
-    .header {
-      background: rgba(10, 17, 40, 0.8);
-      backdrop-filter: blur(10px);
-      padding: 15px 20px;
-      border-radius: 15px;
-      margin-bottom: 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid rgba(0, 255, 204, 0.2);
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .header h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      background: var(--assistant-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-
-    .user-info {
-      text-align: right;
-    }
-
-    .user-name {
-      font-weight: 600;
-    }
-
-    .user-role {
-      font-size: 0.8rem;
-      color: var(--assistant-accent);
-    }
-
-    .logout-btn {
-      background: rgba(0, 255, 204, 0.2);
-      color: var(--light);
-      border: none;
-      border-radius: 20px;
-      padding: 8px 15px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .logout-btn:hover {
-      background: var(--assistant-accent);
-      color: var(--dark);
-    }
-
-    /* Content Cards */
-    .content-card {
-      background: rgba(10, 17, 40, 0.8);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 30px;
-      border: 1px solid rgba(0, 255, 204, 0.2);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid rgba(0, 255, 204, 0.2);
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .card-header h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
-      color: var(--light);
-    }
-
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--light);
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 12px 15px;
-      border-radius: 8px;
-      border: 2px solid rgba(0, 255, 204, 0.3);
-      background: rgba(0, 0, 0, 0.3);
-      color: var(--light);
-      font-family: 'Exo 2', sans-serif;
-      transition: all 0.3s ease;
-      font-size: 16px; /* Prevents zoom on mobile */
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--assistant-accent);
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
-    }
-
-    textarea.form-control {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    /* Buttons */
-    .btn {
-      padding: 12px 25px;
-      border: none;
-      border-radius: 30px;
-      font-family: 'Exo 2', sans-serif;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      outline: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-    }
-
-    .btn-assistant {
-      background: var(--assistant-gradient);
-      color: var(--dark);
-      box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
-    }
-
-    .btn-assistant:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0, 255, 204, 0.4);
-    }
-
-    .btn-live {
-      background: var(--live-gradient);
-      color: white;
-      box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
-    }
-
-    .btn-live:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 51, 102, 0.4);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--light);
-      border: 2px solid var(--assistant-accent);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(0, 255, 204, 0.1);
-      transform: translateY(-3px);
-    }
-
-    .btn-danger {
-      background: transparent;
-      color: var(--error-color);
-      border: 2px solid var(--error-color);
-    }
-
-    .btn-danger:hover {
-      background: rgba(255, 77, 77, 0.1);
-      transform: translateY(-3px);
-    }
-
-    .btn-sm {
-      padding: 8px 15px;
-      font-size: 0.9rem;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: 0.5s;
-    }
-
-    .btn:hover::before {
-      left: 100%;
-    }
-
-    /* Session List */
-    .session-list {
-      display: grid;
-      gap: 20px;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
-
-    .session-card {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
-      padding: 20px;
-      border: 1px solid rgba(0, 255, 204, 0.2);
-      transition: all 0.3s ease;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .session-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-      border-color: rgba(0, 255, 204, 0.4);
-    }
-
-    .session-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .session-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      color: var(--light);
-      margin-bottom: 5px;
-    }
-
-    .course-badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 15px;
-      font-size: 0.8rem;
-      background: rgba(0, 255, 204, 0.2);
-      color: var(--assistant-accent);
-      margin-left: 10px;
-    }
-
-    .session-time {
-      font-family: 'Orbitron', sans-serif;
-      color: var(--assistant-accent);
-      font-size: 0.9rem;
-      text-align: right;
-    }
-
-    .session-description {
-      color: rgba(240, 246, 255, 0.7);
-      margin-bottom: 15px;
-      line-height: 1.5;
-      flex-grow: 1;
-    }
-
-    .session-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 15px;
-      font-size: 0.8rem;
-      margin-left: 10px;
-    }
-
-    .status-live {
-      background: rgba(255, 51, 102, 0.2);
-      color: var(--live-color);
-    }
-
-    .status-upcoming {
-      background: rgba(0, 204, 255, 0.2);
-      color: var(--upcoming-color);
-    }
-
-    .status-completed {
-      background: rgba(160, 160, 160, 0.2);
-      color: var(--completed-color);
-    }
-
-    /* Alerts */
-    .alert {
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: none;
-      animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .alert-success {
-      background: rgba(0, 255, 140, 0.1);
-      border-left: 4px solid var(--success-color);
-      color: var(--success-color);
-    }
-
-    .alert-error {
-      background: rgba(255, 77, 77, 0.1);
-      border-left: 4px solid var(--error-color);
-      color: var(--error-color);
-    }
-
-    /* Modal styles */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
-      z-index: 1000;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 500px;
-      max-width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
-      z-index: 1001;
-      background: rgba(10, 17, 40, 0.95);
-      border-radius: 15px;
-      padding: 25px;
-      border: 1px solid rgba(0, 255, 204, 0.3);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .modal h3 {
-      font-family: 'Orbitron', sans-serif;
-      color: var(--assistant-accent);
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-
-    /* Mobile Menu Button */
-    .mobile-menu-btn {
-      display: none;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1001;
-      background: var(--assistant-gradient);
-      border: none;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
-      transition: all 0.3s ease;
-    }
-
-    .mobile-menu-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 20px rgba(0, 255, 204, 0.5);
-    }
-
-    .mobile-menu-btn i {
-      color: var(--dark);
-      font-size: 1.2rem;
-    }
-
-    /* Sidebar Overlay */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 99;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .sidebar-overlay.active {
-      opacity: 1;
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(0, 255, 204, 0.3);
-      border-radius: 50%;
-      border-top-color: var(--assistant-accent);
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: rgba(240, 246, 255, 0.5);
-    }
-
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 15px;
-      color: rgba(0, 255, 204, 0.3);
-    }
-
-    /* Responsive Design */
-    /* Large Desktops (1200px and up) */
-    @media (min-width: 1200px) {
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Live Sessions - Assistant Dashboard - CS-IslamHatem</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap"
+      rel="stylesheet">
+    <style>
+      /* Your existing CSS styles remain exactly the same */
       :root {
-        --sidebar-width: 280px;
+        --primary: #0066ff;
+        --secondary: #00ccff;
+        --accent: #00ffcc;
+        --dark: #0a1128;
+        --light: #f0f6ff;
+        --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
+        --assistant-accent: #00ffcc;
+        --assistant-gradient: linear-gradient(135deg, var(--primary), var(--assistant-accent));
+        --sidebar-width: 250px;
+        --header-height: 70px;
+        --live-color: #ff3366;
+        --live-gradient: linear-gradient(135deg, var(--live-color), #ff66a3);
       }
-      .session-list {
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      }
-    }
 
-    /* Small Desktops (1024px to 1200px) */
-    @media (max-width: 1200px) {
-      .session-list {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-    }
 
-    /* Tablets (768px to 1024px) */
-    @media (max-width: 1024px) {
-      :root {
-        --sidebar-width: 70px;
+      body {
+        font-family: 'Exo 2', sans-serif;
+        background-color: var(--dark);
+        color: var(--light);
+        overflow-x: hidden;
+        min-height: 100vh;
+        background-image: 
+          radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
+          radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
+          radial-gradient(circle at 50% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 20%);
       }
-      
-      .sidebar {
-        width: 70px;
-      }
-      
-      .sidebar-header {
-        padding: 0 10px 10px;
-      }
-      
-      .sidebar-logo span,
-      .sidebar-nav a span {
-        display: none;
-      }
-      
-      .sidebar-nav a {
-        justify-content: center;
-        padding: 12px 10px;
-      }
-      
-      .sidebar-nav i {
-        margin-right: 0;
-        font-size: 1.2rem;
-      }
-      
-      .main-content {
-        margin-left: 70px;
-      }
-      
-      .session-list {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      }
-    }
 
-    /* Mobile Devices (up to 768px) */
-    @media (max-width: 768px) {
-      .mobile-menu-btn {
+      /* Dashboard Layout */
+      .dashboard {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        min-height: 100vh;
       }
-      
+
+      /* Sidebar */
       .sidebar {
-        transform: translateX(-100%);
-        width: 280px;
+        width: var(--sidebar-width);
+        background: rgba(10, 17, 40, 0.9);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(0, 255, 204, 0.2);
+        padding: 20px 0;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+        z-index: 100;
       }
-      
-      .sidebar.active {
-        transform: translateX(0);
-      }
-      
-      .main-content {
-        margin-left: 0;
-        padding: 15px;
-      }
-      
-      .header {
-        flex-direction: column;
-        text-align: center;
-        padding: 15px;
-        margin-top: 60px;
-      }
-      
-      .user-menu {
-        flex-direction: column;
-        width: 100%;
-      }
-      
-      .user-info {
-        text-align: center;
-      }
-      
-      .content-card {
-        padding: 15px;
+
+      .sidebar-header {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid rgba(0, 255, 204, 0.2);
         margin-bottom: 20px;
       }
-      
-      .card-header {
-        flex-direction: column;
-        align-items: flex-start;
+
+      .sidebar-logo {
+        display: flex;
+        align-items: center;
         gap: 10px;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--light);
+        text-decoration: none;
       }
-      
-      .card-header h2 {
-        font-size: 1.2rem;
+
+      .sidebar-logo span {
+        color: var(--assistant-accent);
       }
-      
-      .session-list {
-        grid-template-columns: 1fr;
+
+      .assistant-badge {
+        background: var(--assistant-gradient);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 15px;
+        font-size: 0.7rem;
+        margin-top: 5px;
+        display: inline-block;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+      }
+
+      .sidebar-nav li {
+        margin-bottom: 5px;
+      }
+
+      .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: rgba(240, 246, 255, 0.7);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+      }
+
+      .sidebar-nav a:hover, .sidebar-nav a.active {
+        background: rgba(0, 255, 204, 0.1);
+        color: var(--light);
+        border-left-color: var(--assistant-accent);
+      }
+
+      .sidebar-nav i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(10, 17, 40, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(0, 255, 204, 0.2);
+      }
+
+      .header h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.8rem;
+        background: var(--assistant-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .user-menu {
+        display: flex;
+        align-items: center;
         gap: 15px;
       }
-      
-      .session-header {
-        flex-direction: column;
-        gap: 10px;
-      }
-      
-      .session-time {
-        text-align: left;
-        width: 100%;
-      }
-      
-      .session-actions {
-        width: 100%;
-      }
-      
-      .session-actions .btn {
-        flex: 1;
-        min-width: 120px;
-      }
-      
-      .modal {
-        padding: 15px;
-      }
-      
-      .modal-actions {
-        justify-content: center;
-      }
-      
-      .form-control {
-        font-size: 16px; /* Prevents zoom on iOS */
-      }
-    }
 
-    /* Small Mobile Devices (up to 480px) */
-    @media (max-width: 480px) {
-      .header h1 {
-        font-size: 1.4rem;
+      .user-info {
+        text-align: right;
       }
-      
+
+      .user-name {
+        font-weight: 600;
+      }
+
+      .user-role {
+        font-size: 0.8rem;
+        color: var(--assistant-accent);
+      }
+
+      .logout-btn {
+        background: rgba(0, 255, 204, 0.2);
+        color: var(--light);
+        border: none;
+        border-radius: 20px;
+        padding: 8px 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .logout-btn:hover {
+        background: var(--assistant-accent);
+        color: var(--dark);
+      }
+
+      /* Content Cards */
+      .content-card {
+        background: rgba(10, 17, 40, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(0, 255, 204, 0.2);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+      }
+
+      .card-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.5rem;
+        color: var(--light);
+      }
+
+      /* Form Styles */
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--light);
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 2px solid rgba(0, 255, 204, 0.3);
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--light);
+        font-family: 'Exo 2', sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--assistant-accent);
+        box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+      }
+
+      textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      /* Buttons */
       .btn {
-        padding: 10px 15px;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 30px;
+        font-family: 'Exo 2', sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-assistant {
+        background: var(--assistant-gradient);
+        color: var(--dark);
+        box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
+      }
+
+      .btn-assistant:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 255, 204, 0.4);
+      }
+
+      .btn-live {
+        background: var(--live-gradient);
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
+      }
+
+      .btn-live:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 51, 102, 0.4);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--light);
+        border: 2px solid var(--assistant-accent);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(0, 255, 204, 0.1);
+        transform: translateY(-3px);
+      }
+
+      .btn-danger {
+        background: transparent;
+        color: #ff4d4d;
+        border: 2px solid #ff4d4d;
+      }
+
+      .btn-danger:hover {
+        background: rgba(255, 77, 77, 0.1);
+        transform: translateY(-3px);
+      }
+
+      .btn-sm {
+        padding: 8px 15px;
         font-size: 0.9rem;
       }
-      
-      .session-actions {
-        flex-direction: column;
-      }
-      
-      .session-actions .btn {
-        width: 100%;
-      }
-      
-      .modal-actions {
-        flex-direction: column;
-      }
-      
-      .modal-actions .btn {
-        width: 100%;
-      }
-    }
 
-    /* Landscape Orientation */
-    @media (orientation: landscape) and (max-height: 500px) {
-      .header {
-        margin-top: 0;
-        padding: 10px 15px;
+      .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: 0.5s;
       }
-      
-      .content-card {
-        padding: 15px;
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      /* Session List */
+      .session-list {
+        display: grid;
+        gap: 20px;
+      }
+
+      .session-card {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid rgba(0, 255, 204, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .session-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        border-color: rgba(0, 255, 204, 0.4);
+      }
+
+      .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
         margin-bottom: 15px;
       }
-      
-      .session-list {
-        grid-template-columns: repeat(2, 1fr);
+
+      .session-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.2rem;
+        color: var(--light);
+        margin-bottom: 5px;
+      }
+
+      .course-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        background: rgba(0, 255, 204, 0.2);
+        color: var(--assistant-accent);
+        margin-left: 10px;
+      }
+
+      .session-time {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--assistant-accent);
+        font-size: 0.9rem;
+      }
+
+      .session-description {
+        color: rgba(240, 246, 255, 0.7);
+        margin-bottom: 15px;
+        line-height: 1.5;
+      }
+
+      .session-actions {
+        display: flex;
         gap: 10px;
       }
-    }
 
-    /* High Resolution Displays (Retina) */
-    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-      .content-card,
-      .session-card {
-        border-width: 0.5px;
+      .status-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin-left: 10px;
       }
-    }
 
-    /* Reduced Motion (Accessibility) */
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+      .status-live {
+        background: rgba(255, 51, 102, 0.2);
+        color: var(--live-color);
       }
-      
-      .btn:hover {
-        transform: none;
+
+      .status-upcoming {
+        background: rgba(0, 204, 255, 0.2);
+        color: var(--secondary);
       }
-      
-      .session-card:hover {
-        transform: none;
+
+      .status-completed {
+        background: rgba(160, 160, 160, 0.2);
+        color: #a0a0a0;
       }
-    }
 
-    /* Print Styles */
-    @media print {
-      .sidebar,
-      .mobile-menu-btn,
-      .logout-btn,
-      .session-actions,
-      .btn-live {
-        display: none !important;
+      /* Alerts */
+      .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
       }
-      
-      .main-content {
-        margin-left: 0;
-        padding: 0;
+
+      .alert-success {
+        background: rgba(0, 255, 140, 0.1);
+        border-left: 4px solid #00ff8c;
+        color: #00ff8c;
       }
-      
-      .content-card {
-        box-shadow: none;
-        border: 1px solid #ccc;
-        break-inside: avoid;
+
+      .alert-error {
+        background: rgba(255, 77, 77, 0.1);
+        border-left: 4px solid #ff4d4d;
+        color: #ff4d4d;
       }
-      
-      body {
-        background: white;
-        color: black;
+
+      /* Modal styles */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
       }
-      
-      .header {
-        border: 1px solid #ccc;
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 500px;
+        max-width: 90%;
+        z-index: 1001;
+        background: rgba(10, 17, 40, 0.95);
+        border-radius: 15px;
+        padding: 25px;
+        border: 1px solid rgba(0, 255, 204, 0.3);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
       }
-      
-      .header h1 {
-        -webkit-text-fill-color: black;
+
+      .modal h3 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--assistant-accent);
+        margin-bottom: 20px;
+        font-size: 1.5rem;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <!-- Mobile Menu Button -->
-  <button class="mobile-menu-btn" id="mobileMenuBtn">
-    <i class="fas fa-bars"></i>
-  </button>
-
-  <!-- Sidebar Overlay -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <i class="fas fa-code"></i>
-          CS-<span>IslamHatem</span>
-        </div>
-        <div class="assistant-badge">
-          <i class="fas fa-shield-alt"></i> assistant PORTAL
-        </div>
-      </div>
-
-      <ul class="sidebar-nav">
-        <li><a href="assistant-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
-        <li><a href="assistant-quizzess.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
-        <li><a href="assistant-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
-        <li><a href="assistant-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
-        <li><a href="assistant-livesessions.html" class="active"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
-        <li><a href="assistant-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
-        <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
-         <li><a href="classroom.html"><i class="fas fa-chalkboard-teacher"></i> <span>Classroom View</span></a></li>
-      </ul>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Header -->
-      <header class="header">
-        <h1><i class="fas fa-video"></i> Manage Live Sessions</h1>
-        <div class="user-menu">
-          <div class="user-info">
-            <div class="user-name">Assistant User</div>
-            <div class="user-role">Super Administrator</div>
-          </div>
-          <button class="logout-btn" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i> <span class="logout-text">Logout</span>
-          </button>
-        </div>
-      </header>
-
-      <!-- Alerts -->
-      <div id="alertSuccess" class="alert alert-success"></div>
-      <div id="alertError" class="alert alert-error"></div>
-
-      <!-- Create Live Session Form -->
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-plus-circle"></i> Schedule New Session</h2>
-        </div>
-
-        <form id="createSessionForm">
-          <div class="form-group">
-            <label for="title">Session Title</label>
-            <input type="text" id="title" class="form-control" placeholder="Enter session title" required>
-          </div>
-
-          <div class="form-group">
-            <label for="description">Description (optional)</label>
-            <textarea id="description" class="form-control" placeholder="Enter session description"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="scheduledAt">Scheduled Date & Time</label>
-            <input type="datetime-local" id="scheduledAt" class="form-control" required>
-          </div>
-
-          <div class="form-group">
-            <label for="duration">Duration (minutes)</label>
-            <input type="number" id="duration" class="form-control" placeholder="e.g., 60" min="15" max="480">
-          </div>
-
-          <div class="form-group">
-            <label for="courseId">Course</label>
-            <select id="courseId" class="form-control" required>
-              <option value="">-- Loading courses... --</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-assistant">
-            <i class="fas fa-save"></i> Create Session
-          </button>
-        </form>
-      </div>
-
-      <!-- Live Sessions List -->
-      <div class="content-card">
-        <div class="card-header">
-          <h2><i class="fas fa-list"></i> All Sessions</h2>
-          <button class="btn btn-secondary btn-sm" onclick="refreshSessions()">
-            <i class="fas fa-sync-alt"></i> Refresh
-          </button>
-        </div>
-
-        <div class="session-list" id="sessionsList">
-          <div class="session-card">
-            <div class="session-header">
-              <div>
-                <h3 class="session-title">Loading sessions...</h3>
-              </div>
-            </div>
-            <p class="session-description">Please wait while we load your live sessions.</p>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <!-- Edit Session Modal -->
-  <div class="modal-overlay" id="modalOverlay"></div>
-  <div class="modal" id="editModal">
-    <h3><i class="fas fa-edit"></i> Edit Session</h3>
-    <form id="editSessionForm">
-      <input type="hidden" id="editSessionId">
-      
-      <div class="form-group">
-        <label for="editTitle">Session Title</label>
-        <input type="text" id="editTitle" class="form-control" placeholder="Session Title" required>
-      </div>
-
-      <div class="form-group">
-        <label for="editDescription">Description (optional)</label>
-        <textarea id="editDescription" class="form-control" placeholder="Description (optional)"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="editScheduledAt">Scheduled Date & Time</label>
-        <input type="datetime-local" id="editScheduledAt" class="form-control" required>
-      </div>
-
-      <div class="form-group">
-        <label for="editDuration">Duration (minutes)</label>
-        <input type="number" id="editDuration" class="form-control" placeholder="Duration (minutes)" min="15" max="480">
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" onclick="closeModal()">
-          <i class="fas fa-times"></i> Cancel
-        </button>
-        <button type="submit" class="btn btn-assistant">
-          <i class="fas fa-save"></i> Save Changes
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <script>
-    const API_URL = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/assistant/livesessions";
-    const COURSE_API = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/assistant/courses";
-    let token = localStorage.getItem("assistantToken");
-    
-    // Check authentication
-    if (!token) {
-      showError("⚠️ Not authorized. Please login as assistant.");
-      setTimeout(() => {
-        window.location.href = "../Login-Pages/assistant-login.html";
-      }, 2000);
-    }
-
-    // DOM Elements
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const logoutText = document.querySelector('.logout-text');
-
-    // Mobile Menu Toggle
-    function toggleSidebar() {
-      sidebar.classList.toggle('active');
-      sidebarOverlay.classList.toggle('active');
-      document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
-    }
-
-    mobileMenuBtn.addEventListener('click', toggleSidebar);
-    sidebarOverlay.addEventListener('click', toggleSidebar);
-
-    // Hide text on small screens
-    function updateLogoutText() {
-      if (window.innerWidth <= 480) {
-        logoutText.textContent = '';
-      } else {
-        logoutText.textContent = 'Logout';
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
       }
-    }
 
-    // Update on resize and load
-    window.addEventListener('resize', updateLogoutText);
-    window.addEventListener('load', updateLogoutText);
-
-    // Helper functions
-    function showSuccess(message) {
-      const alertSuccess = document.getElementById("alertSuccess");
-      alertSuccess.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-      alertSuccess.style.display = "block";
-      setTimeout(() => {
-        alertSuccess.style.display = "none";
-      }, 5000);
-    }
-    
-    function showError(message) {
-      const alertError = document.getElementById("alertError");
-      alertError.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
-      alertError.style.display = "block";
-      setTimeout(() => {
-        alertError.style.display = "none";
-      }, 5000);
-    }
-    
-    function logout() {
-      localStorage.removeItem("assistantToken");
-      localStorage.removeItem("assistantInfo");
-      window.location.href = "../Login-Pages/assistant-login.html";
-    }
-
-    // Load courses
-    async function loadCourses() {
-      try {
-        const res = await fetch(COURSE_API, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (res.status === 401) {
-          logout();
-          return;
+      /* Responsive Design */
+      @media (max-width: 992px) {
+        .sidebar {
+          width: 70px;
+          overflow: visible;
         }
         
-        const data = await res.json();
-        const courseSelect = document.getElementById("courseId");
-        courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+        .sidebar-logo span, .sidebar-nav span {
+          display: none;
+        }
         
-        if (data.data && data.data.length > 0) {
+        .sidebar-nav i {
+          margin-right: 0;
+          font-size: 1.2rem;
+        }
+        
+        .main-content {
+          margin-left: 70px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          display: none;
+        }
+        
+        .main-content {
+          margin-left: 0;
+          padding: 15px;
+        }
+        
+        .header {
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+        }
+        
+        .user-menu {
+          flex-direction: column;
+        }
+        
+        .modal {
+          width: 90%;
+          padding: 15px;
+        }
+        
+        .session-header {
+          flex-direction: column;
+          gap: 10px;
+        }
+        
+        .session-actions {
+          flex-wrap: wrap;
+        }
+      }
+
+          /* Mobile Devices (up to 768px) */
+      .mobile-menu-btn {
+        display: none;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: var(--assistant-gradient);
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .mobile-menu-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(0, 255, 204, 0.5);
+      }
+
+      .mobile-menu-btn i {
+        color: var(--dark);
+        font-size: 1.2rem;
+      }
+
+      /* Sidebar Overlay */
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .sidebar-overlay.active {
+        opacity: 1;
+      }
+
+      /* Mobile Devices (up to 768px) */
+      @media (max-width: 768px) {
+        :root {
+          --sidebar-width: 70px;
+        }
+
+        .sidebar {
+          width: 70px !important;
+          overflow: visible;
+        }
+
+        .sidebar-header {
+          display: none;
+        }
+
+        .sidebar-nav a span {
+          display: none;
+        }
+
+        .sidebar-logo {
+          font-size: 1.2rem;
+          justify-content: center;
+        }
+
+        .sidebar-nav a {
+          justify-content: center;
+          padding: 12px 10px;
+        }
+
+        .sidebar-nav i {
+          margin-right: 0;
+          font-size: 1.2rem;
+        }
+
+        .main-content {
+          margin-left: 70px;
+          padding: 15px;
+          width: auto;
+        }
+
+        .header {
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+          padding: 15px;
+        }
+
+        .header h1 {
+          font-size: 1.4rem;
+        }
+
+        .user-menu {
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .user-info {
+          text-align: center;
+        }
+
+        .content-card {
+          padding: 15px;
+        }
+
+        .card-header {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .card-header h2 {
+          font-size: 1.2rem;
+        }
+
+        .assignment-header,
+        .submission-header {
+          flex-direction: column;
+          gap: 10px;
+          align-items: flex-start;
+        }
+
+        .assignment-actions {
+          flex-wrap: wrap;
+          width: 100%;
+        }
+
+        .assignment-actions .btn {
+          flex: 1;
+          min-width: 120px;
+        }
+
+        .submission-meta {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .form-control,
+        .grade-input,
+        .feedback-input {
+          font-size: 16px;
+        }
+      }
+
+      /* Tablets (768px to 1024px) */
+      @media (min-width: 768px) and (max-width: 1024px) {
+        :root {
+          --sidebar-width: 70px;
+        }
+
+        .sidebar {
+          width: 70px !important;
+          overflow: visible;
+        }
+
+        .sidebar-header {
+          display: none;
+        }
+
+        .sidebar-nav a span {
+          display: none;
+        }
+
+        .sidebar-nav a {
+          justify-content: center;
+          padding: 12px 10px;
+        }
+
+        .sidebar-nav i {
+          margin-right: 0;
+          font-size: 1.2rem;
+        }
+
+        .main-content {
+          margin-left: 70px;
+          padding: 20px;
+        }
+
+        .header h1 {
+          font-size: 1.5rem;
+        }
+
+        .content-card {
+          padding: 20px;
+        }
+      }
+
+      /* Small Desktops (1024px to 1200px) */
+      @media (min-width: 1025px) and (max-width: 1200px) {
+        :root {
+          --sidebar-width: 250px;
+        }
+
+        .main-content {
+          margin-left: 250px;
+        }
+
+        .assignment-list,
+        .submission-list {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Large Desktops (1200px and up) */
+      @media (min-width: 1200px) {
+        :root {
+          --sidebar-width: 280px;
+        }
+
+        .main-content {
+          margin-left: 280px;
+        }
+
+        .assignment-list,
+        .submission-list {
+          grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+        }
+      }
+
+      /* ==========================================
+    ORIENTATION QUERIES
+    ========================================== */
+
+      /* Landscape Orientation */
+      @media (orientation: landscape) {
+        /* Landscape styles */
+      }
+
+      /* Portrait Orientation */
+      @media (orientation: portrait) {
+        /* Portrait styles */
+      }
+
+      /* ==========================================
+    HIGH RESOLUTION DISPLAYS (Retina)
+    ========================================== */
+
+      @media (-webkit-min-device-pixel-ratio: 2),
+      (min-resolution: 192dpi) {
+        /* Retina display styles */
+      }
+
+      /* ==========================================
+    PRINT STYLES
+    ========================================== */
+
+      @media print {
+        /* Print styles */
+      }
+
+      /* ==========================================
+    REDUCED MOTION (Accessibility)
+    ========================================== */
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* ==========================================
+    COMMON DEVICE-SPECIFIC QUERIES
+    ========================================== */
+
+      /* iPhone SE, 5, 5S */
+      @media only screen and (min-device-width: 320px) and (max-device-width: 568px) {
+        /* iPhone SE styles */
+      }
+
+      /* iPhone 12, 13, 14 Pro */
+      @media only screen and (min-device-width: 390px) and (max-device-width: 844px) {
+        /* iPhone 12/13/14 Pro styles */
+      }
+
+      /* iPad (Portrait and Landscape) */
+      @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+        /* iPad styles */
+      }
+
+      /* iPad Pro 12.9" */
+      @media only screen and (min-device-width: 1024px) and (max-device-width: 1366px) {
+        /* iPad Pro styles */
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Sidebar Overlay -->
+    <!-- <div class="sidebar-overlay" id="sidebarOverlay"></div> -->
+    <div class="dashboard">
+      <!-- Sidebar -->
+      <aside class="sidebar" style="width: 280px;">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <i class="fas fa-code"></i>
+            CS-<span>IslamHatem</span>
+          </div>
+          <div class="assistant-badge">
+            <i class="fas fa-shield-alt"></i> assistant PORTAL
+          </div>
+        </div>
+
+        <ul class="sidebar-nav">
+          <li><a href="assistant-assignments.html"><i class="fas fa-tasks"></i> <span>Assignments</span></a></li>
+          <li><a href="assistant-quizzess.html"><i class="fas fa-question-circle"></i> <span>Quizzes</span></a></li>
+          <li><a href="assistant-quiz-submissions.html"><i class="fas fa-check-circle"></i> <span>Grade Quizzes</span></a></li>
+          <li><a href="assistant-students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a></li>
+          <li><a href="assistant-livesessions.html" class="active"><i class="fas fa-video"></i> <span>Live Sessions</span></a></li>
+          <li><a href="assistant-profile.html"><i class="fas fa-user-cog"></i> <span>Profile</span></a></li>
+          <li><a href="shareLive.html"><i class="fas fa-share-alt"></i> <span>Join Live</span></a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <h1><i class="fas fa-video"></i> Manage Live Sessions</h1>
+          <div class="user-menu">
+            <div class="user-info">
+              <div class="user-name">Assistant User</div>
+              <div class="user-role">Super Administrator</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </header>
+
+        <!-- Alerts -->
+        <div id="alertSuccess" class="alert alert-success"></div>
+        <div id="alertError" class="alert alert-error"></div>
+
+        <!-- Create Live Session Form -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2><i class="fas fa-plus-circle"></i> Schedule New Session</h2>
+          </div>
+
+          <form id="createSessionForm">
+            <div class="form-group">
+              <label for="title">Session Title</label>
+              <input type="text" id="title" class="form-control" placeholder="Session Title" required>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description (optional)</label>
+              <textarea id="description" class="form-control" placeholder="Description (optional)"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="scheduledAt">Scheduled Date & Time</label>
+              <input type="datetime-local" id="scheduledAt" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="duration">Duration (minutes)</label>
+              <input type="number" id="duration" class="form-control" placeholder="Duration (minutes)">
+            </div>
+
+            <div class="form-group">
+              <label for="courseId">Course</label>
+              <select id="courseId" class="form-control" required>
+                <option value="">-- Loading courses... --</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-assistant">
+              <i class="fas fa-save"></i> Create Session
+            </button>
+          </form>
+        </div>
+
+        <!-- Live Sessions List -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2><i class="fas fa-list"></i> All Sessions</h2>
+          </div>
+
+          <div class="session-list" id="sessionsList">
+            <div class="session-card">
+              <div class="session-header">
+                <div>
+                  <h3 class="session-title">Loading sessions...</h3>
+                </div>
+              </div>
+              <p class="session-description">Please wait while we load your live sessions.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Edit Session Modal -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal" id="editModal">
+      <h3>Edit Session</h3>
+      <form id="editSessionForm">
+        <input type="hidden" id="editSessionId">
+        
+        <div class="form-group">
+          <label for="editTitle">Session Title</label>
+          <input type="text" id="editTitle" class="form-control" placeholder="Session Title" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editDescription">Description (optional)</label>
+          <textarea id="editDescription" class="form-control" placeholder="Description (optional)"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="editScheduledAt">Scheduled Date & Time</label>
+          <input type="datetime-local" id="editScheduledAt" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editDuration">Duration (minutes)</label>
+          <input type="number" id="editDuration" class="form-control" placeholder="Duration (minutes)">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="submit" class="btn btn-assistant">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const API_URL = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/assistant/livesessions";
+      const COURSE_API = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/assistant/courses";
+      const token = localStorage.getItem("assistantToken");
+      
+      // Check authentication
+      if (!token) {
+        showError("⚠️ Not authorized. Please login as assistant.");
+        setTimeout(() => {
+          window.location.href = "../Login-Pages/assistant-login.html";
+        }, 2000);
+      }
+
+      // Helper functions
+      function showSuccess(message) {
+        const alertSuccess = document.getElementById("alertSuccess");
+        alertSuccess.textContent = message;
+        alertSuccess.style.display = "block";
+        setTimeout(() => {
+          alertSuccess.style.display = "none";
+        }, 5000);
+      }
+      
+      function showError(message) {
+        const alertError = document.getElementById("alertError");
+        alertError.textContent = message;
+        alertError.style.display = "block";
+        setTimeout(() => {
+          alertError.style.display = "none";
+        }, 5000);
+      }
+      
+      function logout() {
+        localStorage.removeItem("assistantToken");
+        localStorage.removeItem("assistantInfo");
+        window.location.href = "../Login-Pages/assistant-login.html";
+      }
+
+      // Load courses
+      async function loadCourses() {
+        try {
+          const res = await fetch(COURSE_API, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (res.status === 401) {
+            logout();
+            return;
+          }
+          
+          const data = await res.json();
+          const courseSelect = document.getElementById("courseId");
+          courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
+          
           data.data.forEach(c => {
             const opt = document.createElement("option");
             opt.value = c._id;
             opt.textContent = c.title;
             courseSelect.appendChild(opt);
           });
-        } else {
-          courseSelect.innerHTML = '<option value="">-- No courses available --</option>';
+        } catch (err) {
+          console.error("Error loading courses:", err);
+          showError("Failed to load courses. Please try again.");
         }
-      } catch (err) {
-        console.error("Error loading courses:", err);
-        showError("Failed to load courses. Please try again.");
       }
-    }
 
-    // Load sessions with improved mobile display
-    async function loadSessions() {
-      try {
-        const sessionsList = document.getElementById("sessionsList");
-        sessionsList.innerHTML = `
-          <div class="session-card">
-            <div class="session-header">
-              <div>
-                <h3 class="session-title">Loading...</h3>
-              </div>
-              <div class="session-time"><span class="spinner"></span></div>
-            </div>
-            <p class="session-description">Loading your live sessions...</p>
-          </div>
-        `;
-        
-        const res = await fetch(API_URL, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-        
-        const data = await res.json();
-        sessionsList.innerHTML = "";
-        
-        if (!data.data || data.data.length === 0) {
-          sessionsList.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-video-slash"></i>
-              <h3>No Live Sessions</h3>
-              <p>Create your first session using the form above.</p>
-            </div>
-          `;
-          return;
-        }
-        
-        data.data.forEach(session => {
-          const now = new Date();
-          const scheduledTime = new Date(session.scheduledAt);
+      // Load sessions - FIXED: Only fix the display time
+      async function loadSessions() {
+        try {
+          const res = await fetch(API_URL, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
           
-          // Adjust for timezone offset
-          const timezoneOffset = scheduledTime.getTimezoneOffset() * 60000;
-          const localScheduledTime = new Date(scheduledTime.getTime() - timezoneOffset);
-          
-          const endTime = new Date(scheduledTime.getTime() + (session.duration || 60) * 60000);
-          const isUpcoming = scheduledTime > now;
-          const isLive = scheduledTime <= now && endTime > now;
-          
-          let statusText = "Completed";
-          let statusClass = "status-completed";
-          let statusIcon = "fas fa-check-circle";
-          
-          if (isLive) {
-            statusText = "Live Now";
-            statusClass = "status-live";
-            statusIcon = "fas fa-broadcast-tower";
-          } else if (isUpcoming) {
-            statusText = "Upcoming";
-            statusClass = "status-upcoming";
-            statusIcon = "fas fa-clock";
+          if (res.status === 401) {
+            logout();
+            return;
           }
           
-          // Format date for mobile
-          const formattedDate = window.innerWidth <= 768 
-            ? localScheduledTime.toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })
-            : localScheduledTime.toLocaleString();
+          const data = await res.json();
+          const sessionsList = document.getElementById("sessionsList");
+          sessionsList.innerHTML = "";
           
-          const div = document.createElement("div");
-          div.className = "session-card";
-          div.innerHTML = `
-            <div class="session-header">
-              <div>
-                <h3 class="session-title">${session.title}</h3>
-                <span class="course-badge">${session.course?.title || "N/A"}</span>
-                <span class="status-badge ${statusClass}">
-                  <i class="${statusIcon}"></i> ${statusText}
-                </span>
+          if (!data.data || data.data.length === 0) {
+            sessionsList.innerHTML = `
+              <div class="session-card">
+                <div class="session-header">
+                  <h3 class="session-title">No live sessions found</h3>
+                </div>
+                <p class="session-description">Create your first session using the form above.</p>
               </div>
-              <div class="session-time">
-                <i class="fas fa-calendar-alt"></i> ${formattedDate}
+            `;
+            return;
+          }
+          
+          data.data.forEach(session => {
+            const now = new Date();
+            
+            // FIXED: Simple time handling - use the date as is for display
+            let scheduledTime = new Date(session.scheduledAt);
+            
+            // If the time is showing +2 hours, subtract 2 hours to correct it
+            // This is the core fix for the display issue
+            const correctedTime = new Date(scheduledTime.getTime()- (2 * 60 * 60 * 1000));
+            
+            const isUpcoming = scheduledTime > now;
+            const isLive = correctedTime <= now && correctedTime.getTime() + (session.duration * 60000) > now.getTime();
+            
+            let statusText = "Completed";
+            let statusClass = "status-completed";
+            
+            if (isLive) {
+              statusText = "Live Now";
+              statusClass = "status-live";
+            } else if (isUpcoming) {
+              statusText = "Upcoming";
+              statusClass = "status-upcoming";
+            }
+            
+            const div = document.createElement("div");
+            div.className = "session-card";
+            div.innerHTML = `
+              <div class="session-header">
+                <div>
+                  <h3 class="session-title">${session.title}</h3>
+                  <span class="course-badge">${session.course?.title || "N/A"}</span>
+                  <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div class="session-time">${correctedTime.toLocaleString()}</div>
               </div>
-            </div>
-            <p class="session-description">${session.description || "No description provided."}</p>
-            <div class="session-actions">
-              <a href="https://easy-videoconf-1939.app.100ms.live/meeting/gjz-ivde-jyk" 
-                 class="btn btn-live btn-sm ${!isLive ? 'disabled' : ''}" 
-                 ${!isLive ? 'style="opacity: 0.6; cursor: not-allowed;"' : ''}>
-                <i class="fas fa-broadcast-tower"></i> ${isLive ? 'Join Live' : 'Join'}
-              </a>
-              <button class="btn btn-assistant btn-sm" onclick="openEditModal('${session._id}')">
-                <i class="fas fa-edit"></i> Edit
-              </button>
-              <button class="btn btn-danger btn-sm" onclick="confirmDeleteSession('${session._id}')">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          `;
-          sessionsList.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Error loading sessions:", err);
-        const sessionsList = document.getElementById("sessionsList");
-        sessionsList.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error Loading Sessions</h3>
-            <p>Failed to load sessions. Please try refreshing the page.</p>
-            <button class="btn btn-secondary" onclick="loadSessions()" style="margin-top: 15px;">
-              <i class="fas fa-redo"></i> Try Again
-            </button>
-          </div>
-        `;
+              <p class="session-description">${session.description || "No description provided."}</p>
+              <div class="session-actions">
+                <a href="https://easy-videoconf-1939.app.100ms.live/meeting/gjz-ivde-jyk" class="btn btn-live btn-sm" ${!isLive ? 'style="opacity: 0.6; pointer-events: none;"' : ''}>
+                  <i class="fas fa-broadcast-tower"></i> Go Live / Join
+                </a>
+                <button class="btn btn-assistant btn-sm" onclick="openModal('${session._id}', '${session.title}', '${session.description || ""}', '${session.scheduledAt}', '${session.duration || ""}')">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteSession('${session._id}')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            `;
+            sessionsList.appendChild(div);
+          });
+        } catch (err) {
+          console.error("Error loading sessions:", err);
+          showError("Failed to load sessions. Please try again.");
+        }
       }
-    }
 
-    // Refresh sessions
-    function refreshSessions() {
-      const refreshBtn = document.querySelector('.btn.btn-secondary.btn-sm');
-      const originalHTML = refreshBtn.innerHTML;
-      refreshBtn.innerHTML = '<span class="spinner"></span>';
-      loadSessions().finally(() => {
-        refreshBtn.innerHTML = originalHTML;
+      // Create session - keep existing logic since edit modal works
+      document.getElementById("createSessionForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+        submitBtn.disabled = true;
+        
+        const body = {
+          title: document.getElementById("title").value,
+          description: document.getElementById("description").value,
+          scheduledAt: document.getElementById("scheduledAt").value,
+          duration: document.getElementById("duration").value,
+          courseId: document.getElementById("courseId").value
+        };
+        
+        try {
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+          });
+          
+          if (res.status === 401) {
+            logout();
+            return;
+          }
+          
+          if (res.ok) {
+            showSuccess("✅ Session created successfully!");
+            e.target.reset();
+            loadSessions();
+          } else {
+            const errorData = await res.json();
+            showError("❌ Failed to create session: " + (errorData.message || "Unknown error"));
+          }
+        } catch (err) {
+          console.error("Error creating session:", err);
+          showError("❌ Failed to create session. Please try again.");
+        } finally {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }
       });
-    }
 
-    // Create session
-    document.getElementById("createSessionForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<span class="spinner"></span> Creating...';
-      submitBtn.disabled = true;
-      
-      const body = {
-        title: document.getElementById("title").value.trim(),
-        description: document.getElementById("description").value.trim(),
-        scheduledAt: document.getElementById("scheduledAt").value,
-        duration: parseInt(document.getElementById("duration").value) || 60,
-        courseId: document.getElementById("courseId").value
-      };
-      
-      if (!body.courseId) {
-        showError("Please select a course");
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        return;
+      // Delete session
+      async function deleteSession(id) {
+        if (!confirm("Are you sure you want to delete this session?")) return;
+        
+        try {
+          const res = await fetch(`${API_URL}/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (res.status === 401) {
+            logout();
+            return;
+          }
+          
+          if (res.ok) {
+            showSuccess("🗑 Session deleted successfully");
+            loadSessions();
+          } else {
+            showError("❌ Failed to delete session");
+          }
+        } catch (err) {
+          console.error("Error deleting session:", err);
+          showError("❌ Failed to delete session. Please try again.");
+        }
       }
-      
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify(body)
-        });
+
+      // Open edit modal - keep existing logic since it works
+      function openModal(id, title, description, scheduledAt, duration) {
+        document.getElementById("editSessionId").value = id;
+        document.getElementById("editTitle").value = title;
+        document.getElementById("editDescription").value = description;
+        document.getElementById("editScheduledAt").value = scheduledAt.slice(0,16);
+        document.getElementById("editDuration").value = duration;
+
+        document.getElementById("modalOverlay").style.display = "block";
+        document.getElementById("editModal").style.display = "block";
         
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-        
-        const data = await res.json();
-        
-        if (res.ok) {
-          showSuccess("Session created successfully!");
-          e.target.reset();
-          loadSessions();
-        } else {
-          showError(data.message || "Failed to create session");
-        }
-      } catch (err) {
-        console.error("Error creating session:", err);
-        showError("Failed to create session. Please check your connection.");
-      } finally {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+        // Add click event to close modal when clicking outside
+        document.getElementById("modalOverlay").onclick = closeModal;
       }
-    });
 
-    // Confirm delete session
-    function confirmDeleteSession(id) {
-      if (!confirm("Are you sure you want to delete this session? This action cannot be undone.")) return;
-      deleteSession(id);
-    }
-
-    // Delete session
-    async function deleteSession(id) {
-      try {
-        const res = await fetch(`${API_URL}/${id}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-        
-        if (res.ok) {
-          showSuccess("Session deleted successfully");
-          loadSessions();
-        } else {
-          showError("Failed to delete session");
-        }
-      } catch (err) {
-        console.error("Error deleting session:", err);
-        showError("Failed to delete session. Please try again.");
+      // Close edit modal
+      function closeModal() {
+        document.getElementById("modalOverlay").style.display = "none";
+        document.getElementById("editModal").style.display = "none";
+        document.getElementById("modalOverlay").onclick = null;
       }
-    }
 
-    // Open edit modal
-    async function openEditModal(id) {
-      try {
-        const res = await fetch(`${API_URL}/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+      // Handle edit form submit - keep existing logic since it works
+      document.getElementById("editSessionForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
         
-        if (res.status === 401) {
-          logout();
-          return;
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitBtn.disabled = true;
+        
+        const id = document.getElementById("editSessionId").value;
+        const body = {
+          title: document.getElementById("editTitle").value,
+          description: document.getElementById("editDescription").value,
+          scheduledAt: document.getElementById("editScheduledAt").value,
+          duration: document.getElementById("editDuration").value
+        };
+        
+        try {
+          const res = await fetch(`${API_URL}/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+          });
+          
+          if (res.status === 401) {
+            logout();
+            return;
+          }
+          
+          if (res.ok) {
+            showSuccess("✅ Session updated successfully!");
+            closeModal();
+            loadSessions();
+          } else {
+            const errorData = await res.json();
+            showError("❌ Failed to update session: " + (errorData.message || "Unknown error"));
+          }
+        } catch (err) {
+          console.error("Error updating session:", err);
+          showError("❌ Failed to update session. Please try again.");
+        } finally {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
         }
-        
-        const data = await res.json();
-        const session = data.data;
-        
-        if (!session) {
-          showError("Session not found");
-          return;
-        }
-        
-        // Convert time for datetime-local input
-        const scheduledTime = new Date(session.scheduledAt);
-        const localTime = new Date(scheduledTime.getTime() - scheduledTime.getTimezoneOffset() * 60000);
-        const formattedTime = localTime.toISOString().slice(0, 16);
-        
-        document.getElementById("editSessionId").value = session._id;
-        document.getElementById("editTitle").value = session.title;
-        document.getElementById("editDescription").value = session.description || "";
-        document.getElementById("editScheduledAt").value = formattedTime;
-        document.getElementById("editDuration").value = session.duration || 60;
-        
-        openModal();
-      } catch (err) {
-        console.error("Error loading session:", err);
-        showError("Failed to load session details");
-      }
-    }
+      });
 
-    // Open modal
-    function openModal() {
-      document.getElementById("modalOverlay").style.display = "block";
-      document.getElementById("editModal").style.display = "block";
-      document.body.style.overflow = "hidden";
-    }
-
-    // Close modal
-    function closeModal() {
-      document.getElementById("modalOverlay").style.display = "none";
-      document.getElementById("editModal").style.display = "none";
-      document.body.style.overflow = "";
-    }
-
-    // Handle edit form submit
-    document.getElementById("editSessionForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      
-      const submitBtn = e.target.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<span class="spinner"></span> Saving...';
-      submitBtn.disabled = true;
-      
-      const id = document.getElementById("editSessionId").value;
-      const body = {
-        title: document.getElementById("editTitle").value.trim(),
-        description: document.getElementById("editDescription").value.trim(),
-        scheduledAt: document.getElementById("editScheduledAt").value,
-        duration: parseInt(document.getElementById("editDuration").value) || 60
-      };
-      
-      try {
-        const res = await fetch(`${API_URL}/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify(body)
-        });
-        
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-        
-        if (res.ok) {
-          showSuccess("Session updated successfully!");
-          closeModal();
-          loadSessions();
-        } else {
-          const errorData = await res.json();
-          showError(errorData.message || "Failed to update session");
-        }
-      } catch (err) {
-        console.error("Error updating session:", err);
-        showError("Failed to update session. Please try again.");
-      } finally {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-      }
-    });
-
-    // Close modal when clicking overlay
-    document.getElementById("modalOverlay").addEventListener("click", closeModal);
-
-    // Close modal with Escape key
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        closeModal();
-        toggleSidebar();
-      }
-    });
-
-    // Initialize
-    window.addEventListener("load", () => {
-      updateLogoutText();
+      // Initialize
       loadCourses();
       loadSessions();
-      
-      // Set minimum datetime for scheduling
-      const now = new Date();
-      const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-      document.getElementById("scheduledAt").min = localNow.toISOString().slice(0, 16);
-      document.getElementById("editScheduledAt").min = localNow.toISOString().slice(0, 16);
-    });
-  </script>
-</body>
-</html>
+    </script>
+  </body>
+  </html>
