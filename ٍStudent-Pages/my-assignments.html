@@ -817,7 +817,7 @@
 
         async function loadAssignments() {
             try {
-                const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
+                const API_BASE = "https://cs-eslamhatem-vhtimw.fly.dev/api";
                 const enrolledRes = await fetch(`${API_BASE}/users/my-courses`, { headers: { "Authorization": "Bearer " + token } });
                 if (enrolledRes.status === 401) { localStorage.removeItem("token"); window.location.href = 'login.html'; return; }
                 enrolledCourses = await enrolledRes.json();
@@ -867,7 +867,7 @@
                     <div class="assignment-header"><h3 class="assignment-title">${assignment.title}</h3><span class="status-badge ${statusClass}">${statusText}</span></div>
                     <div class="course-info"><i class="fas fa-graduation-cap"></i><span>${assignment.courseName || 'Course Assignment'}</span></div>
                     <div class="assignment-desc">${assignment.description || "No description provided."}</div>
-                    <div class="assignment-meta">${dueDate ? `<div class="meta-item"><i class="fas fa-calendar-day"></i>Due: ${dueDate.toLocaleDateString()}</div>` : ''}${assignment.pdf ? `<div class="meta-item"><i class="fas fa-file-pdf"></i><a href="https://cs-eslamhatem-backend-1i25nw.fly.dev/uploads/${assignment.pdf}" target="_blank">Download PDF</a></div>` : ''}</div>
+                    <div class="assignment-meta">${dueDate ? `<div class="meta-item"><i class="fas fa-calendar-day"></i>Due: ${dueDate.toLocaleDateString()}</div>` : ''}${assignment.pdf ? `<div class="meta-item"><i class="fas fa-file-pdf"></i><a href="https://cs-eslamhatem-vhtimw.fly.dev/uploads/${assignment.pdf}" target="_blank">Download PDF</a></div>` : ''}</div>
                     ${dueDate ? `<div class="due-date"><div class="due-date-label">Time remaining:</div><div class="countdown" id="countdown-${assignment._id}">${calculateTimeRemaining(dueDate)}</div></div>` : ''}
                     ${assignment.submission ? renderSubmissionDetails(assignment) : renderSubmissionForm(assignment, dueDate ? dueDate < now : false)}
                 `;
@@ -971,7 +971,7 @@
             try {
                 loadingProgress.style.width = "50%";
                 loadingText.textContent = "Validating file...";
-                const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api";
+                const API_BASE = "https://cs-eslamhatem-vhtimw.fly.dev/api";
                 loadingProgress.style.width = "70%";
                 loadingText.textContent = "Uploading file...";
                 loadingProgress.style.width = "85%";
