@@ -786,7 +786,7 @@
   </div>
 
   <script>
-    const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin";
+    const API_BASE = "https://cs-eslamhatem-vhtimw.fly.dev/api/admin";
     const token = localStorage.getItem("adminToken"); // stored after login
 
     if (!token) {
@@ -1316,7 +1316,7 @@
               <td>${s.student?.email || "-"}</td>
               <td>${s.score || "-"}</td>
               <td>${s.attemptedAt ? new Date(s.attemptedAt).toLocaleString() : "-"}</td>
-              <td>${s.pdfAnswerFile ? `<a href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${s.pdfAnswerFile}" target="_blank">Download</a>` : "No file"}</td>
+              <td>${s.pdfAnswerFile ? `<a href="https://cs-eslamhatem-vhtimw.fly.dev/${s.pdfAnswerFile}" target="_blank">Download</a>` : "No file"}</td>
             `;
             tbody.appendChild(tr);
           });
