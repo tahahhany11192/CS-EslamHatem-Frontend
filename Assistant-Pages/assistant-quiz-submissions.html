@@ -1128,7 +1128,7 @@
   </div>
 
   <script>
-    const API_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/assistant";
+    const API_BASE = "https://cs-eslamhatem-vhtimw.fly.dev/api/assistant";
     const token = localStorage.getItem("assistantToken");
     
     let allSubmissions = [];
@@ -1319,7 +1319,7 @@
             
             ${quiz.examType === 'pdf' && sub.pdfAnswerFile ? `
               <div style="text-align: center; margin: 15px 0;">
-                <a href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${sub.pdfAnswerFile}" 
+                <a href="https://cs-eslamhatem-vhtimw.fly.dev/${sub.pdfAnswerFile}" 
                    target="_blank" 
                    class="btn btn-secondary btn-sm">
                   <i class="fas fa-download"></i> Download PDF Answer
@@ -1445,7 +1445,7 @@
               <h3>PDF Answer Submission</h3>
               <p>Student has submitted a PDF file for grading.</p>
               ${sub.pdfAnswerFile ? `
-                <a href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${sub.pdfAnswerFile}" 
+                <a href="https://cs-eslamhatem-vhtimw.fly.dev/${sub.pdfAnswerFile}" 
                    target="_blank" 
                    class="btn btn-assistant" style="margin-top: 15px;">
                   <i class="fas fa-download"></i> Download PDF
