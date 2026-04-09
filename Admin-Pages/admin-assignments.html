@@ -1350,10 +1350,10 @@
       }, 2000);
     }
 
-    const API_ADMIN = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin";
+    const API_ADMIN = "https://cs-eslamhatem-vhtimw.fly.dev/api/admin";
     const ASSIGN_API = API_ADMIN + "/assignments";
     const COURSES_API = API_ADMIN + "/courses";
-    const UPLOADS_BASE = "https://cs-eslamhatem-backend-1i25nw.fly.dev/uploads/";
+    const UPLOADS_BASE = "https://cs-eslamhatem-vhtimw.fly.dev/uploads/";
 
     // DOM Elements
     const form = document.getElementById("assignmentForm");
@@ -1650,7 +1650,7 @@
           const studentEmail = s.student?.email || "";
           const grade = s.grade ?? "Not graded";
           const feedback = s.feedback || "No feedback";
-          const fileLink = s.fileUrl ? `<a class="file-link" href="https://cs-eslamhatem-backend-1i25nw.fly.dev/${s.fileUrl}" target="_blank"><i class="fas fa-download"></i> Download Submission</a>` : `<span style="color: rgba(240, 246, 255, 0.5);">No file submitted</span>`;
+          const fileLink = s.fileUrl ? `<a class="file-link" href="https://cs-eslamhatem-vhtimw.fly.dev/${s.fileUrl}" target="_blank"><i class="fas fa-download"></i> Download Submission</a>` : `<span style="color: rgba(240, 246, 255, 0.5);">No file submitted</span>`;
 
           const div = document.createElement("div");
           div.className = "submission-card";
@@ -1707,7 +1707,7 @@
         e.target.disabled = true;
 
         try {
-          const res = await fetch(`https://cs-eslamhatem-backend-1i25nw.fly.dev/api/admin/assignments/submissions/${id}/grade`, {
+          const res = await fetch(`https://cs-eslamhatem-vhtimw.fly.dev/api/admin/assignments/submissions/${id}/grade`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -1736,7 +1736,7 @@
       if (!confirm("Are you sure you want to delete this submission? This action cannot be undone.")) return;
       
       try {
-        const res = await fetch(`https://cs-eslamhatem.fly.dev/api/admin/assignments/submissions/${id}`, {
+        const res = await fetch(`https://cs-eslamhatem-vhtimw.fly.dev/api/admin/assignments/submissions/${id}`, {
           method: "DELETE",
           headers: headersAuthJSON()
         });
@@ -1777,7 +1777,7 @@
         
         for (const submission of submissions) {
           try {
-            const res = await fetch(`https://cs-eslamhatem.fly.dev/api/admin/assignments/submissions/${submission._id}`, {
+            const res = await fetch(`https://cs-eslamhatem-vhtimw.fly.dev/api/admin/assignments/submissions/${submission._id}`, {
               method: "DELETE",
               headers: headersAuthJSON()
             });
