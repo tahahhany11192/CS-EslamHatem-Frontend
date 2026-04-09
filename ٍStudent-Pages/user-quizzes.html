@@ -1291,7 +1291,7 @@
 
   <script>
     // Global variables
-    const BASE_URL = "https://cs-eslamhatem-backend-1i25nw.fly.dev/api/users";
+    const BASE_URL = "https://cs-eslamhatem-vhtimw.fly.dev/api/users";
     let currentQuizId = null;
     let currentQuiz = null;
     let quizzes = [];
@@ -2219,7 +2219,7 @@ function closeExamModal() {
         document.getElementById("gradeDisplay").style.display = "none";
 
         if (quiz.pdfFile) {
-          const pdfUrl = `https://cs-eslamhatem-backend-1i25nw.fly.dev/${quiz.pdfFile.replace(/\\/g, "/")}`;
+          const pdfUrl = `https://cs-eslamhatem-vhtimw.fly.dev/${quiz.pdfFile.replace(/\\/g, "/")}`;
           const downloadLink = document.getElementById("downloadLink");
           downloadLink.href = pdfUrl;
           downloadLink.style.display = "inline-block";
