@@ -830,12 +830,15 @@ OUTPUT x"></textarea>
                     
                     <div class="output-panel" id="outputBox">
                         <div id="outputContent">Output will appear here...</div>
-                        <div id="inputPrompt" class="input-prompt">
-                            <div class="input-label" id="inputLabel">Enter value:</div>
-                            <input type="text" id="inputField" class="input-field" placeholder="Type your input here...">
-                            <button id="submitInput" class="submit-btn">Submit</button>
-                        </div>
                     </div>
+
+                    <!-- Input is kept OUTSIDE the output panel so it never becomes program output -->
+                    <div id="inputPrompt" class="input-prompt">
+                        <div class="input-label" id="inputLabel">Input required</div>
+                        <input type="text" id="inputField" class="input-field" placeholder="Type your input here...">
+                        <button id="submitInput" class="submit-btn">Submit</button>
+                    </div>
+
                     <div class="explanation-panel" id="explanationBox"></div>
                     
                     <div class="examples-section">
@@ -919,10 +922,11 @@ OUTPUT "Sum: ", sum`
             stack: [],
             isRunning: false,
             autoRunInterval: null,
+            autoMode: false,
             rawLines: [],
             waitingForInput: false,
             inputVariables: [],
-            inputCallback: null
+            inputMessage: ''
         };
 
         function initCompiler() {
@@ -935,29 +939,29 @@ OUTPUT "Sum: ", sum`
                 stack: [],
                 isRunning: false,
                 autoRunInterval: null,
+                autoMode: false,
                 rawLines: [],
                 waitingForInput: false,
                 inputVariables: [],
-                inputCallback: null
+                inputMessage: ''
             };
 
-            // Setup input submit handler
-            document.addEventListener('click', function(e) {
-                if (e.target && e.target.id === 'submitInput') {
-                    handleInputSubmit();
-                }
-            });
+            // Use direct handlers instead of document.addEventListener to prevent duplicate submits
+            const submitBtn = document.getElementById('submitInput');
+            const inputField = document.getElementById('inputField');
 
-            // Setup enter key handler for input field
-            document.addEventListener('keydown', function(e) {
-                if (e.target && e.target.id === 'inputField' && e.key === 'Enter') {
+            submitBtn.onclick = handleInputSubmit;
+
+            inputField.onkeydown = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
                     handleInputSubmit();
                 }
-            });
+            };
         }
 
         function handleInputSubmit() {
-            if (!executionState.waitingForInput || !executionState.inputCallback) return;
+            if (!executionState.waitingForInput || executionState.inputVariables.length === 0) return;
 
             const inputField = document.getElementById('inputField');
             const inputValue = inputField.value.trim();
@@ -967,64 +971,55 @@ OUTPUT "Sum: ", sum`
                 return;
             }
 
-            // Hide input prompt
+            const varList = executionState.inputVariables;
+            const values = inputValue.split(',').map(v => v.trim());
+
+            for (let i = 0; i < varList.length; i++) {
+                const variableName = varList[i];
+                const value = i < values.length ? values[i] : "";
+
+                // Store numbers as numbers, otherwise store text
+                executionState.variables[variableName] = value !== '' && !isNaN(value) ? Number(value) : value;
+            }
+
             document.getElementById('inputPrompt').style.display = 'none';
             inputField.value = '';
 
-            // Call the callback with the input value
-            executionState.inputCallback(inputValue);
+            document.getElementById('explanationBox').textContent =
+                `Input received for: ${varList.join(', ')}`;
 
-            // Reset waiting state
+            // Move to the next line ONCE only.
+            // This fixes the bug where the same INPUT line was executed again,
+            // forcing the student to type the input twice.
+            executionState.currentLine++;
+
             executionState.waitingForInput = false;
             executionState.inputVariables = [];
-            executionState.inputCallback = null;
+            executionState.inputMessage = '';
 
-            // Continue execution
-            if (executionState.autoRunInterval) {
-                executeNextStep();
+            // Continue automatically only if the user clicked Run Automatically.
+            // Step mode will wait for the next Next Step click.
+            if (executionState.autoMode) {
+                scheduleAutoRun();
             }
         }
 
-        function showInputPrompt(variables) {
-            executionState.waitingForInput = true;
-            const prompt = document.getElementById('inputPrompt');
-            const label = document.getElementById('inputLabel');
-            const inputField = document.getElementById('inputField');
-            
-            // Get the current line to extract the original input message
-            const currentLine = executionState.rawLines[executionState.currentLine];
-            
-            if (variables.length === 1) {
-                // For single variable input like "INPUT x", check if there's a custom message
-                if (currentLine.toLowerCase().includes('input "') || currentLine.toLowerCase().includes("input '")) {
-                    // Extract message from input line
-                    const match = currentLine.match(/INPUT\s+["']([^"']+)["']\s*,\s*(\w+)/i) || 
-                                 currentLine.match(/INPUT\s+["']([^"']+)["']\s*$/i);
-                    
-                    if (match) {
-                        label.textContent = match[1]; // Show the custom message
-                        inputField.placeholder = `Enter value for ${variables[0]}...`;
-                    } else {
-                        label.textContent = `Enter value for ${variables[0]}:`;
-                    }
-                } else {
-                    label.textContent = `Enter value for ${variables[0]}:`;
-                }
-            } else {
-                label.textContent = `Enter ${variables.length} values separated by commas:`;
-            }
-            
-            prompt.style.display = 'block';
-            inputField.focus();
-            
-            // Return a promise-like callback system
-            return new Promise((resolve) => {
-                executionState.inputCallback = function(value) {
-                    resolve(value);
-                };
-            });
-        }
+function showInputPrompt(variables, message = '') {
+    executionState.waitingForInput = true;
+    executionState.inputVariables = variables;
+    executionState.inputMessage = message;
 
+    const prompt = document.getElementById('inputPrompt');
+    const label = document.getElementById('inputLabel');
+    const inputField = document.getElementById('inputField');
+
+    // ✅ Do not show any built-in input text
+    label.textContent = '';
+    inputField.placeholder = '';
+
+    prompt.style.display = 'block';
+    inputField.focus();
+}
         function prepareExecution() {
             const codeArea = document.getElementById('codeInput');
             const rawLines = codeArea.value.split('\n');
@@ -1044,10 +1039,11 @@ OUTPUT "Sum: ", sum`
                 stack: [],
                 isRunning: true,
                 autoRunInterval: null,
+                autoMode: false,
                 rawLines,
                 waitingForInput: false,
                 inputVariables: [],
-                inputCallback: null
+                inputMessage: ''
             };
 
             executionState.lineElements = rawLines.map((line, index) => {
@@ -1117,7 +1113,7 @@ OUTPUT "Sum: ", sum`
             }
         }
 
-        async function executeNextStep() {
+        function executeNextStep() {
             if (executionState.waitingForInput) {
                 return false; // Don't proceed while waiting for input
             }
@@ -1184,76 +1180,37 @@ OUTPUT "Sum: ", sum`
                     return true;
                 }
 
-                // INPUT - Modified to use input field instead of prompt
+                // INPUT
                 if (/^INPUT\s+(.+)$/i.test(line)) {
-                    // Extract everything after INPUT
-                    const inputPart = line.match(/^INPUT\s+(.+)$/i)[1];
-                    
-                    // Check if there's a quoted message before variables
-                    if (/^["']/.test(inputPart)) {
-                        // Find the message and variables
-                        const match = inputPart.match(/^["']([^"']+)["']\s*,\s*(.+)$/i);
-                        if (match) {
-                            const [, message, varPart] = match;
-                            const varList = varPart.split(',').map(v => v.trim());
-                            
-                            // Store the variables we're waiting for
-                            executionState.inputVariables = varList;
-                            
-                            // Show the input prompt with custom message
-                            showInputPrompt(varList).then(inputValue => {
-                                // Process the input
-                                const values = inputValue.split(',').map(v => v.trim());
-                                
-                                for (let i = 0; i < varList.length; i++) {
-                                    const v = varList[i];
-                                    const val = i < values.length ? values[i] : "";
-                                    executionState.variables[v] = isNaN(val) ? val : Number(val);
-                                }
-                                
-                                exBox.textContent = `Input received for: ${varList.join(', ')}`;
-                                executionState.currentLine++;
-                                
-                                // Continue with next step if auto-running
-                                if (executionState.autoRunInterval) {
-                                    setTimeout(() => executeNextStep(), 500);
-                                }
-                            });
-                            
-                            return false;
-                        }
+                    const inputPart = line.match(/^INPUT\s+(.+)$/i)[1].trim();
+                    let message = '';
+                    let varPart = inputPart;
+
+                    // Supports:
+                    // INPUT x
+                    // INPUT x, y
+                    // INPUT "Enter your name:", name
+                    const messageMatch = inputPart.match(/^["']([^"']+)["']\s*,\s*(.+)$/i);
+                    if (messageMatch) {
+                        message = messageMatch[1];
+                        varPart = messageMatch[2];
                     }
-                    
-                    // Regular INPUT without custom message
-                    const varList = inputPart.split(',').map(v => v.trim());
-                    
-                    // Store the variables we're waiting for
-                    executionState.inputVariables = varList;
-                    
-                    // Show the input prompt
-                    showInputPrompt(varList).then(inputValue => {
-                        // Process the input
-                        const values = inputValue.split(',').map(v => v.trim());
-                        
-                        for (let i = 0; i < varList.length; i++) {
-                            const v = varList[i];
-                            const val = i < values.length ? values[i] : "";
-                            executionState.variables[v] = isNaN(val) ? val : Number(val);
-                        }
-                        
-                        exBox.textContent = `Input received for: ${varList.join(', ')}`;
-                        executionState.currentLine++;
-                        
-                        // Continue with next step if auto-running
-                        if (executionState.autoRunInterval) {
-                            setTimeout(() => executeNextStep(), 500);
-                        }
-                    });
-                    
-                    return false; // Pause execution until input is received
+
+                    const varList = varPart
+                        .split(',')
+                        .map(v => v.trim())
+                        .filter(Boolean);
+
+                    if (varList.length === 0) {
+                        throw new Error('INPUT needs at least one variable.');
+                    }
+
+                    showInputPrompt(varList, message);
+                    exBox.textContent = `Waiting for input: ${varList.join(', ')}`;
+                    return false; // Pause until the student submits input
                 }
 
-                // OUTPUT - Enhanced to handle both strings and variables
+                                // OUTPUT - Enhanced to handle both strings and variables
                 if (/^OUTPUT\s+(.+)$/i.test(line)) {
                     const expressions = line.match(/^OUTPUT\s+(.+)$/i)[1].split(',').map(e => e.trim());
                     const values = expressions.map(e => {
@@ -1516,52 +1473,106 @@ OUTPUT "Sum: ", sum`
             }
         }
 
-        function runAuto() {
-            if (executionState.isRunning) {
-                clearInterval(executionState.autoRunInterval || 0);
+        function finishAutoRun() {
+            if (executionState.autoRunInterval) {
+                clearTimeout(executionState.autoRunInterval);
                 executionState.autoRunInterval = null;
-                executionState.isRunning = false;
-                document.querySelector('.compiler-btn.run').textContent = 'Run Automatically';
+            }
+
+            executionState.autoMode = false;
+            executionState.isRunning = false;
+
+            const runBtn = document.querySelector('.compiler-btn.run');
+            if (runBtn) runBtn.textContent = 'Run Automatically';
+        }
+
+        function scheduleAutoRun() {
+            if (!executionState.autoMode || !executionState.isRunning || executionState.waitingForInput) {
+                return;
+            }
+
+            if (executionState.autoRunInterval) {
+                clearTimeout(executionState.autoRunInterval);
+            }
+
+            executionState.autoRunInterval = setTimeout(() => {
+                executionState.autoRunInterval = null;
+
+                if (!executionState.autoMode || executionState.waitingForInput) return;
+
+                const shouldContinue = executeNextStep();
+
+                if (executionState.waitingForInput) {
+                    // Pause automatic execution until the student submits the input.
+                    return;
+                }
+
+                if (shouldContinue && executionState.isRunning) {
+                    scheduleAutoRun();
+                } else {
+                    finishAutoRun();
+                }
+            }, 700);
+        }
+
+        function runAuto() {
+            if (executionState.autoMode) {
+                stopExecution();
                 return;
             }
 
             prepareExecution();
+            executionState.autoMode = true;
+            executionState.isRunning = true;
+
             document.querySelector('.compiler-btn.run').textContent = 'Stop';
 
-            executionState.autoRunInterval = setInterval(() => {
-                const continueExecution = executeNextStep();
-                if (!continueExecution) {
-                    clearInterval(executionState.autoRunInterval);
-                    executionState.autoRunInterval = null;
-                    executionState.isRunning = false;
-                    document.querySelector('.compiler-btn.run').textContent = 'Run Automatically';
-                }
-            }, 1500);
+            // Run the first step immediately, then schedule the rest.
+            const shouldContinue = executeNextStep();
+
+            if (executionState.waitingForInput) {
+                return;
+            }
+
+            if (shouldContinue && executionState.isRunning) {
+                scheduleAutoRun();
+            } else {
+                finishAutoRun();
+            }
         }
 
         function runStep() {
             if (!executionState.isRunning) {
                 prepareExecution();
             }
+
+            executionState.autoMode = false;
             executeNextStep();
         }
-        
+
         function stopExecution() {
             if (executionState.autoRunInterval) {
-                clearInterval(executionState.autoRunInterval);
+                clearTimeout(executionState.autoRunInterval);
                 executionState.autoRunInterval = null;
             }
+
+            executionState.autoMode = false;
             executionState.isRunning = false;
-            document.querySelector('.compiler-btn.run').textContent = 'Run Automatically';
-            document.getElementById('explanationBox').textContent += '\n\nExecution stopped by user.';
+
+            const runBtn = document.querySelector('.compiler-btn.run');
+            if (runBtn) runBtn.textContent = 'Run Automatically';
+
+            const exBox = document.getElementById('explanationBox');
+            if (exBox) exBox.textContent += '\n\nExecution stopped by user.';
         }
-        
+
         function resetCompiler() {
             stopExecution();
             document.getElementById('codeDisplay').innerHTML = '';
             document.getElementById('outputContent').textContent = 'Output will appear here...';
-            document.getElementById('explanationBox').textContent = 'Enter your pseudocode and click "Run Next Step" or "Run Automatically"';
+            document.getElementById('explanationBox').textContent = 'Enter your pseudocode and click "Next Step" or "Run Automatically"';
             document.getElementById('inputPrompt').style.display = 'none';
+
             executionState = {
                 lineElements: [],
                 variables: {},
@@ -1570,10 +1581,11 @@ OUTPUT "Sum: ", sum`
                 stack: [],
                 isRunning: false,
                 autoRunInterval: null,
+                autoMode: false,
                 rawLines: [],
                 waitingForInput: false,
                 inputVariables: [],
-                inputCallback: null
+                inputMessage: ''
             };
         }
     </script>
