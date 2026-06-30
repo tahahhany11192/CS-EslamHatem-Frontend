@@ -1137,7 +1137,7 @@
       }, 250);
     });
 
-    const API_BASE = "https://cs-eslamhatem-vhtimw.fly.dev/api/admin";
+    const API_BASE = "https://cs-eslamhatem-zpihcg.fly.dev/api/admin";
     const token = localStorage.getItem("adminToken");
     
     // State management
@@ -1524,7 +1524,7 @@
       if (submission.fileUrl.startsWith('http')) {
         fileUrl = submission.fileUrl;
       } else {
-        fileUrl = `https://cs-eslamhatem-vhtimw.fly.dev/${submission.fileUrl}`;
+        fileUrl = `https://cs-eslamhatem-zpihcg.fly.dev/${submission.fileUrl}`;
       }
     }
 
@@ -1689,7 +1689,7 @@
             if (submission.pdfAnswerFile.startsWith('http') || submission.pdfAnswerFile.startsWith('https')) {
               pdfUrl = submission.pdfAnswerFile;
             } else {
-              pdfUrl = `https://cs-eslamhatem-vhtimw.fly.dev/${submission.pdfAnswerFile}`;
+              pdfUrl = `https://cs-eslamhatem-zpihcg.fly.dev/${submission.pdfAnswerFile}`;
             }
           }
           
