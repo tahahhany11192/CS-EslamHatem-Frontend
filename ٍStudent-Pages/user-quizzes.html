@@ -461,8 +461,6 @@
       text-decoration: none;
       display: inline-block;
       text-align: center;
-      position: relative;
-      overflow: hidden;
     }
 
     .btn-primary {
@@ -495,91 +493,6 @@
     .btn-disabled:hover {
       transform: none;
       box-shadow: none;
-    }
-
-    /* Loading bar styles */
-    .loading-container {
-      display: none;
-      margin-top: 15px;
-      width: 100%;
-    }
-
-    .loading-bar {
-      height: 4px;
-      background-color: rgba(0, 102, 255, 0.2);
-      border-radius: 2px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .loading-progress {
-      height: 100%;
-      width: 0%;
-      background: var(--gradient);
-      border-radius: 2px;
-      transition: width 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .loading-progress::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      background-image: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.4),
-        transparent
-      );
-      animation: shimmer 1.5s infinite;
-    }
-
-    @keyframes shimmer {
-      0% {
-        transform: translateX(-100%);
-      }
-      100% {
-        transform: translateX(100%);
-      }
-    }
-
-    .loading-text {
-      text-align: center;
-      margin-top: 8px;
-      font-size: 0.9rem;
-      color: var(--secondary);
-      font-family: 'Orbitron', sans-serif;
-    }
-
-    /* Loading spinner for buttons */
-    .btn-loading {
-      position: relative;
-      color: transparent !important;
-    }
-
-    .btn-loading::after {
-      content: '';
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      top: 50%;
-      left: 50%;
-      margin-left: -10px;
-      margin-top: -10px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
     }
 
     /* Exam Modal */
@@ -753,8 +666,6 @@
       border-radius: 5px; 
       cursor: pointer; 
       transition: var(--transition);
-      position: relative;
-      overflow: hidden;
     }
 
     .btn-pdf-upload:hover { 
@@ -840,6 +751,11 @@
       height: 40px;
       animation: spin 1s linear infinite;
       margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     /* Bottom Navigation - Mobile */
@@ -1041,6 +957,11 @@
       background-color: rgba(139, 92, 246, 0.15);
       color: #8b5cf6;
     }
+    .status-expired {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: #f87171;
+    }
+
     
     .attempt-info {
       margin-top: 10px;
@@ -1255,17 +1176,9 @@
                 <label class="form-label" for="answerFile">Upload Your Answer (PDF):</label>
                 <input type="file" id="answerFile" name="answer" accept="application/pdf" required />
               </div>
-              <button type="submit" class="btn-pdf-upload" id="uploadPdfBtn">
+              <button type="submit" class="btn-pdf-upload">
                 <i class="fas fa-upload"></i> Upload Answer
               </button>
-              
-              <!-- Loading Bar Container -->
-              <div class="loading-container" id="pdfLoadingContainer">
-                <div class="loading-bar">
-                  <div class="loading-progress" id="pdfLoadingProgress"></div>
-                </div>
-                <div class="loading-text" id="pdfLoadingText">Uploading PDF...</div>
-              </div>
             </form>
             <p id="uploadStatus" class="status"></p>
           </div>
@@ -1291,9 +1204,10 @@
 
   <script>
     // Global variables
-    const BASE_URL = "https://cs-eslamhatem-vhtimw.fly.dev/api/users";
+    const BASE_URL = "http://localhost:3000/api/users";
     let currentQuizId = null;
     let currentQuiz = null;
+    let currentAttempt = null;
     let quizzes = [];
     let pendingCount = 0;
     let completedCount = 0;
@@ -1301,547 +1215,237 @@
     let timerInterval = null;
     let timeRemaining = 0;
     let quizStarted = false;
+    let isSubmitting = false;
 
-    // Timer persistence functions
-    // Save timer state to localStorage
-    function saveTimerState(quizId, endTime, duration) {
-        const timerState = {
-            quizId: quizId,
-            endTime: endTime,
-            duration: duration,
-            startedAt: Date.now()
-        };
-        localStorage.setItem('activeQuizTimer', JSON.stringify(timerState));
-        console.log("Timer state saved:", timerState);
-    }
-
-    // Get timer state from localStorage
-    function getTimerState() {
-        const saved = localStorage.getItem('activeQuizTimer');
-        return saved ? JSON.parse(saved) : null;
-    }
-
-    // Clear timer state from localStorage
-// Clear all quiz-related states
-function clearAllQuizStates() {
-    clearTimerState();
-    localStorage.removeItem('currentQuizType');
-    currentQuizId = null;
-    currentQuiz = null;
-    quizStarted = false;
-    console.log("All quiz states cleared");
-}
-
-// Update clearTimerState to also clear quiz type
-function clearTimerState() {
-    localStorage.removeItem('activeQuizTimer');
-    console.log("Timer state cleared");
-}
-
-    // Check if timer should be resumed
-    function shouldResumeTimer(quizId) {
-        const timerState = getTimerState();
-        if (!timerState) return false;
-        
-        // Check if it's for the same quiz
-        if (timerState.quizId !== quizId) {
-            clearTimerState();
-            return false;
-        }
-        
-        // Check if timer is still valid (not expired)
-        const now = Date.now();
-        const endTime = new Date(timerState.endTime).getTime();
-        
-        // If time has expired, clear state and return false
-        if (now >= endTime) {
-            clearTimerState();
-            return false;
-        }
-        
-        return true;
-    }
-
-    // Calculate remaining time from saved state
-    function calculateRemainingTime(quizId) {
-        const timerState = getTimerState();
-        if (!timerState || timerState.quizId !== quizId) return null;
-        
-        const now = Date.now();
-        const endTime = new Date(timerState.endTime).getTime();
-        
-        // Calculate remaining seconds
-        const remainingSeconds = Math.max(0, Math.floor((endTime - now) / 1000));
-        
-        // If less than 5 seconds left, consider it expired
-        if (remainingSeconds < 5) {
-            clearTimerState();
-            return null;
-        }
-        
-        return remainingSeconds;
-    }
-
-    // Initialize the application
-    document.addEventListener('DOMContentLoaded', function() {
-      // Check authentication
+    document.addEventListener("DOMContentLoaded", function () {
       const token = localStorage.getItem("token");
       if (!token) {
         alert("You need to log in to view your quizzes");
-        window.location.href = 'login.html';
+        window.location.href = "login.html";
         return;
       }
 
-      // Mobile menu functionality
-      const overlay = document.getElementById('overlay');
-      const sidebar = document.getElementById('sidebar');
-      const menuToggle = document.getElementById('menuToggle');
-      const closeExamBtn = document.getElementById('closeExam');
-      const examModal = document.getElementById('examModal');
-      const submitQuizBtn = document.getElementById('submitQuizBtn');
-      const loadingState = document.getElementById('loadingState');
-      const answerUploadForm = document.getElementById('answerUploadForm');
-      
-      // Show loading state initially
-      loadingState.style.display = 'flex';
-      
-      // Check for active timer on page load
-      const timerState = getTimerState();
-      if (timerState) {
-          console.log("Found active timer state:", timerState);
-          
-          // Calculate if timer is still valid
-          const now = Date.now();
-          const endTime = new Date(timerState.endTime).getTime();
-          
-          if (now >= endTime) {
-              // Timer has expired, clear it
-              clearTimerState();
-              console.log("Timer expired, cleared state");
-          } else {
-              // Show a notification that a quiz is in progress
-              const remainingSeconds = Math.floor((endTime - now) / 1000);
-              const minutes = Math.floor(remainingSeconds / 60);
-              const seconds = remainingSeconds % 60;
-              console.log(`Quiz timer active: ${minutes}:${seconds.toString().padStart(2, '0')} remaining`);
-              
-              // Show the timer on the page
-              document.getElementById('timerContainer').style.display = 'block';
-              document.getElementById('timerDisplay').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-          }
-      }
-      
-      // Mobile menu toggle
-      menuToggle.addEventListener('click', function() {
-        sidebar.classList.toggle('active');
-        overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+      const overlay = document.getElementById("overlay");
+      const sidebar = document.getElementById("sidebar");
+      const menuToggle = document.getElementById("menuToggle");
+      const closeExamBtn = document.getElementById("closeExam");
+      const submitQuizBtn = document.getElementById("submitQuizBtn");
+      const loadingState = document.getElementById("loadingState");
+      const answerUploadForm = document.getElementById("answerUploadForm");
+
+      loadingState.style.display = "flex";
+
+      menuToggle.addEventListener("click", function () {
+        sidebar.classList.toggle("active");
+        overlay.style.display = sidebar.classList.contains("active") ? "block" : "none";
       });
-      
-      // Close sidebar when clicking on overlay
-      overlay.addEventListener('click', function() {
-        sidebar.classList.remove('active');
-        overlay.style.display = 'none';
+
+      overlay.addEventListener("click", function () {
+        sidebar.classList.remove("active");
+        overlay.style.display = "none";
       });
-      
-      // Close exam modal
-      closeExamBtn.addEventListener('click', function() {
+
+      closeExamBtn.addEventListener("click", function () {
         closeExamModal();
       });
-      
-      // Submit quiz button
-      submitQuizBtn.addEventListener('click', function() {
-        submitAnswers();
+
+      submitQuizBtn.addEventListener("click", function () {
+        submitAnswers(false);
       });
-      
-      // PDF upload form submission
-      answerUploadForm.addEventListener('submit', function(e) {
+
+      answerUploadForm.addEventListener("submit", function (e) {
         e.preventDefault();
         uploadPdfAnswer();
       });
-      
-      // Handle window resize
-      window.addEventListener('resize', function() {
+
+      window.addEventListener("resize", function () {
         if (window.innerWidth > 768) {
-          sidebar.classList.remove('active');
-          overlay.style.display = 'none';
+          sidebar.classList.remove("active");
+          overlay.style.display = "none";
         }
       });
 
-      // User menu functionality
       const userMenu = document.getElementById("userMenu");
       userMenu.addEventListener("click", () => {
         userMenu.classList.toggle("active");
       });
 
-      // Warn user before leaving during an active quiz
-      window.addEventListener('beforeunload', function(e) {
-          if (quizStarted || getTimerState()) {
-              e.preventDefault();
-              e.returnValue = 'You have an active quiz in progress. Are you sure you want to leave?';
-              return e.returnValue;
-          }
-      });
-
-      // Load quizzes
       loadQuizzes();
     });
 
-    // Auth helper
-    const authHeader = () => ({ "Authorization": "Bearer " + (localStorage.getItem("token") || "") });
+    const authHeader = () => ({ Authorization: "Bearer " + (localStorage.getItem("token") || "") });
 
-    // Update quiz statistics
+    function quizIdOf(q) {
+      return q.quizId || q._id || q.id;
+    }
+
+    function quizTypeOf(q) {
+      return q.examType || q.type || "structured";
+    }
+
+    function formatSeconds(totalSeconds) {
+      const safeSeconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+      const minutes = Math.floor(safeSeconds / 60);
+      const seconds = safeSeconds % 60;
+      return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
+
+    async function startQuizSession() {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Cannot start quiz");
+      }
+
+      currentAttempt = data.data;
+      return currentAttempt;
+    }
+
     function updateQuizStats() {
       pendingCount = 0;
       completedCount = 0;
       gradedCount = 0;
-      
+
       quizzes.forEach(quiz => {
-        // Check if user has an attempt for this quiz
-        if (quiz.attempted && quiz.submittedAt) {
-          // Check if the quiz has been reviewed (based on your QuizAttempt model)
-          if (quiz.reviewedAt) {
-            gradedCount++;
-          } 
-          // Check if the quiz has been submitted but not reviewed
-          else if (quiz.attempted && quiz.submittedAt) {
-            completedCount++;
-          } else {
-            pendingCount++;
-          }
-        } else {
-          pendingCount++;
-        }
+        const status = quiz.attemptStatus || "not_started";
+
+        if (status === "reviewed") gradedCount++;
+        else if (status === "pending") completedCount++;
+        else pendingCount++;
       });
-      
-      // Update the UI
-      document.getElementById('pending-count').textContent = pendingCount;
-      document.getElementById('completed-count').textContent = completedCount;
-      document.getElementById('graded-count').textContent = gradedCount;
-      
-      // Update progress bar
+
+      document.getElementById("pending-count").textContent = pendingCount;
+      document.getElementById("completed-count").textContent = completedCount;
+      document.getElementById("graded-count").textContent = gradedCount;
+
       const totalQuizzes = quizzes.length;
       const completedAndGraded = completedCount + gradedCount;
       const progressPercentage = totalQuizzes > 0 ? Math.round((completedAndGraded / totalQuizzes) * 100) : 0;
-      
-      document.getElementById('progress-percentage').textContent = `${progressPercentage}%`;
-      document.getElementById('progress-fill').style.width = `${progressPercentage}%`;
+
+      document.getElementById("progress-percentage").textContent = `${progressPercentage}%`;
+      document.getElementById("progress-fill").style.width = `${progressPercentage}%`;
     }
 
-    // Get grade class based on score
     function getGradeClass(score, maxScore) {
       if (score === "N/A" || score === null || score === undefined) return "grade-na";
-      
+
       const numericScore = parseFloat(score);
       const numericMax = parseFloat(maxScore);
-      
+
       if (isNaN(numericScore) || isNaN(numericMax) || numericMax === 0) return "grade-na";
-      
+
       const percentage = (numericScore / numericMax) * 100;
-      
       if (percentage >= 80) return "grade-high";
       if (percentage >= 50) return "grade-medium";
       return "grade-low";
     }
 
-    // Format score display
     function formatScoreDisplay(score, maxScore) {
       if (score === "N/A" || score === null || score === undefined) return "N/A";
       if (maxScore === "N/A" || maxScore === null || maxScore === undefined) return `${score}`;
-      
+
       const numericScore = parseFloat(score);
       const numericMax = parseFloat(maxScore);
-      
+
       if (isNaN(numericScore) || isNaN(numericMax)) return "N/A";
-      
       return `${score}/${maxScore}`;
     }
 
-    // Start or resume the quiz timer
-    // Start or resume the quiz timer
-// Start or resume the quiz timer
-function startTimer(duration, quizId, quizType = null) {
-    console.log("Starting/Resuming timer for quiz:", quizId, "with duration:", duration, "minutes", "Type:", quizType);
-    
-    // Clear any existing timer
-    if (timerInterval) {
+    function startTimer(remainingSeconds) {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+
+      timeRemaining = Math.max(0, Math.floor(Number(remainingSeconds) || 0));
+      quizStarted = true;
+
+      const timerContainer = document.getElementById("timerContainer");
+      timerContainer.style.display = "block";
+      timerContainer.style.zIndex = "2000";
+
+      updateTimerDisplay();
+
+      if (timeRemaining <= 0) {
+        handleTimeEnded();
+        return;
+      }
+
+      timerInterval = setInterval(function () {
+        timeRemaining--;
+
+        if (timeRemaining <= 0) {
+          handleTimeEnded();
+        } else {
+          updateTimerDisplay();
+        }
+      }, 1000);
+    }
+
+    async function handleTimeEnded() {
+      if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
-    }
-    
-    // Check if we should resume from saved state
-    let remainingSeconds = calculateRemainingTime(quizId);
-    
-    if (remainingSeconds !== null && remainingSeconds > 0) {
-        // Resume existing timer
-        console.log("Resuming timer from saved state:", remainingSeconds, "seconds remaining");
-        timeRemaining = remainingSeconds;
-    } else {
-        // Start new timer
-        timeRemaining = duration * 60; // Convert minutes to seconds
-        
-        // Calculate end time and save to localStorage
-        const endTime = new Date(Date.now() + (duration * 60 * 1000));
-        saveTimerState(quizId, endTime.toISOString(), duration);
-        console.log("Started new timer, end time:", endTime);
-    }
-    
-    quizStarted = true;
-    
-    // Show timer
-    const timerContainer = document.getElementById('timerContainer');
-    const timerDisplay = document.getElementById('timerDisplay');
-    
-    // Make sure timer is visible and on top
-    timerContainer.style.display = 'block';
-    timerContainer.style.zIndex = '2000';
-    
-    // Update timer immediately
-    updateTimerDisplay();
-    
-    // Store quiz type for auto-submission
-    if (quizType) {
-        localStorage.setItem('currentQuizType', quizType);
-    }
-    
-    // Set up interval to update timer every second
-    timerInterval = setInterval(function() {
-        timeRemaining--;
-        
-        // Update localStorage with remaining time (every 10 seconds to reduce writes)
-        if (timeRemaining % 10 === 0) {
-            const endTime = new Date(Date.now() + (timeRemaining * 1000));
-            saveTimerState(quizId, endTime.toISOString(), duration);
-        }
-        
-        if (timeRemaining <= 0) {
-            // Time's up!
-            clearInterval(timerInterval);
-            timerInterval = null;
-            timerDisplay.textContent = "00:00";
-            timerDisplay.className = "timer-display timer-danger";
-            
-            // Clear the saved timer state
-            clearTimerState();
-            
-            // Auto-submit the quiz based on type
-            setTimeout(() => {
-                autoSubmitQuiz();
-            }, 1000); // Delay by 1 second to ensure UI updates first
-        } else {
-            updateTimerDisplay();
-        }
-    }, 1000);
-}
-    
-    // Auto-submit quiz when time is up
-// Auto-submit quiz when time is up
-async function autoSubmitQuiz() {
-    console.log("Time's up! Auto-submitting quiz...");
-    console.log("Current Quiz ID:", currentQuizId);
-    console.log("Current Quiz:", currentQuiz);
-    
-    if (!currentQuizId) {
-        console.error("No current quiz ID found for auto-submission");
-        alert("Time's up! Your quiz has been closed.");
+      }
+
+      timeRemaining = 0;
+      updateTimerDisplay();
+
+      if (currentQuiz && quizTypeOf(currentQuiz) === "structured") {
+        alert("Time's up! Submitting your answers now.");
+        await submitAnswers(true);
+      } else {
+        alert("Time's up! Upload time has ended.");
         closeExamModal();
-        return;
+      }
     }
-    
-    const token = localStorage.getItem("token");
-    
-    try {
-        // First, try to determine quiz type from DOM
-        const isStructuredQuiz = document.getElementById("modalStructuredQuiz").style.display !== "none";
-        const isPdfQuiz = document.getElementById("modalPdfQuiz").style.display !== "none";
-        
-        console.log("DOM detection - Structured:", isStructuredQuiz, "PDF:", isPdfQuiz);
-        
-        // If DOM detection fails, check localStorage
-        let quizType = null;
-        if (isStructuredQuiz) quizType = "structured";
-        else if (isPdfQuiz) quizType = "pdf";
-        else {
-            quizType = localStorage.getItem('currentQuizType');
-            console.log("Using quiz type from localStorage:", quizType);
-        }
-        
-        if (quizType === "structured") {
-            await autoSubmitStructuredQuiz(token);
-        } else if (quizType === "pdf") {
-            await autoSubmitPdfQuiz(token);
-        } else {
-            // Try both methods as fallback
-            console.log("Quiz type unknown, trying structured first...");
-            try {
-                await autoSubmitStructuredQuiz(token);
-            } catch (structErr) {
-                console.log("Structured auto-submit failed, trying PDF...");
-                await autoSubmitPdfQuiz(token);
-            }
-        }
-        
-    } catch (error) {
-        console.error("Error during auto-submission:", error);
-        alert("Time's up! There was an error submitting your quiz. Please contact your instructor.");
-    } finally {
-        // Always close the modal
-        setTimeout(() => {
-            closeExamModal();
-        }, 2000);
-    }
-}
 
-// Helper function for structured quiz auto-submission
-async function autoSubmitStructuredQuiz(token) {
-    console.log("Auto-submitting structured quiz");
-    
-    // Collect any answers the user has provided
-    const answers = [];
-    if (currentQuiz && currentQuiz.questions) {
-        currentQuiz.questions.forEach((q, i) => {
-            let value = "";
-            if (q.type === "mcq") {
-                const selected = document.querySelector(`input[name="q${i}"]:checked`);
-                value = selected ? selected.value : "";
-            } else {
-                const textarea = document.querySelector(`textarea[name="q${i}"]`);
-                value = textarea ? textarea.value : "";
-            }
-            if (q._id) {
-                answers.push({ questionId: q._id, answer: value });
-            }
-        });
-    }
-    
-    console.log("Submitting answers:", answers);
-    
-    // Submit even if answers are empty
-    const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/submit`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ answers })
-    });
-    
-    if (res.ok) {
-        const result = await res.json();
-        console.log("Structured quiz auto-submitted successfully:", result);
-        alert("Time's up! Your answers have been submitted automatically.");
-    } else {
-        const error = await res.text();
-        console.error("Failed to auto-submit structured quiz:", error);
-        throw new Error("Failed to submit structured quiz");
-    }
-}
+    function updateTimerDisplay() {
+      const timerDisplay = document.getElementById("timerDisplay");
+      timerDisplay.textContent = formatSeconds(timeRemaining);
 
-// Helper function for PDF quiz auto-submission
-async function autoSubmitPdfQuiz(token) {
-    console.log("Auto-submitting PDF quiz");
-    
-    try {
-        // Try to submit empty form data first
-        const formData = new FormData();
-        formData.append("autoSubmit", "true");
-        
-        const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/upload`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: formData
-        });
-        
-        if (res.ok) {
-            console.log("PDF quiz auto-submitted successfully");
-            alert("Time's up! Your quiz has been submitted automatically.");
-            return;
-        }
-        
-        // If that fails, try to mark as submitted
-        console.log("Standard PDF upload failed, trying to mark as submitted...");
-        
-        const markRes = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/submit-empty`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ autoSubmitted: true })
-        });
-        
-        if (markRes.ok) {
-            console.log("Quiz marked as auto-submitted");
-            alert("Time's up! Your quiz has been marked as submitted.");
-        } else {
-            throw new Error("All auto-submission methods failed");
-        }
-        
-    } catch (error) {
-        console.error("PDF auto-submission failed:", error);
-        // Even if API fails, we should mark it as submitted locally
-        alert("Time's up! Your quiz has been closed.");
-        throw error;
-    }
-}    // Update timer display
-    // Update timer display
-function updateTimerDisplay() {
-    const timerDisplay = document.getElementById('timerDisplay');
-    const minutes = Math.floor(timeRemaining / 60);
-    const seconds = timeRemaining % 60;
-    
-    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
-    // Change color based on remaining time
-    if (timeRemaining < 60) {
+      if (timeRemaining < 60) {
         timerDisplay.className = "timer-display timer-danger";
-        // Show warning when less than 1 minute remaining
-        if (timeRemaining === 60) {
-            alert("Warning: Less than 1 minute remaining! Your quiz will be auto-submitted when time expires.");
-        }
-    } else if (timeRemaining < 300) {
+      } else if (timeRemaining < 300) {
         timerDisplay.className = "timer-display timer-warning";
-        // Show warning when less than 5 minutes remaining
-        if (timeRemaining === 300) {
-            alert("Warning: Less than 5 minutes remaining!");
-        }
-    } else {
+      } else {
         timerDisplay.className = "timer-display timer-normal";
+      }
     }
-}
-    
-    // Stop the timer
+
     function stopTimer() {
       if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
       }
-      
-      // Hide timer
-      document.getElementById('timerContainer').style.display = 'none';
-      quizStarted = false;
-      
-      // Don't clear timer state here - we only clear it when time expires or quiz is submitted
-      // This allows resuming if page is accidentally refreshed
-    }
 
-    // User Quizzes functions
-    function quizIdOf(q) { return q.quizId || q._id || q.id; }
-    function quizTypeOf(q) { return q.examType || q.type || "structured"; }
+      document.getElementById("timerContainer").style.display = "none";
+      quizStarted = false;
+    }
 
     async function loadQuizzes() {
       const container = document.getElementById("quizList");
-      const loadingState = document.getElementById('loadingState');
-      
+      const loadingState = document.getElementById("loadingState");
+
       try {
         const res = await fetch(`${BASE_URL}/quizzes/my`, { headers: authHeader() });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const payload = await res.json();
         quizzes = payload.quizzes || payload.data || [];
 
-        // Hide loading state
-        loadingState.style.display = 'none';
-
+        loadingState.style.display = "none";
         container.innerHTML = "";
+
         if (quizzes.length === 0) {
           container.innerHTML = `
             <div class="empty-state">
@@ -1853,41 +1457,72 @@ function updateTimerDisplay() {
           return;
         }
 
-        // Update stats
         updateQuizStats();
 
         quizzes.forEach(q => {
           const id = quizIdOf(q);
+          const encodedId = encodeURIComponent(id);
           const type = quizTypeOf(q);
-          
-          // Determine status based on the QuizAttempt model structure
-          let statusClass, statusText, statusDescription;
+          const attemptStatus = q.attemptStatus || "not_started";
 
-          if (q.reviewedAt) {
-            statusClass = 'status-graded';
-            statusText = 'Graded';
-            statusDescription = 'Your quiz has been graded';
-          } 
-          else if (q.attempted && q.submittedAt) {
-            statusClass = 'status-completed';
-            statusText = 'Submitted';
-            statusDescription = 'Your answers have been submitted';
-          } 
-          else if (q.attempted) {
-            statusClass = 'status-pending';
-            statusText = 'In Progress';
-            statusDescription = 'You have started this quiz';
-          } 
-          else {
-            statusClass = 'status-pending';
-            statusText = 'Not Started';
-            statusDescription = 'You have not started this quiz yet';
+          let statusClass = "status-pending";
+          let statusText = "Not Started";
+          let statusDescription = "You have not started this quiz yet";
+
+          if (attemptStatus === "reviewed") {
+            statusClass = "status-graded";
+            statusText = "Graded";
+            statusDescription = "Your quiz has been graded";
+          } else if (attemptStatus === "pending") {
+            statusClass = "status-completed";
+            statusText = "Submitted";
+            statusDescription = "Your answers have been submitted";
+          } else if (attemptStatus === "in_progress") {
+            statusClass = "status-in-progress";
+            statusText = "In Progress";
+            statusDescription = `Quiz started. Remaining time: ${formatSeconds(q.remainingSeconds)}`;
+          } else if (attemptStatus === "expired") {
+            statusClass = "status-expired";
+            statusText = "Time Ended";
+            statusDescription = "Quiz time ended. You cannot start it again";
           }
 
-          // Get grade class for styling
           const gradeClass = getGradeClass(q.score, q.totalMarks);
           const scoreDisplay = formatScoreDisplay(q.score, q.totalMarks);
-          
+
+          let actionButton = "";
+          if (attemptStatus === "reviewed" || attemptStatus === "pending") {
+            actionButton = `
+              <button class="btn btn-primary" onclick="viewQuizResults('${encodedId}')">
+                <i class="fas fa-chart-bar"></i> View Results
+              </button>
+            `;
+          } else if (attemptStatus === "expired") {
+            actionButton = `
+              <button class="btn btn-disabled" disabled>
+                <i class="fas fa-lock"></i> Time Ended
+              </button>
+            `;
+          } else if (attemptStatus === "in_progress") {
+            actionButton = `
+              <button class="btn btn-secondary" onclick="continueQuiz('${encodedId}')">
+                <i class="fas fa-play-circle"></i> Continue Quiz
+              </button>
+            `;
+          } else if (type === "structured") {
+            actionButton = `
+              <button class="btn btn-primary" onclick="openStructuredQuiz('${encodedId}')">
+                <i class="fas fa-play-circle"></i> Start Quiz
+              </button>
+            `;
+          } else {
+            actionButton = `
+              <button class="btn btn-secondary" onclick="openPdfQuiz('${encodedId}')">
+                <i class="fas fa-upload"></i> Start PDF Quiz
+              </button>
+            `;
+          }
+
           const card = document.createElement("div");
           card.className = "quiz-card";
           card.innerHTML = `
@@ -1895,13 +1530,13 @@ function updateTimerDisplay() {
               <h3 class="quiz-title">${q.title || "Untitled Quiz"}</h3>
               <span class="status-badge ${statusClass}">${statusText}</span>
             </div>
-            
+
             <div class="quiz-desc">${q.description || "No description provided."}</div>
-            
+
             <div class="quiz-meta">
               <div class="meta-item">
-                <i class="fas fa-${type === 'structured' ? 'pen-alt' : 'file-pdf'}"></i>
-                Type: ${type.toUpperCase()}
+                <i class="fas fa-${type === "structured" ? "pen-alt" : "file-pdf"}"></i>
+                Type: ${String(type).toUpperCase()}
               </div>
               <div class="meta-item">
                 <i class="fas fa-clock"></i>
@@ -1912,53 +1547,36 @@ function updateTimerDisplay() {
                 Total: ${q.totalMarks ?? "-"} marks
               </div>
             </div>
-            
-            <div class="quiz-status ${statusClass.replace('status-', 'status-')}">
-              <i class="fas fa-${statusText === 'Graded' ? 'check-circle' : 
-                                statusText === 'Submitted' ? 'paper-plane' : 
-                                statusText === 'In Progress' ? 'spinner' : 'play-circle'}"></i>
+
+            <div class="quiz-status ${statusClass}">
+              <i class="fas fa-${statusText === "Graded" ? "check-circle" : statusText === "Submitted" ? "paper-plane" : statusText === "In Progress" ? "spinner" : statusText === "Time Ended" ? "lock" : "play-circle"}"></i>
               <span style="margin-left: 8px;">${statusDescription}</span>
             </div>
-            
+
             ${q.submittedAt ? `
               <div class="attempt-info">
                 <i class="fas fa-calendar"></i>
                 Submitted on: ${new Date(q.submittedAt).toLocaleDateString()}
               </div>
-            ` : ''}
-            
+            ` : ""}
+
             <div style="margin-top: 15px;">
-  ${q.reviewedAt || (q.attempted && q.submittedAt)
-    ? `<button class="btn btn-primary" onclick="viewQuizResults('${encodeURIComponent(id)}')">
-        <i class="fas fa-chart-bar"></i> View Results
-       </button>`
-    : q.attempted
-      ? `<button class="btn btn-secondary" onclick="continueQuiz('${encodeURIComponent(id)}')">
-          <i class="fas fa-play-circle"></i> Continue Quiz
-         </button>`
-      : type === "structured"
-        ? `<button class="btn btn-primary" onclick="openStructuredQuiz('${encodeURIComponent(id)}')">
-            <i class="fas fa-play-circle"></i> Start Quiz
-           </button>`
-        : `<button class="btn btn-secondary" onclick="openPdfQuiz('${encodeURIComponent(id)}')">
-            <i class="fas fa-upload"></i> Upload Answers
-           </button>`
-  }
-</div>
+              ${actionButton}
+            </div>
 
-${q.reviewedAt ? `
-  <div class="grade-display ${gradeClass}">
-    <div class="grade-value">${scoreDisplay}</div>
-    <div class="grade-label">Final Score</div>
-  </div>
-` : ''}
-
+            ${q.reviewedAt ? `
+              <div class="grade-display ${gradeClass}">
+                <div class="grade-value">${scoreDisplay}</div>
+                <div class="grade-label">Final Score</div>
+              </div>
+            ` : ""}
           `;
+
           container.appendChild(card);
         });
       } catch (err) {
         console.error("Failed to load quizzes:", err);
-        loadingState.style.display = 'none';
+        loadingState.style.display = "none";
         container.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-exclamation-circle"></i>
@@ -1971,25 +1589,24 @@ ${q.reviewedAt ? `
 
     function openStructuredQuiz(id) {
       if (!id) return alert("Invalid quiz id");
-      currentQuizId = id;
+      currentQuizId = decodeURIComponent(id);
       loadStructuredQuiz();
     }
 
     function openPdfQuiz(id) {
       if (!id) return alert("Invalid quiz id");
-      currentQuizId = id;
+      currentQuizId = decodeURIComponent(id);
       loadPdfQuiz();
     }
 
     function continueQuiz(id) {
       if (!id) return alert("Invalid quiz id");
-      currentQuizId = id;
-      
-      // Find the quiz
-      const quiz = quizzes.find(q => quizIdOf(q) === id);
+      currentQuizId = decodeURIComponent(id);
+
+      const quiz = quizzes.find(q => String(quizIdOf(q)) === String(currentQuizId));
       if (!quiz) return alert("Quiz not found");
-      
-      if (quiz.type === "structured") {
+
+      if (quizTypeOf(quiz) === "structured") {
         loadStructuredQuiz();
       } else {
         loadPdfQuiz();
@@ -1998,41 +1615,36 @@ ${q.reviewedAt ? `
 
     function viewQuizResults(id) {
       if (!id) return alert("Invalid quiz id");
-      currentQuizId = id;
+      currentQuizId = decodeURIComponent(id);
       showQuizResults();
     }
 
-    // Open exam modal
     function openExamModal() {
-      const examModal = document.getElementById('examModal');
-      examModal.classList.add('active');
-      document.body.style.overflow = 'hidden'; // Prevent scrolling
+      const examModal = document.getElementById("examModal");
+      examModal.classList.add("active");
+      document.body.style.overflow = "hidden";
     }
 
-    // Close exam modal
-    // Close exam modal
-// Close exam modal
-function closeExamModal() {
-    const examModal = document.getElementById('examModal');
-    examModal.classList.remove('active');
-    document.body.style.overflow = ''; // Enable scrolling
-    
-    // Only stop the timer
-    stopTimer();
-    
-    // Clear quiz type from localStorage
-    localStorage.removeItem('currentQuizType');
-    
-    // Reload quizzes to update status
-    loadQuizzes();
-}
+    function closeExamModal() {
+      const examModal = document.getElementById("examModal");
+      examModal.classList.remove("active");
+      document.body.style.overflow = "";
+      stopTimer();
+      loadQuizzes();
+    }
 
-    // Structured Quiz functions
     async function loadStructuredQuiz() {
       const token = localStorage.getItem("token");
-      
+
       try {
-        // Fetch quiz info
+        const session = await startQuizSession();
+
+        if (!session || session.remainingSeconds <= 0) {
+          alert("Quiz time has ended. You cannot open this quiz again.");
+          loadQuizzes();
+          return;
+        }
+
         const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -2040,8 +1652,6 @@ function closeExamModal() {
 
         currentQuiz = await res.json();
         document.getElementById("modalQuizTitle").textContent = currentQuiz.title || "Structured Quiz";
-
-        // Show structured quiz, hide PDF quiz
         document.getElementById("modalStructuredQuiz").style.display = "block";
         document.getElementById("modalPdfQuiz").style.display = "none";
         document.getElementById("gradeDisplay").style.display = "none";
@@ -2049,57 +1659,26 @@ function closeExamModal() {
         const form = document.getElementById("quizForm");
         form.innerHTML = "";
 
-        // Fetch user's attempt
-        let attempt = null;
-        try {
-          const attemptRes = await fetch(`${BASE_URL}/${currentQuizId}/attempt`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (attemptRes.ok) {
-            const attemptData = await attemptRes.json();
-            attempt = attemptData.attempt;
-          }
-        } catch (err) {
-          console.log("No attempt found or error fetching attempt:", err);
-        }
+        const attempt = currentAttempt;
+        const questions = currentQuiz.questions || [];
 
-        // If quiz is already submitted and graded, show results
-        if (attempt && (attempt.status === "reviewed" || attempt.reviewedAt)) {
-          showQuizResults();
-          return;
-        }
-
-        // Start the timer (always start a new timer when opening a quiz)
-        const quizDuration = currentQuiz.duration || 20;
-        console.log("Starting timer for quiz duration:", quizDuration);
-        startTimer(quizDuration, currentQuizId, "structured");
-
-        currentQuiz.questions.forEach((q, i) => {
+        questions.forEach((q, i) => {
           const div = document.createElement("div");
           div.className = "question";
 
           let userAnswer = "";
-          let marksObtained = 0;
-          let isReviewed = false;
-
-          if (attempt) {
-            const ansObj = attempt.answers.find(a => a.question && a.question.toString() === q._id);
-            if (ansObj) {
-              userAnswer = ansObj.answer || "";
-              marksObtained = ansObj.marksObtained || 0;
-              isReviewed = attempt.status === "reviewed" || attempt.reviewedAt;
-            }
+          if (attempt && Array.isArray(attempt.answers)) {
+            const ansObj = attempt.answers.find(a => a.question && String(a.question) === String(q._id));
+            if (ansObj) userAnswer = ansObj.answer || "";
           }
 
           if (q.type === "mcq") {
             div.innerHTML = `
               <label>Q${i + 1}: ${q.text}</label>
               <div class="options">
-                ${q.options.map(opt => `
+                ${(q.options || []).map(opt => `
                   <label>
-                    <input type="radio" name="q${i}" value="${opt}" 
-                      ${opt === userAnswer ? "checked" : ""} 
-                      ${isReviewed ? "disabled" : ""}>
+                    <input type="radio" name="q${i}" value="${opt}" ${opt === userAnswer ? "checked" : ""}>
                     ${opt}
                   </label>
                 `).join("")}
@@ -2108,118 +1687,113 @@ function closeExamModal() {
           } else {
             div.innerHTML = `
               <label>Q${i + 1}: ${q.text}</label>
-              <textarea name="q${i}" placeholder="Your answer here" ${isReviewed ? "disabled" : ""}>${userAnswer}</textarea>
+              <textarea name="q${i}" placeholder="Your answer here">${userAnswer}</textarea>
             `;
-          }
-
-          if (isReviewed) {
-            const scoreDiv = document.createElement("div");
-            scoreDiv.innerHTML = `<strong>Marks Obtained:</strong> ${marksObtained}`;
-            scoreDiv.style.marginTop = "5px";
-            div.appendChild(scoreDiv);
           }
 
           form.appendChild(div);
         });
 
-        // Show total score if reviewed
-        const statusEl = document.getElementById("status");
-        if (attempt) {
-          if (attempt.status === "reviewed" || attempt.reviewedAt) {
-            statusEl.innerHTML = `✅ Total Score: <strong>${attempt.score || 0}</strong>`;
-          } else {
-            statusEl.textContent = "⚠ Your submission is pending grading";
-          }
-        } else {
-          statusEl.textContent = "";
-        }
-
-        // Open the modal
+        document.getElementById("status").textContent = "";
+        startTimer(session.remainingSeconds);
         openExamModal();
-
       } catch (err) {
         console.error("Error loading quiz:", err);
-        document.getElementById("modalQuizTitle").textContent = "❌ Error loading quiz";
+        alert(err.message || "Error loading quiz");
+        loadQuizzes();
       }
     }
 
-  async function submitAnswers() {
-    // Check if time is already up
-    if (timeRemaining <= 0) {
-        alert("Time is already up! Your quiz was automatically submitted.");
-        return;
-    }
-    
-    const token = localStorage.getItem("token");
-    if (!currentQuiz || !currentQuiz.questions) return;
+    async function submitAnswers(autoSubmit = false) {
+      if (isSubmitting) return;
 
-    const answers = currentQuiz.questions.map((q, i) => {
+      const token = localStorage.getItem("token");
+      if (!currentQuiz || !currentQuiz.questions) return;
+
+      isSubmitting = true;
+
+      const answers = currentQuiz.questions.map((q, i) => {
         let value = "";
-        if (q.type === "mcq") {
-            const selected = document.querySelector(`input[name="q${i}"]:checked`);
-            value = selected ? selected.value : "";
-        } else {
-            const textarea = document.querySelector(`textarea[name="q${i}"]`);
-            value = textarea ? textarea.value : "";
-        }
-        return { questionId: q._id, answer: value };
-    });
 
-    try {
+        if (q.type === "mcq") {
+          const selected = document.querySelector(`input[name="q${i}"]:checked`);
+          value = selected ? selected.value : "";
+        } else {
+          const textarea = document.querySelector(`textarea[name="q${i}"]`);
+          value = textarea ? textarea.value : "";
+        }
+
+        return { questionId: q._id, answer: value };
+      });
+
+      try {
         const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/submit`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ answers })
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ answers })
         });
 
         const data = await res.json();
         const statusEl = document.getElementById("status");
+
         if (!res.ok) throw new Error(data.error || "Submission failed");
 
-        statusEl.textContent = "✅ Answers submitted successfully!";
-        
-        // Clear the timer state since quiz is submitted
-        clearAllQuizStates();
-        
-        // Stop the timer
+        statusEl.textContent = autoSubmit
+          ? "✅ Time ended. Answers auto-submitted successfully!"
+          : "✅ Answers submitted successfully!";
+
         stopTimer();
 
-        // Show success message for 2 seconds then close modal
         setTimeout(() => {
-            closeExamModal();
-        }, 2000);
-
-    } catch (err) {
+          closeExamModal();
+        }, 1500);
+      } catch (err) {
         document.getElementById("status").textContent = "❌ Submission failed: " + err.message;
         console.error("Submit error:", err);
+
+        if (err.message.toLowerCase().includes("time")) {
+          setTimeout(() => closeExamModal(), 1500);
+        }
+      } finally {
+        isSubmitting = false;
+      }
     }
-}
-    // PDF Quiz functions
+
     async function loadPdfQuiz() {
       const token = localStorage.getItem("token");
-      
+
       try {
-        // Fetch quiz info
+        const session = await startQuizSession();
+
+        if (!session || session.remainingSeconds <= 0) {
+          alert("Quiz time has ended. You cannot open this quiz again.");
+          loadQuizzes();
+          return;
+        }
+
         const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error("Failed to fetch quiz");
+
         const quiz = await res.json();
+        currentQuiz = quiz;
 
-        document.getElementById("modalQuizTitle").textContent = quiz.title;
-        document.getElementById("pdfQuizDescription").textContent = quiz.description;
+        document.getElementById("modalQuizTitle").textContent = quiz.title || "PDF Quiz";
+        document.getElementById("pdfQuizDescription").textContent = quiz.description || "";
         document.getElementById("pdfQuizDuration").textContent = quiz.duration || "N/A";
-
-        // Show PDF quiz, hide structured quiz
         document.getElementById("modalStructuredQuiz").style.display = "none";
         document.getElementById("modalPdfQuiz").style.display = "block";
         document.getElementById("gradeDisplay").style.display = "none";
+        document.getElementById("answerFile").disabled = false;
+        document.querySelector(".btn-pdf-upload").disabled = false;
+        document.getElementById("uploadStatus").textContent = "";
 
         if (quiz.pdfFile) {
-          const pdfUrl = `https://cs-eslamhatem-vhtimw.fly.dev/${quiz.pdfFile.replace(/\\/g, "/")}`;
+          const pdfUrl = `http://localhost:3000/${quiz.pdfFile.replace(/\\/g, "/")}`;
           const downloadLink = document.getElementById("downloadLink");
           downloadLink.href = pdfUrl;
           downloadLink.style.display = "inline-block";
@@ -2229,166 +1803,71 @@ function closeExamModal() {
           document.getElementById("downloadLink").style.display = "none";
         }
 
-        // Fetch user's attempt for this quiz
-        let attempt = null;
-        try {
-          const attemptRes = await fetch(`${BASE_URL}/${currentQuizId}/attempt`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (attemptRes.ok) {
-            const attemptData = await attemptRes.json();
-            attempt = attemptData.attempt;
-          }
-        } catch (err) {
-          console.log("No attempt found or error fetching attempt:", err);
-        }
-
-        const uploadStatus = document.getElementById("uploadStatus");
-
-        if (attempt) {
-          if (attempt.status === "reviewed" || attempt.reviewedAt) {
-            // Show results instead of upload form
-            showQuizResults();
-            return;
-          } else if (attempt.submittedAt) {
-            uploadStatus.textContent = "⚠ Your submission is pending grading";
-            // Disable the upload form if already submitted
-            document.getElementById("answerFile").disabled = true;
-            document.querySelector(".btn-pdf-upload").disabled = true;
-          }
-        } else {
-          uploadStatus.textContent = "";
-        }
-
-        // Start the timer for PDF quiz (if not already submitted)
-        if (!attempt || !attempt.submittedAt) {
-          const quizDuration = quiz.duration || 20;
-          console.log("Starting timer for PDF quiz duration:", quizDuration);
-          startTimer(quizDuration, currentQuizId, "pdf");
-        }
-
-        // Open the modal
+        startTimer(session.remainingSeconds);
         openExamModal();
-
       } catch (err) {
-        document.getElementById("modalQuizTitle").textContent = "Error loading quiz";
-        console.error("Error loading quiz:", err);
+        console.error("Error loading PDF quiz:", err);
+        alert(err.message || "Error loading quiz");
+        loadQuizzes();
       }
     }
 
-    // PDF answer upload with loading bar - UPDATED FUNCTION
     async function uploadPdfAnswer() {
-          if (timeRemaining <= 0) {
-        alert("Time is already up! Your quiz was automatically submitted.");
-        return;
-    }
-      const file = document.getElementById("answerFile").files[0];
-      if (!file) {
-        alert("Please select a file first.");
-        return;
-      }
+      if (isSubmitting) return;
 
-      const token = localStorage.getItem("token");
-      const uploadBtn = document.getElementById("uploadPdfBtn");
-      const loadingContainer = document.getElementById("pdfLoadingContainer");
-      const loadingProgress = document.getElementById("pdfLoadingProgress");
-      const loadingText = document.getElementById("pdfLoadingText");
+      const file = document.getElementById("answerFile").files[0];
       const uploadStatus = document.getElementById("uploadStatus");
 
-      // Show loading state
-      uploadBtn.classList.add("btn-loading");
-      loadingContainer.style.display = "block";
-      loadingProgress.style.width = "30%";
-      loadingText.textContent = "Preparing file...";
+      if (!file) {
+        alert("Please select a PDF file first.");
+        return;
+      }
 
       const formData = new FormData();
       formData.append("answer", file);
 
+      const token = localStorage.getItem("token");
+      isSubmitting = true;
+
       try {
-        loadingProgress.style.width = "50%";
-        loadingText.textContent = "Validating PDF...";
-
-        // Check file size (limit to 10MB)
-        if (file.size > 10 * 1024 * 1024) {
-          throw new Error("File size exceeds 10MB limit");
-        }
-
-        // Check file type
-        if (!file.type.includes('pdf')) {
-          throw new Error("Please upload a PDF file only");
-        }
-
-        loadingProgress.style.width = "70%";
-        loadingText.textContent = "Uploading file...";
-
         const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/upload`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData
         });
 
-        loadingProgress.style.width = "95%";
-        loadingText.textContent = "Processing...";
-
         const data = await res.json();
-        
-        if (res.ok) {
-          loadingProgress.style.width = "100%";
-          loadingText.textContent = "✅ Answer uploaded successfully!";
-          uploadStatus.textContent = "✅ Answer uploaded successfully!";
-          
-          // Clear the timer state since quiz is submitted
-          clearAllQuizStates();
-          
-          // Wait a moment to show completion
-          await new Promise(resolve => setTimeout(resolve, 800));
-          
-          // Stop the timer
-          stopTimer();
-          
-          // Show success message for 2 seconds then close modal
-          setTimeout(() => {
-            closeExamModal();
-          }, 2000);
-        } else {
-          throw new Error(data.error || "Upload failed");
-        }
+        if (!res.ok) throw new Error(data.error || "Upload failed");
+
+        uploadStatus.textContent = "✅ Answer uploaded successfully!";
+        document.getElementById("answerFile").disabled = true;
+        document.querySelector(".btn-pdf-upload").disabled = true;
+        stopTimer();
+
+        setTimeout(() => closeExamModal(), 1500);
       } catch (err) {
-        console.error("Upload error:", err);
-        loadingText.textContent = "❌ Upload error";
-        loadingProgress.style.backgroundColor = "#f87171";
         uploadStatus.textContent = "❌ Upload error: " + err.message;
-        
-        // Reset after error
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.error("Upload error:", err);
+
+        if (err.message.toLowerCase().includes("time")) {
+          setTimeout(() => closeExamModal(), 1500);
+        }
       } finally {
-        // Reset loading state
-        uploadBtn.classList.remove("btn-loading");
-        
-        // Hide loading bar after a delay
-        setTimeout(() => {
-          loadingContainer.style.display = "none";
-          loadingProgress.style.width = "0%";
-          loadingProgress.style.backgroundColor = ""; // Reset color
-          loadingText.textContent = "Uploading PDF...";
-        }, 500);
+        isSubmitting = false;
       }
     }
 
-    // Show quiz results
     async function showQuizResults() {
       const token = localStorage.getItem("token");
-      
+
       try {
-        // Fetch quiz info
         const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error("Failed to fetch quiz");
         currentQuiz = await res.json();
-        
-        // Fetch user's attempt
-        const attemptRes = await fetch(`${BASE_URL}/${currentQuizId}/attempt`, {
+
+        const attemptRes = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/attempt`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const attemptData = await attemptRes.json();
@@ -2396,24 +1875,24 @@ function closeExamModal() {
 
         if (attempt && (attempt.status === "reviewed" || attempt.reviewedAt)) {
           document.getElementById("modalQuizTitle").textContent = currentQuiz.title || "Quiz Results";
-          
-          // Format the grade display
+
           const scoreDisplay = formatScoreDisplay(attempt.score, currentQuiz.totalMarks);
           const gradeClass = getGradeClass(attempt.score, currentQuiz.totalMarks);
-          
+
           document.getElementById("modalGradeValue").textContent = scoreDisplay;
           document.getElementById("modalGradeValue").className = `modal-grade-value ${gradeClass}`;
           document.getElementById("feedbackText").textContent = attempt.feedback || "No feedback provided.";
-          
-          // Show results, hide quiz forms
           document.getElementById("modalStructuredQuiz").style.display = "none";
           document.getElementById("modalPdfQuiz").style.display = "none";
           document.getElementById("gradeDisplay").style.display = "block";
-          
-          // Open the modal
+
           openExamModal();
+        } else if (attempt && attempt.status === "pending") {
+          alert("Your submission is still pending grading.");
+        } else if (attempt && attempt.status === "expired") {
+          alert("Quiz time ended and no result is available yet.");
         } else {
-          alert("Results are not available yet. Your submission is still being graded.");
+          alert("Results are not available yet.");
         }
       } catch (err) {
         console.error("Error fetching results:", err);
@@ -2421,7 +1900,6 @@ function closeExamModal() {
       }
     }
 
-    // Logout function
     function logout() {
       localStorage.removeItem("token");
       localStorage.removeItem("userInfo");
