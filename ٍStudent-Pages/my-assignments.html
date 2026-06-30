@@ -41,13 +41,11 @@
             min-height: 100vh;
         }
 
-        /* Layout */
         .dashboard-container {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar - Desktop */
         .sidebar {
             width: 277px;
             background: rgba(10, 17, 40, 0.9);
@@ -114,7 +112,6 @@
             text-align: center;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -123,7 +120,6 @@
             transition: var(--transition);
         }
 
-        /* Header - Mobile & Desktop */
         .header {
             background: rgba(10, 17, 40, 0.8);
             backdrop-filter: blur(10px);
@@ -152,6 +148,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            position: relative;
         }
 
         .profile-img {
@@ -166,7 +163,6 @@
             font-size: 1.2rem;
         }
 
-        /* Page Title */
         .page-title {
             font-family: 'Orbitron', sans-serif;
             font-size: 2rem;
@@ -182,7 +178,6 @@
             font-size: 1.1rem;
         }
 
-        /* Stats Cards */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -220,7 +215,6 @@
         .stat-completed { color: #4ade80; }
         .stat-overdue { color: #f87171; }
 
-        /* Assignment Cards */
         .assignments-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -277,7 +271,6 @@
             gap: 5px;
         }
 
-        /* Status badges */
         .status-badge {
             padding: 5px 10px;
             border-radius: 50px;
@@ -306,7 +299,6 @@
             color: #6a5af9;
         }
 
-        /* Due date counter */
         .due-date {
             margin-top: 15px;
             padding: 10px;
@@ -330,7 +322,6 @@
             color: #f87171;
         }
 
-        /* Submission form */
         .submission-form {
             margin-top: 20px;
             padding-top: 15px;
@@ -363,7 +354,13 @@
             border-color: var(--secondary);
         }
 
-        /* Buttons */
+        .required-note {
+            color: #f87171;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            display: block;
+        }
+
         .btn {
             padding: 10px 20px;
             border: none;
@@ -375,8 +372,6 @@
             text-decoration: none;
             display: inline-block;
             text-align: center;
-            position: relative;
-            overflow: hidden;
         }
 
         .btn-primary {
@@ -385,13 +380,13 @@
             box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
         }
 
         .btn-primary:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -407,106 +402,6 @@
             background: rgba(0, 204, 255, 0.1);
         }
 
-        /* Loading bar styles */
-        .loading-container {
-            display: none;
-            margin-top: 15px;
-            width: 100%;
-        }
-
-        .loading-bar {
-            height: 4px;
-            background-color: rgba(0, 102, 255, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .loading-progress {
-            height: 100%;
-            width: 0%;
-            background: var(--gradient);
-            border-radius: 2px;
-            transition: width 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .loading-progress::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background-image: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.4),
-                transparent
-            );
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        .loading-text {
-            text-align: center;
-            margin-top: 8px;
-            font-size: 0.9rem;
-            color: var(--secondary);
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        /* Loading spinner for buttons */
-        .btn-loading {
-            position: relative;
-            color: transparent !important;
-        }
-
-        .btn-loading::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 50%;
-            left: 50%;
-            margin-left: -10px;
-            margin-top: -10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* File requirement warning */
-        .file-requirement-warning {
-            font-size: 0.75rem;
-            margin-top: 5px;
-            color: #fbbf24;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .file-requirement-warning i {
-            font-size: 0.7rem;
-        }
-
-        /* Submission details */
         .submission-details {
             margin-top: 20px;
             padding: 15px;
@@ -529,6 +424,7 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 10px;
+            margin-top: 10px;
         }
 
         .grade-value {
@@ -545,7 +441,6 @@
             font-style: italic;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -559,7 +454,10 @@
             opacity: 0.5;
         }
 
-        /* Loading State */
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+
         .loading-state {
             text-align: center;
             padding: 40px 20px;
@@ -576,7 +474,11 @@
             margin: 0 auto 15px;
         }
 
-        /* Bottom Navigation - Mobile */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -614,7 +516,6 @@
             background: rgba(0, 204, 255, 0.1);
         }
 
-        /* Toggle Button */
         .menu-toggle {
             display: none;
             background: none;
@@ -624,7 +525,6 @@
             cursor: pointer;
         }
 
-        /* Overlay for mobile sidebar */
         .overlay {
             position: fixed;
             top: 0;
@@ -637,7 +537,12 @@
             display: none;
         }
 
-        /* Responsive Design */
+        @media (max-width: 992px) {
+            .assignments-container, .stats-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -658,11 +563,19 @@
                 display: flex;
             }
             
+            .header {
+                padding: 15px;
+            }
+            
+            .welcome-section h1 {
+                font-size: 1.3rem;
+            }
+            
             .menu-toggle {
                 display: block;
             }
             
-            .assignments-container {
+            .assignments-container, .stats-container {
                 grid-template-columns: 1fr;
             }
         }
@@ -684,7 +597,6 @@
             transform: scale(1.1);
         }
 
-        /* Balls */
         .ball {
             position: absolute;
             width: 45px;
@@ -722,18 +634,9 @@
             opacity: 1;
             pointer-events: auto;
         }
-
-        .course-info {
-            margin-bottom: 10px;
-            color: var(--secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
     </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <div class="overlay" id="overlay"></div>
@@ -745,17 +648,77 @@
                     CS-<span>IslamHatem</span>
                 </a>
             </div>
+            
             <ul class="nav-menu">
-                <li class="nav-item"><a href="Student-Dashboard.html" class="nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-                <li class="nav-item"><a href="available-courses.html" class="nav-link"><i class="fas fa-graduation-cap"></i><span>Available Course Packages</span></a></li>
-                <li class="nav-item"><a href="available-lessons.html" class="nav-link"><i class="fas fa-book-open"></i><span>Available Lessons</span></a></li>
-                <li class="nav-item"><a href="my-learning.html" class="nav-link"><i class="fas fa-tasks"></i><span>My Learning</span></a></li>
-                <li class="nav-item"><a href="my-assignments.html" class="nav-link active"><i class="fas fa-clipboard-list"></i><span>My Assignments</span></a></li>
-                <li class="nav-item"><a href="user-quizzes.html" class="nav-link"><i class="fas fa-question-circle"></i><span>My Quizzes</span></a></li>
-                <li class="nav-item"><a href="student-streams.html" class="nav-link"><i class="fas fa-video"></i><span>Online Meetings</span></a></li>
-                <li class="nav-item"><a href="student-profile.html" class="nav-link"><i class="fas fa-user"></i><span>Profile</span></a></li>
-                <li class="nav-item"><a href="student-helpCenter.html" class="nav-link"><i class="fas fa-life-ring"></i><span>Help Center</span></a></li>
-                <li class="nav-item"><a href="compiler.html" class="nav-link"><i class="fas fa-code"></i><span>Compiler</span></a></li>
+                <li class="nav-item">
+                    <a href="Student-Dashboard.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="available-courses.html" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Available Course Packages</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="available-lessons.html" class="nav-link">
+                        <i class="fas fa-book-open"></i>
+                        <span>Available Lessons</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="my-learning.html" class="nav-link">
+                        <i class="fas fa-tasks"></i>
+                        <span>My Learning</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="my-assignments.html" class="nav-link active">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>My Assignments</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="user-quizzes.html" class="nav-link">
+                        <i class="fas fa-question-circle"></i>
+                        <span>My Quizzes</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="student-streams.html" class="nav-link">
+                        <i class="fas fa-video"></i>
+                        <span>Online Meetings</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="student-profile.html" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="student-helpCenter.html" class="nav-link">
+                        <i class="fas fa-life-ring"></i>
+                        <span>Help Center</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="compiler.html" class="nav-link">
+                        <i class="fas fa-code"></i>
+                        <span>Compiler</span>
+                    </a>
+                </li>
             </ul>
         </aside>
 
@@ -765,9 +728,15 @@
                     <h1>My Assignments</h1>
                     <p>Track and submit your programming assignments</p>
                 </div>
-                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+
                 <div class="user-profile" id="userMenu">
-                    <div class="profile-img"><i class="fas fa-user"></i></div>
+                    <div class="profile-img">
+                        <i class="fas fa-user"></i>
+                    </div>
                     <a href="student-profile.html" class="ball profile">Profile</a>
                     <a onclick="logout()" class="ball logout">Logout</a>
                 </div>
@@ -779,262 +748,500 @@
             </div>
 
             <div class="stats-container">
-                <div class="stat-card"><div class="stat-number" id="pending-count">0</div><div class="stat-label">Pending Assignments</div></div>
-                <div class="stat-card"><div class="stat-number stat-completed" id="completed-count">0</div><div class="stat-label">Completed</div></div>
-                <div class="stat-card"><div class="stat-number stat-overdue" id="overdue-count">0</div><div class="stat-label">Overdue</div></div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pending-count">0</div>
+                    <div class="stat-label">Pending Assignments</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number stat-completed" id="completed-count">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number stat-overdue" id="overdue-count">0</div>
+                    <div class="stat-label">Overdue</div>
+                </div>
             </div>
 
             <div id="assignments-container" class="assignments-container">
-                <div class="loading-state"><div class="spinner"></div><p>Loading your assignments...</p></div>
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading your assignments...</p>
+                </div>
             </div>
         </main>
 
         <nav class="bottom-nav">
-            <a href="Student-Dashboard.html" class="nav-btn"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="available-courses.html" class="nav-btn"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
-            <a href="my-learning.html" class="nav-btn"><i class="fas fa-book-open"></i><span>Lessons</span></a>
-            <a href="student-profile.html" class="nav-btn"><i class="fas fa-user"></i><span>Profile</span></a>
+            <a href="Student-Dashboard.html" class="nav-btn">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+
+            <a href="available-courses.html" class="nav-btn">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Courses</span>
+            </a>
+
+            <a href="my-learning.html" class="nav-btn">
+                <i class="fas fa-book-open"></i>
+                <span>Lessons</span>
+            </a>
+
+            <a href="student-profile.html" class="nav-btn">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
         </nav>
     </div>
 
     <script>
         const userMenu = document.getElementById("userMenu");
-        function logout() { localStorage.removeItem("token"); localStorage.removeItem("userInfo"); window.location.href = "../Login-Pages/login.html"; }
-        userMenu.addEventListener("click", () => userMenu.classList.toggle("active"));
 
-        let assignments = [], enrolledCourses = [], token = null;
+        function logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("userInfo");
+            window.location.href = "../Login-Pages/login.html";
+        }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        userMenu.addEventListener("click", () => {
+            userMenu.classList.toggle("active");
+        });
+
+        let assignments = [];
+        let pendingCount = 0;
+        let completedCount = 0;
+        let overdueCount = 0;
+        let token = null;
+
+        document.addEventListener("DOMContentLoaded", function () {
             token = localStorage.getItem("token");
-            if (!token) { alert("You need to log in to view your assignments"); window.location.href = 'login.html'; return; }
 
-            const overlay = document.getElementById('overlay'), sidebar = document.getElementById('sidebar'), menuToggle = document.getElementById('menuToggle');
-            menuToggle.addEventListener('click', () => { sidebar.classList.toggle('active'); overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none'; });
-            overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.style.display = 'none'; });
-            window.addEventListener('resize', () => { if (window.innerWidth > 768) { sidebar.classList.remove('active'); overlay.style.display = 'none'; } });
+            if (!token) {
+                alert("You need to log in to view your assignments");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const overlay = document.getElementById("overlay");
+            const sidebar = document.getElementById("sidebar");
+            const menuToggle = document.getElementById("menuToggle");
+
+            menuToggle.addEventListener("click", function () {
+                sidebar.classList.toggle("active");
+                overlay.style.display = sidebar.classList.contains("active") ? "block" : "none";
+            });
+
+            overlay.addEventListener("click", function () {
+                sidebar.classList.remove("active");
+                overlay.style.display = "none";
+            });
+
+            window.addEventListener("resize", function () {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove("active");
+                    overlay.style.display = "none";
+                }
+            });
+
             loadAssignments();
         });
 
         async function loadAssignments() {
             try {
-                const API_BASE = "https://cs-eslamhatem-vhtimw.fly.dev/api";
-                const enrolledRes = await fetch(`${API_BASE}/users/my-courses`, { headers: { "Authorization": "Bearer " + token } });
-                if (enrolledRes.status === 401) { localStorage.removeItem("token"); window.location.href = 'login.html'; return; }
-                enrolledCourses = await enrolledRes.json();
-                const enrolledCourseIds = enrolledCourses.map(course => course._id);
+                const API_BASE = "http://localhost:3000/api";
 
-                const assignmentsRes = await fetch(`${API_BASE}/users/my-assignments`, { headers: { "Authorization": "Bearer " + token } });
-                if (assignmentsRes.status === 401) { localStorage.removeItem("token"); window.location.href = 'login.html'; return; }
-                const data = await assignmentsRes.json();
-                const allAssignments = data.data || [];
-                assignments = allAssignments.filter(assignment => assignment.course && enrolledCourseIds.some(cid => cid.toString() === assignment.course.toString()));
-                assignments.forEach(assignment => { const course = enrolledCourses.find(c => c._id.toString() === assignment.course.toString()); assignment.courseName = course ? course.title : 'Unknown Course'; });
+                const res = await fetch(`${API_BASE}/users/my-assignments`, {
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                });
 
-                if (assignments.length === 0) {
-                    document.getElementById("assignments-container").innerHTML = enrolledCourses.length === 0 ? 
-                        `<div class="empty-state"><i class="fas fa-graduation-cap"></i><p>You are not enrolled in any courses yet.</p><p>Enroll in a course to see assignments.</p><a href="available-courses.html" class="btn btn-primary" style="margin-top: 15px;">Browse Courses</a></div>` :
-                        `<div class="empty-state"><i class="fas fa-clipboard-check"></i><p>No assignments found for your enrolled courses.</p></div>`;
-                    document.getElementById('pending-count').textContent = '0';
-                    document.getElementById('completed-count').textContent = '0';
-                    document.getElementById('overdue-count').textContent = '0';
+                if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    window.location.href = "login.html";
                     return;
                 }
-                updateStatsAndRender();
-            } catch (err) { console.error(err); document.getElementById("assignments-container").innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Error loading assignments. Please try again.</p><button class="btn btn-primary" onclick="loadAssignments()">Retry</button></div>`; }
+
+                const data = await res.json();
+                assignments = data.data || [];
+
+                updateAssignmentStats();
+                renderAssignments();
+
+            } catch (err) {
+                console.error("Load assignments error:", err);
+
+                document.getElementById("assignments-container").innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Error loading assignments. Please try again.</p>
+                        <button class="btn btn-primary" onclick="loadAssignments()" style="margin-top: 15px;">Retry</button>
+                    </div>
+                `;
+            }
         }
 
-        function updateStatsAndRender() {
-            let pending = 0, completed = 0, overdue = 0, now = new Date();
-            assignments.forEach(a => { if (a.submission) completed++; else if (a.dueDate && new Date(a.dueDate) < now) overdue++; else pending++; });
-            document.getElementById('pending-count').textContent = pending;
-            document.getElementById('completed-count').textContent = completed;
-            document.getElementById('overdue-count').textContent = overdue;
-            renderAssignments();
+        function updateAssignmentStats() {
+            pendingCount = 0;
+            completedCount = 0;
+            overdueCount = 0;
+
+            const now = new Date();
+
+            assignments.forEach(assignment => {
+                if (assignment.submission) {
+                    completedCount++;
+                } else if (assignment.dueDate && new Date(assignment.dueDate) < now) {
+                    overdueCount++;
+                } else {
+                    pendingCount++;
+                }
+            });
+
+            document.getElementById("pending-count").textContent = pendingCount;
+            document.getElementById("completed-count").textContent = completedCount;
+            document.getElementById("overdue-count").textContent = overdueCount;
+        }
+
+        function formatDueDateTime(dateValue) {
+            const d = new Date(dateValue);
+            if (Number.isNaN(d.getTime())) return "-";
+
+            return d.toLocaleString([], {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
         }
 
         function renderAssignments() {
             const container = document.getElementById("assignments-container");
-            if (!assignments.length) return;
-            container.innerHTML = '';
-            assignments.forEach(assignment => {
-                const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null, now = new Date();
-                let statusClass, statusText;
-                if (assignment.submission) statusClass = assignment.submission.grade !== undefined ? 'status-graded' : 'status-completed', statusText = assignment.submission.grade !== undefined ? 'Graded' : 'Submitted';
-                else if (dueDate && dueDate < now) statusClass = 'status-overdue', statusText = 'Overdue';
-                else statusClass = 'status-pending', statusText = 'Pending';
-                const card = document.createElement('div'); card.className = 'assignment-card';
-                card.innerHTML = `
-                    <div class="assignment-header"><h3 class="assignment-title">${assignment.title}</h3><span class="status-badge ${statusClass}">${statusText}</span></div>
-                    <div class="course-info"><i class="fas fa-graduation-cap"></i><span>${assignment.courseName || 'Course Assignment'}</span></div>
-                    <div class="assignment-desc">${assignment.description || "No description provided."}</div>
-                    <div class="assignment-meta">${dueDate ? `<div class="meta-item"><i class="fas fa-calendar-day"></i>Due: ${dueDate.toLocaleDateString()}</div>` : ''}${assignment.pdf ? `<div class="meta-item"><i class="fas fa-file-pdf"></i><a href="https://cs-eslamhatem-vhtimw.fly.dev/uploads/${assignment.pdf}" target="_blank">Download PDF</a></div>` : ''}</div>
-                    ${dueDate ? `<div class="due-date"><div class="due-date-label">Time remaining:</div><div class="countdown" id="countdown-${assignment._id}">${calculateTimeRemaining(dueDate)}</div></div>` : ''}
-                    ${assignment.submission ? renderSubmissionDetails(assignment) : renderSubmissionForm(assignment, dueDate ? dueDate < now : false)}
+
+            if (!assignments || assignments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No assignments found.</p>
+                        <p>New assignments will appear here when assigned by your instructor.</p>
+                    </div>
                 `;
-                container.appendChild(card);
-                if (!assignment.submission && dueDate && dueDate > now) startCountdownTimer(assignment._id, dueDate);
-                if (!assignment.submission && dueDate && dueDate < now) {
-                    const btn = document.getElementById(`submit-btn-${assignment._id}`);
-                    if (btn) btn.disabled = true;
+                return;
+            }
+
+            container.innerHTML = "";
+
+            assignments.forEach(assignment => {
+                const assignmentCard = document.createElement("div");
+                assignmentCard.className = "assignment-card";
+
+                let statusClass;
+                let statusText;
+
+                const now = new Date();
+                const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null;
+
+                if (assignment.submission) {
+                    if (assignment.submission.grade !== undefined && assignment.submission.grade !== null) {
+                        statusClass = "status-graded";
+                        statusText = "Graded";
+                    } else if (assignment.submission.isLate) {
+                        statusClass = "status-overdue";
+                        statusText = "Submitted Late";
+                    } else {
+                        statusClass = "status-completed";
+                        statusText = "Submitted";
+                    }
+                } else if (dueDate && dueDate < now) {
+                    statusClass = "status-overdue";
+                    statusText = "Overdue";
+                } else {
+                    statusClass = "status-pending";
+                    statusText = "Pending";
+                }
+
+                assignmentCard.innerHTML = `
+                    <div class="assignment-header">
+                        <h3 class="assignment-title">${assignment.title}</h3>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+
+                    <div class="assignment-desc">${assignment.description || "No description provided."}</div>
+
+                    <div class="assignment-meta">
+                        ${dueDate ? `
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-day"></i>
+                                Due: ${formatDueDateTime(assignment.dueDate)}
+                            </div>
+                        ` : ""}
+
+                        ${assignment.pdf ? `
+                            <div class="meta-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <a href="http://localhost:3000/uploads/${assignment.pdf}" target="_blank">Download PDF</a>
+                            </div>
+                        ` : ""}
+                    </div>
+
+                    ${dueDate ? `
+                        <div class="due-date">
+                            <div class="due-date-label">Time remaining:</div>
+                            <div class="countdown" id="countdown-${assignment._id}">
+                                ${calculateTimeRemaining(dueDate)}
+                            </div>
+                        </div>
+                    ` : ""}
+
+                    ${assignment.submission ? renderSubmissionDetails(assignment) : renderSubmissionForm(assignment)}
+                `;
+
+                container.appendChild(assignmentCard);
+
+                if (!assignment.submission && dueDate && dueDate > new Date()) {
+                    startCountdownTimer(assignment._id, dueDate);
                 }
             });
         }
 
-        function renderSubmissionForm(assignment, isOverdue) {
+        function renderSubmissionDetails(assignment) {
+            const submission = assignment.submission;
+
+            return `
+                <div class="submission-details" style="border-left-color: ${submission.isLate ? "#f87171" : "var(--secondary)"};">
+                    <div class="submission-header">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Your Submission</span>
+                    </div>
+
+                    ${submission.submittedAt ? `
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            Submitted at: ${formatDueDateTime(submission.submittedAt)}
+                        </div>
+                    ` : ""}
+
+                    ${submission.fileUrl ? `
+                        <div class="meta-item" style="margin-top: 10px;">
+                            <i class="fas fa-file-pdf"></i>
+                            <a href="http://localhost:3000/${submission.fileUrl}" target="_blank" style="color: var(--secondary);">
+                                View Submitted PDF
+                            </a>
+                        </div>
+                    ` : ""}
+
+                    ${submission.isLate ? `
+                        <div style="margin-top: 10px; color: #f87171;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Submitted late by: <strong>${submission.lateByText || "Late"}</strong>
+                        </div>
+                    ` : `
+                        <div style="margin-top: 10px; color: #4ade80;">
+                            <i class="fas fa-check"></i>
+                            Submitted on time
+                        </div>
+                    `}
+
+                    ${submission.grade !== undefined && submission.grade !== null ? `
+                        <div class="grade-display">
+                            <span class="grade-value">Grade: ${submission.grade}</span>
+                        </div>
+                    ` : `
+                        <div class="grade-display">
+                            <span class="status-badge status-pending">Grading in progress</span>
+                        </div>
+                    `}
+
+                    ${submission.feedback ? `
+                        <div class="feedback">
+                            <strong>Instructor Feedback:</strong><br>
+                            ${submission.feedback}
+                        </div>
+                    ` : ""}
+                    ${submission.reviewPdfUrl ? `
+    <div class="meta-item" style="margin-top: 12px;">
+        <i class="fas fa-file-circle-check"></i>
+        <a 
+            href="http://localhost:3000/${submission.reviewPdfUrl}" 
+            target="_blank" 
+            style="color: #4ade80;"
+        >
+            View Correction Review PDF
+            ${submission.reviewPdfOriginalName ? `(${submission.reviewPdfOriginalName})` : ""}
+        </a>
+    </div>
+` : ""}
+                </div>
+            `;
+        }
+
+        function renderSubmissionForm(assignment) {
+            const now = new Date();
+            const dueDate = assignment.dueDate ? new Date(assignment.dueDate) : null;
+            const isOverdue = dueDate && dueDate < now;
+
             return `
                 <form class="submission-form" onsubmit="submitAssignment(event, '${assignment._id}')">
-                    <div class="form-group"><label class="form-label">Your Comment:</label><textarea id="textAnswer-${assignment._id}" name="textAnswer" placeholder="Write your comment here..." rows="4" ${isOverdue ? 'disabled' : ''}></textarea></div>
-                    <div class="form-group"><label class="form-label">Assignment File (Required):</label><input type="file" id="file-${assignment._id}" name="file" accept=".pdf,.doc,.docx,.zip,.txt,.jpg,.png" ${isOverdue ? 'disabled' : ''}><div class="file-requirement-warning"><i class="fas fa-exclamation-triangle"></i> Please attach a file before submitting</div></div>
-                    <button type="submit" class="btn btn-primary" id="submit-btn-${assignment._id}" ${isOverdue ? 'disabled' : 'disabled'}>${isOverdue ? 'Assignment Closed' : 'Submit Assignment'}</button>
-                    <div class="loading-container" id="loading-container-${assignment._id}"><div class="loading-bar"><div class="loading-progress" id="loading-progress-${assignment._id}"></div></div><div class="loading-text" id="loading-text-${assignment._id}">Submitting assignment...</div></div>
-                    ${isOverdue ? `<div style="margin-top: 10px; color: #f87171;"><i class="fas fa-exclamation-circle"></i> This assignment is overdue and can no longer be submitted.</div>` : ''}
+                    ${isOverdue ? `
+                        <div style="margin-bottom: 12px; color: #f87171;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            This assignment is overdue, but you can still submit it. The lateness will be saved.
+                        </div>
+                    ` : ""}
+
+                    <div class="form-group">
+                        <label class="form-label" for="textAnswer-${assignment._id}">Your Comment:</label>
+                        <textarea 
+                            id="textAnswer-${assignment._id}" 
+                            name="textAnswer" 
+                            placeholder="Write your comment here..." 
+                            rows="4"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="file-${assignment._id}">
+                            Upload Answers PDF <span style="color:#f87171;">*</span>
+                        </label>
+
+                        <input 
+                            type="file" 
+                            id="file-${assignment._id}" 
+                            name="file"
+                            accept="application/pdf,.pdf"
+                            required
+                        >
+
+                        <small class="required-note">
+                            PDF answer file is required. You cannot submit without uploading a PDF.
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        ${isOverdue ? "Submit Late Assignment" : "Submit Assignment"}
+                    </button>
                 </form>
             `;
         }
 
-        // Attach file validation to each file input after rendering
-        function attachFileValidation(assignmentId) {
-            const fileInput = document.getElementById(`file-${assignmentId}`);
-            const submitBtn = document.getElementById(`submit-btn-${assignmentId}`);
-            if (!fileInput || !submitBtn) return;
-            
-            // Initial check
-            const checkFile = () => {
-                if (fileInput.files.length > 0) {
-                    submitBtn.disabled = false;
-                } else {
-                    submitBtn.disabled = true;
-                }
-            };
-            
-            fileInput.addEventListener('change', checkFile);
-            checkFile(); // Run initial check
-        }
-
-        function renderSubmissionDetails(assignment) {
-            return `<div class="submission-details"><div class="submission-header"><i class="fas fa-check-circle"></i><span>Your Submission</span></div>${assignment.submission.grade !== undefined && assignment.submission.grade !== null ? `<div class="grade-display"><span class="grade-value">Grade: ${assignment.submission.grade}</span></div>` : `<div class="grade-display"><span class="status-badge status-pending">Grading in progress</span></div>`}${assignment.submission.feedback ? `<div class="feedback"><strong>Instructor Feedback:</strong><br>${assignment.submission.feedback}</div>` : ''}</div>`;
-        }
-
         function calculateTimeRemaining(dueDate) {
-            const now = new Date(), diff = dueDate - now;
-            if (diff <= 0) return '<span class="countdown-overdue">Overdue</span>';
-            const days = Math.floor(diff / (86400000)), hours = Math.floor((diff % 86400000) / 3600000), minutes = Math.floor((diff % 3600000) / 60000);
+            const now = new Date();
+            const timeDiff = dueDate - now;
+
+            if (timeDiff <= 0) {
+                return '<span class="countdown-overdue">Overdue - late submission allowed</span>';
+            }
+
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
             return `${days}d ${hours}h ${minutes}m`;
         }
 
         function startCountdownTimer(assignmentId, dueDate) {
-            const update = () => {
-                const el = document.getElementById(`countdown-${assignmentId}`);
-                if (!el) return;
+            const countdownElement = document.getElementById(`countdown-${assignmentId}`);
+
+            if (countdownElement) {
+                countdownElement.innerHTML = calculateTimeRemaining(dueDate);
+            }
+
+            const timer = setInterval(() => {
+                const countdownElement = document.getElementById(`countdown-${assignmentId}`);
+
+                if (!countdownElement) {
+                    clearInterval(timer);
+                    return;
+                }
+
                 const now = new Date();
+
                 if (dueDate <= now) {
-                    el.innerHTML = '<span class="countdown-overdue">Overdue</span>';
-                    const btn = document.getElementById(`submit-btn-${assignmentId}`);
-                    if (btn) btn.disabled = true;
-                    const fileInp = document.getElementById(`file-${assignmentId}`);
-                    if (fileInp) fileInp.disabled = true;
-                    const textarea = document.getElementById(`textAnswer-${assignmentId}`);
-                    if (textarea) textarea.disabled = true;
-                } else el.innerHTML = calculateTimeRemaining(dueDate);
-            };
-            update();
-            const interval = setInterval(() => { if (!document.getElementById(`countdown-${assignmentId}`)) clearInterval(interval); else update(); }, 60000);
+                    countdownElement.innerHTML = '<span class="countdown-overdue">Overdue - late submission allowed</span>';
+                    clearInterval(timer);
+                } else {
+                    countdownElement.innerHTML = calculateTimeRemaining(dueDate);
+                }
+            }, 60000);
         }
 
         async function submitAssignment(e, assignmentId) {
             e.preventDefault();
+
             const form = e.target;
+            const submitButton = form.querySelector("button[type='submit']");
             const fileInput = document.getElementById(`file-${assignmentId}`);
-            
-            // CRITICAL FIX: Check if file is attached - if not, prevent submission
-            if (!fileInput || fileInput.files.length === 0) {
-                alert("❌ Please attach a file before submitting your assignment.");
-                // Flash warning on the file input
-                fileInput.style.border = "2px solid #f87171";
-                setTimeout(() => { if(fileInput) fileInput.style.border = ""; }, 1500);
+
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                alert("Please upload your PDF answer file before submitting.");
                 return;
             }
-            
-            const submitBtn = document.getElementById(`submit-btn-${assignmentId}`);
-            const loadingContainer = document.getElementById(`loading-container-${assignmentId}`);
-            const loadingProgress = document.getElementById(`loading-progress-${assignmentId}`);
-            const loadingText = document.getElementById(`loading-text-${assignmentId}`);
-            
-            submitBtn.classList.add("btn-loading");
-            loadingContainer.style.display = "block";
-            loadingProgress.style.width = "30%";
-            loadingText.textContent = "Preparing submission...";
-            
+
+            const file = fileInput.files[0];
+            const fileName = file.name.toLowerCase();
+            const isPdfByExtension = fileName.endsWith(".pdf");
+            const isPdfByType = file.type === "application/pdf" || file.type === "";
+
+            if (!isPdfByExtension || !isPdfByType) {
+                alert("Only PDF files are allowed. Please upload a valid PDF answer file.");
+                fileInput.value = "";
+                return;
+            }
+
             const formData = new FormData(form);
             formData.append("assignmentId", assignmentId);
-            
+
             try {
-                loadingProgress.style.width = "50%";
-                loadingText.textContent = "Validating file...";
-                const API_BASE = "https://cs-eslamhatem-vhtimw.fly.dev/api";
-                loadingProgress.style.width = "70%";
-                loadingText.textContent = "Uploading file...";
-                loadingProgress.style.width = "85%";
-                loadingText.textContent = "Sending to server...";
-                
+                const API_BASE = "http://localhost:3000/api";
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Submitting...";
+
+                console.log("Submitting assignment:", {
+                    assignmentId,
+                    fileName: file.name,
+                    fileType: file.type,
+                    fileSize: file.size
+                });
+
                 const res = await fetch(`${API_BASE}/users/submit-assignment`, {
                     method: "POST",
-                    headers: { "Authorization": "Bearer " + token },
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    },
                     body: formData
                 });
-                
-                loadingProgress.style.width = "95%";
-                loadingText.textContent = "Finalizing...";
-                const data = await res.json();
-                
-                if (data.success) {
-                    loadingProgress.style.width = "100%";
-                    loadingText.textContent = "✅ Assignment submitted successfully!";
-                    await new Promise(resolve => setTimeout(resolve, 800));
-                    alert("Assignment submitted successfully!");
+
+                let data;
+
+                try {
+                    data = await res.json();
+                } catch (jsonErr) {
+                    console.error("Response is not JSON:", jsonErr);
+                    alert("Server returned an invalid response. Check backend terminal.");
+                    return;
+                }
+
+                console.log("Submit assignment response:", data);
+
+                if (res.ok && data.success) {
+                    alert(data.message || "Assignment submitted successfully!");
+                    form.reset();
                     loadAssignments();
-                } else throw new Error(data.error || "Unknown error");
+                } else {
+                    alert("Error submitting assignment: " + (data.error || data.message || "Unknown error"));
+                }
+
             } catch (err) {
-                console.error(err);
-                loadingText.textContent = "❌ Error submitting assignment";
-                loadingProgress.style.backgroundColor = "#f87171";
-                alert("Error: " + err.message);
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                console.error("Submit error:", err);
+                alert("Submit failed. Check backend terminal and browser console.");
             } finally {
-                submitBtn.classList.remove("btn-loading");
-                setTimeout(() => {
-                    loadingContainer.style.display = "none";
-                    loadingProgress.style.width = "0%";
-                    loadingProgress.style.backgroundColor = "";
-                    loadingText.textContent = "Submitting assignment...";
-                }, 500);
+                submitButton.disabled = false;
+                submitButton.textContent = "Submit Assignment";
             }
         }
-
-        // Override renderAssignments to attach file validation AFTER adding to DOM
-        const originalRender = renderAssignments;
-        window.renderAssignments = function() {
-            originalRender();
-            setTimeout(() => {
-                assignments.forEach(assignment => {
-                    if (!assignment.submission) attachFileValidation(assignment._id);
-                });
-            }, 50);
-        };
-        renderAssignments = window.renderAssignments;
-        // Ensure validation attaches after initial render
-        const attachAllValidations = () => {
-            assignments.forEach(assignment => { if (!assignment.submission) attachFileValidation(assignment._id); });
-        };
-        window.updateStatsAndRender = updateStatsAndRender;
-        const originalUpdate = updateStatsAndRender;
-        window.updateStatsAndRender = function() {
-            originalUpdate();
-            attachAllValidations();
-        };
-        updateStatsAndRender = window.updateStatsAndRender;
-        // initial call override
-        setTimeout(() => attachAllValidations(), 300);
     </script>
 </body>
 </html>
