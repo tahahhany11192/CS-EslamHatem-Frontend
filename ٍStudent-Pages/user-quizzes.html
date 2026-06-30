@@ -1204,7 +1204,7 @@
 
   <script>
     // Global variables
-    const BASE_URL = "http://localhost:3000/api/users";
+    const BASE_URL = "https://cs-eslamhatem-zpihcg.fly.dev/api/users";
     let currentQuizId = null;
     let currentQuiz = null;
     let currentAttempt = null;
@@ -1793,7 +1793,7 @@
         document.getElementById("uploadStatus").textContent = "";
 
         if (quiz.pdfFile) {
-          const pdfUrl = `http://localhost:3000/${quiz.pdfFile.replace(/\\/g, "/")}`;
+          const pdfUrl = `https://cs-eslamhatem-zpihcg.fly.dev/${quiz.pdfFile.replace(/\\/g, "/")}`;
           const downloadLink = document.getElementById("downloadLink");
           downloadLink.href = pdfUrl;
           downloadLink.style.display = "inline-block";
