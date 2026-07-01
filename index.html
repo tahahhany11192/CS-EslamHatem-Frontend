@@ -1,1034 +1,1652 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" type="image/jpg" href="uploads/Islam-Hatem.jpg">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS-IslamHatem | Computer Science Education</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #0066ff;
-            --secondary: #00ccff;
-            --accent: #ff00cc;
-            --dark: #0a1128;
-            --light: #f0f6ff;
-            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
-            --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Exo 2', sans-serif;
-            background-color: var(--dark);
-            color: var(--light);
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 60%, rgba(0, 204, 255, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 80%, rgba(255, 0, 204, 0.1) 0%, transparent 20%);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header & Navigation */
-        header {
-            padding: 20px 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            background: rgba(10, 17, 40, 0.95);
-            border-bottom: 1px solid rgba(0, 204, 255, 0.2);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 1.8rem;
-            color: var(--light);
-            text-decoration: none;
-            z-index: 1001;
-        }
-
-        .logo span {
-            color: var(--secondary);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
-
-        .nav-links a {
-            color: var(--light);
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-            padding: 5px 0;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background: var(--gradient);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover:after {
-            width: 100%;
-        }
-
-        .auth-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        /* Mobile Menu Button */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--light);
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        /* Motion Buttons */
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 30px;
-            font-family: 'Exo 2', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            outline: none;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background: var(--gradient);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--light);
-            border: 2px solid var(--secondary);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(0, 204, 255, 0.1);
-            transform: translateY(-3px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 180px 0 100px;
-            text-align: center;
-            position: relative;
-        }
-
-        .hero h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 4rem;
-            margin-bottom: 20px;
-            background: linear-gradient(to right, var(--light), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 5px rgba(0, 204, 255, 0.5);
-            }
-            to {
-                text-shadow: 0 0 20px rgba(0, 204, 255, 0.8), 0 0 30px rgba(0, 204, 255, 0.6);
-            }
-        }
-
-        .hero p {
-            font-size: 1.4rem;
-            max-width: 800px;
-            margin: 0 auto 40px;
-            color: rgba(240, 246, 255, 0.8);
-            line-height: 1.6;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-bottom: 60px;
-            flex-wrap: wrap;
-        }
-
-        /* Features Section */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 80px 0;
-        }
-
-        .feature-card {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 204, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-            border-color: rgba(0, 204, 255, 0.3);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .feature-card h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--light);
-        }
-
-        .feature-card p {
-            color: rgba(240, 246, 255, 0.7);
-        }
-
-        /* About Section */
-        .about {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-            margin: 100px 0;
-        }
-
-        .about-content {
-            flex: 1;
-        }
-
-        .about-image {
-            flex: 1;
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        .about-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-
-        .about-image:hover img {
-            transform: scale(1.05);
-        }
-
-        .about h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .about p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            color: rgba(240, 246, 255, 0.8);
-        }
-
-        /* Testimonials */
-        .testimonials {
-            margin: 100px 0;
-        }
-
-        .testimonial-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .testimonial-card {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid rgba(0, 204, 255, 0.1);
-            position: relative;
-        }
-
-        .testimonial-card::before {
-            content: '"';
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 4rem;
-            font-family: serif;
-            color: rgba(0, 204, 255, 0.2);
-        }
-
-        .testimonial-text {
-            font-style: italic;
-            margin-bottom: 20px;
-            color: rgba(240, 246, 255, 0.9);
-        }
-
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .author-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .author-details h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            color: var(--light);
-        }
-
-        .author-details p {
-            color: rgba(240, 246, 255, 0.7);
-            font-size: 0.9rem;
-        }
-
-        /* CTA Section */
-        .cta {
-            background: var(--gradient);
-            border-radius: 20px;
-            padding: 60px;
-            text-align: center;
-            margin: 100px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--light);
-        }
-
-        .cta p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            color: rgba(240, 246, 255, 0.9);
-        }
-
-        /* Animated Background Elements */
-        .floating-shapes {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .shape {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.1;
-            animation: float 15s infinite linear;
-        }
-
-        .shape-1 {
-            width: 300px;
-            height: 300px;
-            background: var(--primary);
-            top: -150px;
-            left: -150px;
-            animation-delay: 0s;
-        }
-
-        .shape-2 {
-            width: 200px;
-            height: 200px;
-            background: var(--accent);
-            bottom: -100px;
-            right: 20%;
-            animation-delay: -5s;
-        }
-
-        .shape-3 {
-            width: 150px;
-            height: 150px;
-            background: var(--secondary);
-            top: 30%;
-            right: -75px;
-            animation-delay: -10s;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            50% {
-                transform: translate(20px, 20px) rotate(180deg);
-            }
-            100% {
-                transform: translate(0, 0) rotate(360deg);
-            }
-        }
-
-        /* Footer */
-        footer {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 60px 0 30px;
-            margin-top: 100px;
-            border-top: 1px solid rgba(0, 204, 255, 0.2);
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-column h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: var(--light);
-        }
-
-        .footer-column ul {
-            list-style: none;
-        }
-
-        .footer-column ul li {
-            margin-bottom: 10px;
-        }
-
-        .footer-column a {
-            color: rgba(240, 246, 255, 0.7);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .footer-column a:hover {
-            color: var(--secondary);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--light);
-            transition: all 0.3s ease;
-        }
-
-        .social-links a:hover {
-            background: var(--gradient);
-            transform: translateY(-3px);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(0, 204, 255, 0.1);
-        }
-
-        .footer-logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            color: var(--light);
-            margin-bottom: 15px;
-        }
-
-        .footer-logo span {
-            color: var(--secondary);
-        }
-
-        /* Mobile Menu */
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 80%;
-            max-width: 300px;
-            height: 100vh;
-            background: rgba(10, 17, 40, 0.98);
-            backdrop-filter: blur(10px);
-            z-index: 999;
-            transition: right 0.3s ease;
-            padding: 100px 30px 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .mobile-menu.active {
-            right: 0;
-        }
-
-        .mobile-menu .nav-links {
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .mobile-menu .auth-buttons {
-            flex-direction: column;
-            margin-top: 20px;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 998;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .about {
-                flex-direction: column;
-            }
-            
-            .about-image {
-                order: -1;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.8rem;
-            }
-            
-            .hero p {
-                font-size: 1.2rem;
-            }
-            
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .auth-buttons {
-                display: none;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .features, .testimonial-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .cta {
-                padding: 40px 20px;
-            }
-            
-            .cta h2 {
-                font-size: 2rem;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            
-            .social-links {
-                justify-content: center;
-            }
-            
-            .about h2 {
-                font-size: 2rem;
-            }
-            
-            .testimonials .section-header h2 {
-                font-size: 2rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 2.2rem;
-            }
-            
-            .hero p {
-                font-size: 1rem;
-            }
-            
-            .btn {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-            
-            .feature-card, .testimonial-card {
-                padding: 20px;
-            }
-            
-            .cta {
-                padding: 30px 15px;
-            }
-            
-            .cta h2 {
-                font-size: 1.8rem;
-            }
-            
-            .about h2 {
-                font-size: 1.8rem;
-            }
-        }
-        
-    /* Loading State Styles */
-    .loading-state {
-        text-align: center;
-        padding: 40px 20px;
-        grid-column: 1 / -1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/jpg" href="uploads/Islam-Hatem.jpg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CS-IslamHatem | Computer Science Education</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0066ff;
+      --secondary: #00ccff;
+      --accent: #ff00cc;
+      --dark: #0a1128;
+      --dark-soft: #101a3a;
+      --light: #f0f6ff;
+      --muted: rgba(240, 246, 255, 0.72);
+      --muted-strong: rgba(240, 246, 255, 0.86);
+      --card-bg: rgba(255, 255, 255, 0.045);
+      --card-border: rgba(0, 204, 255, 0.16);
+      --header-bg: rgba(10, 17, 40, 0.92);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-pill: 999px;
+      --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+      --gradient-accent: linear-gradient(135deg, var(--primary), var(--accent));
+      --max-width: 1400px;
     }
 
-    .spinner {
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top: 4px solid var(--secondary);
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 15px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 100px;
     }
 
-    /* Professional Photo Frame */
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background-color: var(--dark);
+      color: var(--light);
+      overflow-x: hidden;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.12) 0%, transparent 24%),
+        radial-gradient(circle at 90% 55%, rgba(0, 204, 255, 0.11) 0%, transparent 24%),
+        radial-gradient(circle at 50% 85%, rgba(255, 0, 204, 0.1) 0%, transparent 28%);
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--secondary);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -60px;
+      left: 16px;
+      background: var(--secondary);
+      color: #061024;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      z-index: 3000;
+      transition: top 0.25s ease;
+    }
+
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 clamp(16px, 4vw, 32px);
+    }
+
+    .section-space {
+      margin-block: clamp(70px, 8vw, 125px);
+    }
+
+    .section-header {
+      max-width: 780px;
+      margin: 0 auto 42px;
+      text-align: center;
+    }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(0, 204, 255, 0.1);
+      border: 1px solid rgba(0, 204, 255, 0.18);
+      color: var(--secondary);
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.4px;
+    }
+
+    .section-header h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.15;
+      margin-bottom: 14px;
+      background: linear-gradient(to right, var(--light), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-header p {
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      line-height: 1.7;
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 1000;
+      padding: 16px 0;
+      backdrop-filter: blur(14px);
+      background: var(--header-bg);
+      border-bottom: 1px solid rgba(0, 204, 255, 0.18);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      color: var(--light);
+      white-space: nowrap;
+      z-index: 1002;
+    }
+
+    .logo-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--gradient);
+      box-shadow: 0 8px 24px rgba(0, 102, 255, 0.35);
+      font-size: 1rem;
+    }
+
+    .logo span {
+      color: var(--secondary);
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(16px, 2.4vw, 32px);
+      flex: 1;
+    }
+
+    .desktop-nav a,
+    .mobile-nav a {
+      color: var(--muted-strong);
+      font-weight: 600;
+      position: relative;
+      padding: 8px 0;
+      transition: color 0.25s ease;
+    }
+
+    .desktop-nav a::after,
+    .mobile-nav a::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 2px;
+      left: 0;
+      bottom: 0;
+      background: var(--gradient);
+      transition: width 0.25s ease;
+    }
+
+    .desktop-nav a:hover,
+    .desktop-nav a.active,
+    .mobile-nav a:hover,
+    .mobile-nav a.active {
+      color: var(--secondary);
+    }
+
+    .desktop-nav a:hover::after,
+    .desktop-nav a.active::after,
+    .mobile-nav a:hover::after,
+    .mobile-nav a.active::after {
+      width: 100%;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 204, 255, 0.18);
+      background: rgba(255, 255, 255, 0.045);
+      color: var(--light);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 12px 24px;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      font-family: 'Exo 2', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        border-color 0.25s ease;
+    }
+
+    .btn::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 -120%;
+      width: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+      transition: left 0.55s ease;
+    }
+
+    .btn:hover::before {
+      left: 120%;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 12px 28px rgba(0, 102, 255, 0.28);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 16px 34px rgba(0, 102, 255, 0.42);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--light);
+      border-color: rgba(0, 204, 255, 0.55);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 204, 255, 0.12);
+      border-color: var(--secondary);
+    }
+
+    .btn-light {
+      background: rgba(255, 255, 255, 0.92);
+      color: #071129;
+      border-color: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .btn-light:hover {
+      background: #ffffff;
+    }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -105%;
+      width: min(86vw, 380px);
+      height: 100vh;
+      z-index: 1001;
+      padding: 24px;
+      background: rgba(10, 17, 40, 0.98);
+      backdrop-filter: blur(16px);
+      border-left: 1px solid rgba(0, 204, 255, 0.18);
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      box-shadow: -30px 0 70px rgba(0, 0, 0, 0.35);
+    }
+
+    .mobile-menu.active {
+      right: 0;
+    }
+
+    .mobile-menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .mobile-close-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 204, 255, 0.22);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--light);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .mobile-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      font-size: 1.08rem;
+    }
+
+    .mobile-actions {
+      display: grid;
+      gap: 14px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0, 204, 255, 0.12);
+    }
+
+    .mobile-actions .btn {
+      width: 100%;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.72);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Background Shapes */
+    .floating-shapes {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.12;
+      filter: blur(2px);
+      animation: float 15s infinite linear;
+    }
+
+    .shape-1 {
+      width: 320px;
+      height: 320px;
+      background: var(--primary);
+      top: -150px;
+      left: -150px;
+    }
+
+    .shape-2 {
+      width: 230px;
+      height: 230px;
+      background: var(--accent);
+      bottom: -110px;
+      right: 18%;
+      animation-delay: -5s;
+    }
+
+    .shape-3 {
+      width: 180px;
+      height: 180px;
+      background: var(--secondary);
+      top: 32%;
+      right: -80px;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+      50% {
+        transform: translate(24px, 24px) rotate(180deg);
+      }
+
+      100% {
+        transform: translate(0, 0) rotate(360deg);
+      }
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      padding: clamp(145px, 15vw, 220px) 0 clamp(70px, 9vw, 125px);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 16px;
+      margin-bottom: 22px;
+      border-radius: var(--radius-pill);
+      background: rgba(0, 204, 255, 0.1);
+      border: 1px solid rgba(0, 204, 255, 0.2);
+      color: var(--secondary);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .hero h1 {
+      max-width: 1050px;
+      margin: 0 auto 22px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.25rem, 6vw, 5rem);
+      line-height: 1.08;
+      letter-spacing: -1px;
+      background: linear-gradient(to right, var(--light), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: glow 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px rgba(0, 204, 255, 0.35);
+      }
+
+      to {
+        text-shadow: 0 0 20px rgba(0, 204, 255, 0.65), 0 0 34px rgba(0, 204, 255, 0.35);
+      }
+    }
+
+    .hero p {
+      max-width: 830px;
+      margin: 0 auto 36px;
+      color: var(--muted);
+      font-size: clamp(1.05rem, 2.4vw, 1.42rem);
+      line-height: 1.7;
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
+    }
+
+    .hero-helper {
+      color: rgba(240, 246, 255, 0.62);
+      font-size: 0.98rem;
+    }
+
+    /* Stats */
+    .stats {
+      margin-top: -35px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(0, 204, 255, 0.16);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-item {
+      padding: 20px;
+      text-align: center;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.055);
+    }
+
+    .stat-item strong {
+      display: block;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.55rem, 3vw, 2.35rem);
+      color: var(--secondary);
+      margin-bottom: 8px;
+    }
+
+    .stat-item span {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.98rem;
+    }
+
+    /* Features */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card,
+    .testimonial-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.24);
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+    }
+
+    .feature-card::before,
+    .testimonial-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(0, 204, 255, 0.12), transparent 36%),
+        radial-gradient(circle at bottom right, rgba(255, 0, 204, 0.1), transparent 38%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+    }
+
+    .feature-card:hover,
+    .testimonial-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(0, 204, 255, 0.38);
+      box-shadow: 0 22px 45px rgba(0, 0, 0, 0.35);
+      background: rgba(255, 255, 255, 0.062);
+    }
+
+    .feature-card:hover::before,
+    .testimonial-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-card {
+      min-height: 295px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      display: grid;
+      place-items: center;
+      border-radius: 20px;
+      background: rgba(0, 204, 255, 0.1);
+      border: 1px solid rgba(0, 204, 255, 0.18);
+      color: var(--secondary);
+      font-size: 1.8rem;
+    }
+
+    .feature-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      line-height: 1.35;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      color: var(--secondary);
+      font-weight: 800;
+      margin-top: auto;
+      transition: gap 0.25s ease;
+    }
+
+    .card-link:hover {
+      gap: 13px;
+    }
+
+    /* About */
+    .about {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+      align-items: center;
+      gap: clamp(36px, 6vw, 70px);
+    }
+
+    .about-content h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .about-content p {
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 1.08rem;
+      margin-bottom: 18px;
+    }
+
+    .about-points {
+      display: grid;
+      gap: 12px;
+      margin: 26px 0 30px;
+    }
+
+    .about-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: var(--muted-strong);
+      line-height: 1.55;
+    }
+
+    .about-point i {
+      color: var(--secondary);
+      margin-top: 4px;
+    }
+
     .photo-frame {
-        position: relative;
-        overflow: hidden;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0, 204, 255, 0.2);
+      background: rgba(255, 255, 255, 0.045);
     }
 
     .photo-frame::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: var(--gradient);
-        opacity: 0.1;
-        z-index: 1;
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--gradient);
+      opacity: 0.08;
+      z-index: 1;
+      pointer-events: none;
     }
 
     .photo-frame img {
-        width: 100%;
-        height: auto;
-        display: block;
-        transition: transform 0.5s ease;
+      width: 100%;
+      min-height: 430px;
+      object-fit: cover;
+      transition: transform 0.5s ease;
     }
 
     .photo-frame:hover img {
-        transform: scale(1.05);
+      transform: scale(1.045);
     }
 
-    </style>
+    /* Testimonials */
+    .testimonial-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .testimonial-card {
+      padding: 30px;
+    }
+
+    .quote-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      border-radius: 16px;
+      color: var(--secondary);
+      background: rgba(0, 204, 255, 0.1);
+      border: 1px solid rgba(0, 204, 255, 0.18);
+    }
+
+    .testimonial-text {
+      position: relative;
+      z-index: 1;
+      color: var(--muted-strong);
+      font-style: italic;
+      line-height: 1.75;
+      margin-bottom: 24px;
+    }
+
+    .testimonial-author {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0, 204, 255, 0.12);
+    }
+
+    .author-avatar {
+      flex: 0 0 auto;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      box-shadow: 0 10px 22px rgba(0, 102, 255, 0.25);
+    }
+
+    .author-details h4 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+
+    .author-details p {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    /* CTA */
+    .cta {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      padding: clamp(42px, 7vw, 72px);
+      text-align: center;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 34%),
+        var(--gradient);
+      box-shadow: 0 24px 60px rgba(0, 102, 255, 0.28);
+    }
+
+    .cta::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      right: -80px;
+      bottom: -90px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .cta h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.18;
+      margin-bottom: 18px;
+    }
+
+    .cta p {
+      max-width: 720px;
+      margin: 0 auto 30px;
+      color: rgba(240, 246, 255, 0.92);
+      font-size: clamp(1.05rem, 2vw, 1.22rem);
+      line-height: 1.7;
+    }
+
+    .cta-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: clamp(70px, 8vw, 120px);
+      padding: 60px 0 28px;
+      background: rgba(0, 0, 0, 0.34);
+      border-top: 1px solid rgba(0, 204, 255, 0.18);
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: 1.3fr 0.8fr 0.9fr 1fr;
+      gap: 38px;
+      margin-bottom: 38px;
+    }
+
+    .footer-column h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.16rem;
+      margin-bottom: 18px;
+    }
+
+    .footer-column p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .footer-column ul {
+      list-style: none;
+      display: grid;
+      gap: 11px;
+    }
+
+    .footer-column a {
+      color: var(--muted);
+      transition: color 0.25s ease, padding-left 0.25s ease;
+    }
+
+    .footer-column a:hover {
+      color: var(--secondary);
+      padding-left: 4px;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .social-links a {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(0, 204, 255, 0.12);
+      color: var(--light);
+      transition: transform 0.25s ease, background 0.25s ease;
+    }
+
+    .social-links a:hover {
+      transform: translateY(-3px);
+      background: var(--gradient);
+      padding-left: 0;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 28px;
+      border-top: 1px solid rgba(0, 204, 255, 0.1);
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .footer-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.45rem;
+      color: var(--light);
+      margin-bottom: 8px;
+    }
+
+    .footer-logo span {
+      color: var(--secondary);
+    }
+
+    /* Loading State */
+    .loading-state {
+      text-align: center;
+      padding: 40px 20px;
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid var(--secondary);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .features {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 992px) {
+      .desktop-nav,
+      .header-actions {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: inline-flex;
+      }
+
+      .about {
+        grid-template-columns: 1fr;
+      }
+
+      .photo-frame {
+        order: -1;
+        max-width: 660px;
+        margin-inline: auto;
+      }
+
+      .photo-frame img {
+        min-height: auto;
+      }
+
+      .testimonial-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 12px 0;
+      }
+
+      .hero {
+        padding-top: 130px;
+      }
+
+      .hero-buttons,
+      .cta-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-buttons .btn,
+      .cta-actions .btn {
+        width: 100%;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-card {
+        min-height: auto;
+      }
+
+      .section-header {
+        margin-bottom: 30px;
+      }
+
+      .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .social-links {
+        justify-content: center;
+      }
+
+      .footer-column a:hover {
+        padding-left: 0;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .logo-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+      }
+
+      .mobile-menu {
+        width: 100%;
+        max-width: none;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+
+      .stat-item {
+        padding: 18px;
+      }
+
+      .feature-card,
+      .testimonial-card {
+        padding: 22px;
+      }
+
+      .about-content p {
+        font-size: 1rem;
+      }
+
+      .cta {
+        padding: 34px 20px;
+      }
+    }
+
+    @media (min-width: 1600px) {
+      :root {
+        --max-width: 1600px;
+      }
+
+      .hero p {
+        font-size: 1.55rem;
+      }
+
+      .features {
+        gap: 30px;
+      }
+
+      .feature-card {
+        min-height: 330px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <!-- Animated Background Elements -->
-    <div class="floating-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <header>
+    <div class="container header-content">
+      <a href="index.html" class="logo" aria-label="CS IslamHatem home page">
+        <span class="logo-mark">
+          <i class="fas fa-code" aria-hidden="true"></i>
+        </span>
+        CS-<span>IslamHatem</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="index.html" class="active">Home</a>
+        <a href="ٍStudent-Pages/available-lessons.html">Lessons</a>
+        <a href="ٍStudent-Pages/available-courses.html">Packages</a>
+        <a href="ٍStudent-Pages/Student-Dashboard.html">Dashboard</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="Login-Pages/Login.html" class="btn btn-secondary">Login</a>
+        <a href="Login-Pages/Register.html" class="btn btn-primary">Register</a>
+      </div>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <aside class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+    <div class="mobile-menu-header">
+      <a href="index.html" class="logo" aria-label="CS IslamHatem home page">
+        <span class="logo-mark">
+          <i class="fas fa-code" aria-hidden="true"></i>
+        </span>
+        CS-<span>IslamHatem</span>
+      </a>
+
+      <button class="mobile-close-btn" id="mobileCloseBtn" aria-label="Close menu">
+        <i class="fas fa-times" aria-hidden="true"></i>
+      </button>
     </div>
 
-    <!-- Header -->
-    <header>
-        <div class="container header-content">
-            <a href="uploads/EslamLogo-removebg-preview.png" class="logo">
-                CS-<span>IslamHatem</span>
-            </a>
-            
-            <nav class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="ٍStudent-Pages/available-lessons.html">Lessons</a>
-                <a href="ٍStudent-Pages/available-courses.html">Packages</a>
-                <a href="ٍStudent-Pages/Student-Dashboard.html">Dashboard</a>
-            </nav>
-            
-            <div class="auth-buttons">
-                <a href="Login-Pages/Login.html">
-                    <button class="btn btn-secondary">Login</button>
-                </a>
-                <a href="Login-Pages/Register.html">
-                    <button class="btn btn-primary">Register</button>
-                </a>
-            </div>
-            
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </header>
+    <nav class="mobile-nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="ٍStudent-Pages/available-lessons.html">Lessons</a>
+      <a href="ٍStudent-Pages/available-courses.html">Packages</a>
+      <a href="ٍStudent-Pages/Student-Dashboard.html">Dashboard</a>
+      <a href="ٍStudent-Pages/compiler.html">Compiler</a>
+      <a href="ٍStudent-Pages/student-streams.html">Live Classes</a>
+    </nav>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <nav class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="ٍStudent-Pages/available-lessons.html">Lessons</a>
-            <a href="ٍStudent-Pages/available-courses.html">Packages</a>
-            <a href="ٍStudent-Pages/Student-Dashboard.html">Dashboard</a>
-        </nav>
-        
-        <div class="auth-buttons">
-            <a href="Login-Pages/Login.html">
-                <button class="btn btn-secondary">Login</button>
-            </a>
-            <a href="Login-Pages/Register.html">
-                <button class="btn btn-primary">Register</button>
-            </a>
-        </div>
+    <div class="mobile-actions">
+      <a href="Login-Pages/Login.html" class="btn btn-secondary">Login</a>
+      <a href="Login-Pages/Register.html" class="btn btn-primary">Register</a>
     </div>
-    
-    <div class="overlay" id="overlay"></div>
+  </aside>
 
-    <!-- Hero Section -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <main id="main-content">
     <section class="hero">
-        <div class="container">
-            <h1>Computer Science Education For IG Students</h1>
-            <p>Join Islam Hatem's online classes and master programming with our interactive compiler designed for IG Students, comprehensive lessons, and personalized feedback.</p>
-            
-            <div class="hero-buttons">
-                <a href="ٍStudent-Pages/available-courses.html">
-                    <button class="btn btn-primary">Explore Courses</button>
-                </a>
-                <a href="ٍStudent-Pages/student-streams.html">
-                    <button class="btn btn-secondary">Live Classes Schedule</button>
-                </a>
-                <a href="ٍStudent-Pages/compiler.html">
-                    <button class="btn btn-primary">Try Compiler</button>
-                </a>
-            </div>
+      <div class="container">
+        <div class="hero-badge">
+          <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+          IG Computer Science Learning Platform
         </div>
+
+        <h1>Computer Science Education For IG Students</h1>
+
+        <p>
+          Join Islam Hatem's online classes and master programming through interactive lessons,
+          live classes, quizzes, assignments, and a browser-based compiler designed for IG students.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="ٍStudent-Pages/available-courses.html" class="btn btn-primary">
+            Explore Courses
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+
+          <a href="ٍStudent-Pages/compiler.html" class="btn btn-secondary">
+            Try Compiler
+            <i class="fas fa-laptop-code" aria-hidden="true"></i>
+          </a>
+
+          <a href="ٍStudent-Pages/student-streams.html" class="btn btn-secondary">
+            Live Schedule
+            <i class="fas fa-video" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <p class="hero-helper">
+          Learn, practice, submit assignments, and track your progress from one place.
+        </p>
+      </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="container">
-        <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-laptop-code"></i>
-                </div>
-                <h3>Interactive Compiler</h3>
-                <p>Practice coding directly in your browser with our advanced compiler designed for learning.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-                <h3>Live Online Classes</h3>
-                <p>Join interactive sessions with Islam Hatem from anywhere in the world.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-tasks"></i>
-                </div>
-                <h3>Assignments & Quizzes</h3>
-                <p>Test your knowledge with challenging assignments and interactive quizzes.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3>Certification</h3>
-                <p>Earn recognized certificates upon completion of courses and packages.</p>
-            </div>
+    <section class="container stats" aria-label="Platform highlights">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <strong>5+</strong>
+          <span>Years Teaching Experience</span>
         </div>
+
+        <div class="stat-item">
+          <strong>67%</strong>
+          <span>Students Achieving 8–9</span>
+        </div>
+
+        <div class="stat-item">
+          <strong>IG</strong>
+          <span>Syllabus-Focused Content</span>
+        </div>
+
+        <div class="stat-item">
+          <strong>24/7</strong>
+          <span>Online Learning Access</span>
+        </div>
+      </div>
     </section>
 
-    <!-- About Section -->
-    <section class="container about">
-        <div class="about-content">
-            <h2>About Islam Hatem</h2>
-            <p>Islam Hatem is a Computer Engineering student at the German University in Cairo (GUC), currently in his fourth year. He earned his IGCSE certificate from El Rowad International School (2019–2022), graduating with eight O-Levels, all graded between 8 and 9, and one AS-Level with grade A. He distinguished himself in Computer Science with a grade 9.</p>
-            <p>With five years of teaching experience, Islam has served as a teaching assistant under Eng. Amr Osama in eight sessions and has also provided two years of private tutoring. His teaching approach has consistently supported student success, with the majority achieving grades 8 and 9 (67%), followed by grade 7 (23%), and grade 6 or below (10%).</p>
-            <a href="ٍStudent-Pages/student-helpCenter.html">
-            <button class="btn btn-primary">Learn More</button>
+    <section class="container section-space">
+      <div class="section-header">
+        <div class="section-eyebrow">
+          <i class="fas fa-star" aria-hidden="true"></i>
+          Why Learn With Us?
+        </div>
+
+        <h2>Everything Students Need In One Platform</h2>
+
+        <p>
+          A complete learning experience that helps students understand theory,
+          practice coding, attend live sessions, and prepare confidently for exams.
+        </p>
+      </div>
+
+      <div class="features">
+        <article class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-laptop-code" aria-hidden="true"></i>
+          </div>
+
+          <h3>Interactive Compiler</h3>
+
+          <p>
+            Practice coding directly in your browser with a student-friendly compiler
+            designed for learning and exam preparation.
+          </p>
+
+          <a href="ٍStudent-Pages/compiler.html" class="card-link">
+            Try Compiler
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-chalkboard-teacher" aria-hidden="true"></i>
+          </div>
+
+          <h3>Live Online Classes</h3>
+
+          <p>
+            Join interactive live sessions with clear explanations, examples,
+            and direct support from anywhere.
+          </p>
+
+          <a href="ٍStudent-Pages/student-streams.html" class="card-link">
+            View Schedule
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-tasks" aria-hidden="true"></i>
+          </div>
+
+          <h3>Assignments & Quizzes</h3>
+
+          <p>
+            Test your knowledge with assignments, quizzes, and structured practice
+            that helps you improve step by step.
+          </p>
+
+          <a href="ٍStudent-Pages/user-quizzes.html" class="card-link">
+            Start Practice
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-certificate" aria-hidden="true"></i>
+          </div>
+
+          <h3>Certification</h3>
+
+          <p>
+            Complete courses and packages while tracking progress and building
+            confidence in Computer Science.
+          </p>
+
+          <a href="ٍStudent-Pages/available-courses.html" class="card-link">
+            Explore Packages
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <section class="container about section-space">
+      <div class="about-content">
+        <div class="section-eyebrow">
+          <i class="fas fa-user-tie" aria-hidden="true"></i>
+          About The Instructor
+        </div>
+
+        <h2>About Islam Hatem</h2>
+
+        <p>
+          Islam Hatem is a Computer Engineering student at the German University in Cairo,
+          currently in his fourth year. He earned his IGCSE certificate from El Rowad
+          International School between 2019 and 2022, graduating with eight O-Levels
+          graded between 8 and 9, and one AS-Level with grade A.
+        </p>
+
+        <p>
+          With five years of teaching experience, Islam has supported many IG Computer
+          Science students through live sessions, private tutoring, assignments,
+          and exam-focused practice.
+        </p>
+
+        <div class="about-points">
+          <div class="about-point">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            <span>IGCSE Computer Science grade 9 achievement.</span>
+          </div>
+
+          <div class="about-point">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            <span>Five years of teaching and tutoring experience.</span>
+          </div>
+
+          <div class="about-point">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            <span>Clear explanations, practical examples, and exam-focused preparation.</span>
+          </div>
+
+          <div class="about-point">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            <span>Strong student results, with many students achieving grades 8 and 9.</span>
+          </div>
+        </div>
+
+        <a href="ٍStudent-Pages/student-helpCenter.html" class="btn btn-primary">
+          Learn More
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <div class="photo-frame">
+        <img
+          src="uploads/islamhatempersonalphoto.png.png"
+          alt="Islam Hatem - Computer Science Educator"
+          loading="lazy"
+        />
+      </div>
+    </section>
+
+    <section class="container testimonials section-space">
+      <div class="section-header">
+        <div class="section-eyebrow">
+          <i class="fas fa-comments" aria-hidden="true"></i>
+          Student Feedback
+        </div>
+
+        <h2>Student Success Stories</h2>
+
+        <p>
+          Hear from students who improved their Computer Science skills through
+          structured lessons, live support, and practical coding exercises.
+        </p>
+      </div>
+
+      <div class="testimonial-cards">
+        <article class="testimonial-card">
+          <div class="quote-icon">
+            <i class="fas fa-quote-left" aria-hidden="true"></i>
+          </div>
+
+          <p class="testimonial-text">
+            "Islam Hatem's teaching style made complex programming concepts easy to understand.
+            I went from struggling to scoring an A* in my IG exams!"
+          </p>
+
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <i class="fas fa-user" aria-hidden="true"></i>
+            </div>
+
+            <div class="author-details">
+              <h4>Sarah Johnson</h4>
+              <p>IG Student, UK</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonial-card">
+          <div class="quote-icon">
+            <i class="fas fa-quote-left" aria-hidden="true"></i>
+          </div>
+
+          <p class="testimonial-text">
+            "The interactive compiler was a game-changer. Being able to practice directly
+            in the browser helped me learn twice as fast compared to traditional methods."
+          </p>
+
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <i class="fas fa-user" aria-hidden="true"></i>
+            </div>
+
+            <div class="author-details">
+              <h4>Ahmed Mohamed</h4>
+              <p>IG Student, Egypt</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonial-card">
+          <div class="quote-icon">
+            <i class="fas fa-quote-left" aria-hidden="true"></i>
+          </div>
+
+          <p class="testimonial-text">
+            "The live classes were incredible. Even though I was halfway across the world,
+            I felt like I was in a real classroom. The assignments were challenging but rewarding."
+          </p>
+
+          <div class="testimonial-author">
+            <div class="author-avatar">
+              <i class="fas fa-user" aria-hidden="true"></i>
+            </div>
+
+            <div class="author-details">
+              <h4>James Chen</h4>
+              <p>IG Student, Singapore</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="container section-space">
+      <div class="cta">
+        <div class="cta-content">
+          <h2>Start Your Computer Science Journey Today</h2>
+
+          <p>
+            Join students worldwide who are improving their programming,
+            problem-solving, and exam skills with a complete IG-focused platform.
+          </p>
+
+          <div class="cta-actions">
+            <a href="ٍStudent-Pages/available-courses.html" class="btn btn-light">
+              Explore All Courses
+              <i class="fas fa-arrow-right" aria-hidden="true"></i>
             </a>
-        </div>
-        <div class="photo-frame">
-            <!-- Replace with your actual photo path -->
-            <img src="uploads/islamhatempersonalphoto.png.png" alt="Islam Hatem - Computer Science Educator">
-        </div>
-    </section>
 
-    <!-- Testimonials Section -->
-    <section class="container testimonials">
-        <div class="section-header">
-            <h2>Student Success Stories</h2>
-            <p>Hear from students who have transformed their computer science skills with Islam Hatem</p>
-        </div>
-        
-        <div class="testimonial-cards">
-            <div class="testimonial-card">
-                <div class="testimonial-text">
-                    "Islam Hatem's teaching style made complex programming concepts easy to understand. I went from struggling to scoring an A* in my IG exams!"
-                </div>
-                <div class="testimonial-author">
-                    <div class="author-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="author-details">
-                        <h4>Sarah Johnson</h4>
-                        <p>IG Student, UK</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="testimonial-card">
-                <div class="testimonial-text">
-                    "The interactive compiler was a game-changer. Being able to practice directly in the browser helped me learn twice as fast compared to traditional methods."
-                </div>
-                <div class="testimonial-author">
-                    <div class="author-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="author-details">
-                        <h4>Ahmed Mohamed</h4>
-                        <p>IG Student, Egypt</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="testimonial-card">
-                <div class="testimonial-text">
-                    "The live classes were incredible. Even though I was halfway across the world, I felt like I was in a real classroom. The assignments were challenging but rewarding."
-                </div>
-                <div class="testimonial-author">
-                    <div class="author-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="author-details">
-                        <h4>James Chen</h4>
-                        <p>IG Student, Singapore</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="container">
-        <div class="cta">
-            <h2>Start Your Computer Science Journey Today</h2>
-            <p>Join thousands of students worldwide who have transformed their programming skills with Islam Hatem's innovative teaching approach.</p>
-            <a href="ٍStudent-Pages/available-courses.html">
-                <button class="btn btn-secondary">Explore All Courses</button>
+            <a href="Login-Pages/Register.html" class="btn btn-secondary">
+              Create Account
+              <i class="fas fa-user-plus" aria-hidden="true"></i>
             </a>
+          </div>
         </div>
+      </div>
     </section>
+  </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>CS-IslamHatem</h3>
-                    <p>Revolutionizing computer science education for IG students worldwide through innovative teaching methods and cutting-edge technology.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="ٍStudent-Pages/available-courses.html">Courses</a></li>
-                        <li><a href="ٍStudent-Pages/available-courses.html">Packages</a></li>
-                        <li><a href="ٍStudent-Pages/compiler.html">Compiler</a></li>
-                        <li><a href="Login-Pages/admin-login.html">admin</a></li>
-                        <li><a href="Login-Pages/assistant-login.html">assistant</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Resources</h3>
-                    <ul>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="ٍStudent-Pages/available-lessons.html">Tutorials</a></li>
-                        <li><a href="ٍStudent-Pages/user-quizzes.html">Practice Exercises</a></li>
-                        <li><a href="ٍStudent-Pages/Student-Dashboard.html">IG Syllabus Guide</a></li>
-                        <li><a href="ٍStudent-Pages/student-helpCenter.html">FAQ</a></li>
-                        
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Contact</h3>
-                    <ul>
-                        <li><a href="mailto:cs.islamhatem@gmail.com">cs.islamhatem@gmail.com</a></li>
-                        <li><a href="tel:+201001209763">+201001209763</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <div class="footer-logo">
-                    CS-<span>IslamHatem</span> &copy; 2023
-                </div>
-                <p>All rights reserved. Designed with ❤️ for computer science education.</p>
-                <p>                            Powerd by Orycom ❤️                      </p>
-            </div>
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>CS-IslamHatem</h3>
+
+          <p>
+            Revolutionizing Computer Science education for IG students through
+            clear teaching, practical coding, live support, and modern learning tools.
+          </p>
+
+          <div class="social-links">
+            <a href="#" aria-label="Facebook">
+              <i class="fab fa-facebook-f" aria-hidden="true"></i>
+            </a>
+
+            <a href="#" aria-label="Twitter">
+              <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+
+            <a href="#" aria-label="Instagram">
+              <i class="fab fa-instagram" aria-hidden="true"></i>
+            </a>
+
+            <a href="#" aria-label="YouTube">
+              <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+          </div>
         </div>
-    </footer>
 
-    <script>
-        // Mobile menu functionality
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const overlay = document.getElementById('overlay');
-        
-        function toggleMobileMenu() {
-            mobileMenu.classList.toggle('active');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
-        }
-        
-        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-        overlay.addEventListener('click', toggleMobileMenu);
-        
-        // Close mobile menu when clicking on a link
-        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
-        mobileMenuLinks.forEach(link => {
-            link.addEventListener('click', toggleMobileMenu);
-        });
+        <div class="footer-column">
+          <h3>Quick Links</h3>
 
-        // Simple animation for buttons
-        document.querySelectorAll('.btn').forEach(button => {
-            button.addEventListener('mouseenter', function(e) {
-                this.style.transform = 'translateY(-3px)';
-            });
-            
-            button.addEventListener('mouseleave', function(e) {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-    </script>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#main-content">About</a></li>
+            <li><a href="ٍStudent-Pages/available-courses.html">Courses</a></li>
+            <li><a href="ٍStudent-Pages/available-courses.html">Packages</a></li>
+            <li><a href="ٍStudent-Pages/compiler.html">Compiler</a></li>
+            <li><a href="Login-Pages/admin-login.html">Admin</a></li>
+            <li><a href="Login-Pages/assistant-login.html">Assistant</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h3>Resources</h3>
+
+          <ul>
+            <li><a href="ٍStudent-Pages/available-lessons.html">Tutorials</a></li>
+            <li><a href="ٍStudent-Pages/user-quizzes.html">Practice Exercises</a></li>
+            <li><a href="ٍStudent-Pages/Student-Dashboard.html">IG Syllabus Guide</a></li>
+            <li><a href="ٍStudent-Pages/student-helpCenter.html">FAQ</a></li>
+            <li><a href="ٍStudent-Pages/student-streams.html">Live Classes</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h3>Contact</h3>
+
+          <ul>
+            <li>
+              <a href="mailto:cs.islamhatem@gmail.com">
+                <i class="fas fa-envelope" aria-hidden="true"></i>
+                cs.islamhatem@gmail.com
+              </a>
+            </li>
+
+            <li>
+              <a href="tel:+201001209763">
+                <i class="fas fa-phone" aria-hidden="true"></i>
+                +201001209763
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-logo">
+          CS-<span>IslamHatem</span> &copy; <span id="currentYear">2026</span>
+        </div>
+
+        <p>All rights reserved. Designed with ❤️ for Computer Science education.</p>
+        <p>Powered by Orycom ❤️</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const mobileCloseBtn = document.getElementById("mobileCloseBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const overlay = document.getElementById("overlay");
+    const mobileMenuLinks = mobileMenu.querySelectorAll("a");
+    const currentYear = document.getElementById("currentYear");
+
+    currentYear.textContent = new Date().getFullYear();
+
+    function openMobileMenu() {
+      mobileMenu.classList.add("active");
+      overlay.classList.add("active");
+      document.body.classList.add("menu-open");
+      mobileMenuBtn.setAttribute("aria-expanded", "true");
+    }
+
+    function closeMobileMenu() {
+      mobileMenu.classList.remove("active");
+      overlay.classList.remove("active");
+      document.body.classList.remove("menu-open");
+      mobileMenuBtn.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleMobileMenu() {
+      if (mobileMenu.classList.contains("active")) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    }
+
+    mobileMenuBtn.addEventListener("click", toggleMobileMenu);
+    mobileCloseBtn.addEventListener("click", closeMobileMenu);
+    overlay.addEventListener("click", closeMobileMenu);
+
+    mobileMenuLinks.forEach((link) => {
+      link.addEventListener("click", closeMobileMenu);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && mobileMenu.classList.contains("active")) {
+        closeMobileMenu();
+      }
+    });
+  </script>
 </body>
 </html>
