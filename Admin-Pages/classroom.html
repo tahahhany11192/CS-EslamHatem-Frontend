@@ -686,6 +686,80 @@
       transform: scale(1.05);
     }
 
+    /* File Input Styling */
+    .file-input {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      font-size: 100px;
+    }
+
+    .file-input-label {
+      display: block;
+      padding: clamp(10px, 1.5vw, 12px) clamp(12px, 1.5vw, 15px);
+      border-radius: 8px;
+      border: 2px dashed rgba(255, 153, 0, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      text-align: center;
+      color: rgba(240, 246, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+    }
+
+    .file-input-label:hover {
+      border-color: var(--admin-accent);
+      color: var(--light);
+    }
+
+    .file-name {
+      margin-top: 8px;
+      font-size: clamp(0.8rem, 1vw, 0.9rem);
+      color: var(--admin-accent);
+      word-break: break-all;
+    }
+
+    .review-pdf-current {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(0, 204, 255, 0.08);
+      border: 1px solid rgba(0, 204, 255, 0.22);
+      font-size: clamp(0.82rem, 1vw, 0.92rem);
+    }
+
+    .review-pdf-current.empty {
+      background: rgba(255, 153, 0, 0.08);
+      border-color: rgba(255, 153, 0, 0.22);
+      color: rgba(240, 246, 255, 0.72);
+    }
+
+    .file-link {
+      color: var(--admin-accent);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s ease;
+      font-size: clamp(0.9rem, 1.2vw, 1rem);
+      word-break: break-all;
+    }
+
+    .file-link:hover {
+      text-decoration: underline;
+    }
+
     /* Alerts */
     .alert {
       padding: 15px;
@@ -1188,6 +1262,18 @@
       return date.toLocaleString();
     }
 
+    function buildFileHref(filePath) {
+      if (!filePath) return "";
+      const value = String(filePath);
+      if (value.startsWith("http://") || value.startsWith("https://")) {
+        return value;
+      }
+      if (value.startsWith("/")) {
+        return `https://cs-eslamhatem-zpihcg.fly.dev${value}`;
+      }
+      return `https://cs-eslamhatem-zpihcg.fly.dev/${value}`;
+    }
+
     // ===== Navigation Functions =====
     function showCoursesView() {
       document.getElementById('coursesView').style.display = 'block';
@@ -1500,109 +1586,142 @@
       }
     }
 
-  function displayAssignmentSubmissions(data) {
-  const container = document.getElementById('assignmentSubmissionsList');
+    function displayAssignmentSubmissions(data) {
+      const container = document.getElementById('assignmentSubmissionsList');
 
-  if (!data || data.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-file-alt"></i>
-        <h3>No Assignment Submissions</h3>
-        <p>This student hasn't submitted any assignments for this course</p>
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = data.map(item => {
-    const assignment = item.assignment;
-    const submission = item.submission;
-    const isSubmitted = !!submission;
-
-    let fileUrl = '';
-    if (isSubmitted && submission.fileUrl) {
-      if (submission.fileUrl.startsWith('http')) {
-        fileUrl = submission.fileUrl;
-      } else {
-        fileUrl = `https://cs-eslamhatem-zpihcg.fly.dev/${submission.fileUrl}`;
-      }
-    }
-
-    return `
-      <div class="submission-card">
-
-        <div class="submission-header">
-          <div>
-            <h3 class="submission-title">${assignment.title}</h3>
-            <div class="student-info">
-              ${isSubmitted ? 'Submitted' : 'Not Submitted'}
-            </div>
+      if (!data || data.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <h3>No Assignment Submissions</h3>
+            <p>This student hasn't submitted any assignments for this course</p>
           </div>
-        </div>
+        `;
+        return;
+      }
 
-        <div class="submission-details">
-          ${
-            isSubmitted && fileUrl
-              ? `
+      container.innerHTML = data.map(item => {
+        const assignment = item.assignment;
+        const submission = item.submission;
+        const isSubmitted = !!submission;
+
+        let fileUrl = '';
+        if (isSubmitted && submission.fileUrl) {
+          fileUrl = buildFileHref(submission.fileUrl);
+        }
+
+        // Review PDF details
+        const reviewPdfUrl = submission?.reviewPdfUrl ? buildFileHref(submission.reviewPdfUrl) : null;
+        const reviewPdfOriginalName = submission?.reviewPdfOriginalName || '';
+
+        return `
+          <div class="submission-card">
+            <div class="submission-header">
+              <div>
+                <h3 class="submission-title">${assignment.title}</h3>
+                <div class="student-info">
+                  ${isSubmitted ? 'Submitted' : 'Not Submitted'}
+                </div>
+              </div>
+            </div>
+
+            <div class="submission-details">
+              ${isSubmitted && fileUrl ? `
                 <p>
                   <i class="fas fa-file"></i>
                   <a href="${fileUrl}" target="_blank">View Submitted File</a>
                 </p>
-              `
-              : `<p style="opacity:0.6;">No file submitted</p>`
+              ` : `<p style="opacity:0.6;">No file submitted</p>`}
+              ${isSubmitted && submission.textAnswer ? `<p><strong>Text Answer:</strong> ${submission.textAnswer}</p>` : ''}
+            </div>
+
+            <div class="submission-meta">
+              <div>
+                <span class="grade-badge">
+                  Grade: ${isSubmitted && submission.grade !== undefined ? submission.grade : 'Not Graded'}
+                </span>
+              </div>
+              <div style="opacity:0.7;">
+                ${isSubmitted ? `Submitted: ${new Date(submission.createdAt).toLocaleDateString()}` : 'Not Submitted'}
+              </div>
+            </div>
+
+            <div class="submission-review">
+              <div class="grade-input-container">
+                <label class="grade-input-label">Grade (0–100)</label>
+                <input 
+                  type="number"
+                  class="grade-input"
+                  ${!isSubmitted ? 'disabled' : ''}
+                  value="${isSubmitted && submission.grade !== undefined ? submission.grade : ''}"
+                  data-id="${submission?._id || ''}"
+                />
+              </div>
+
+              <div class="grade-input-container">
+                <label class="grade-input-label">Feedback</label>
+                <textarea 
+                  class="feedback-input"
+                  ${!isSubmitted ? 'disabled' : ''}
+                >${isSubmitted ? submission.feedback || '' : ''}</textarea>
+              </div>
+
+              <!-- Review PDF Upload -->
+              <div class="grade-input-container">
+                <label class="grade-input-label">Review PDF / Corrected Answers PDF</label>
+                <div class="file-input">
+                  <input type="file" class="review-pdf-input" accept="application/pdf" ${!isSubmitted ? 'disabled' : ''}>
+                  <div class="file-input-label">
+                    <i class="fas fa-file-pdf"></i> Upload corrected answers PDF
+                  </div>
+                </div>
+                <div class="file-name review-pdf-name"></div>
+                ${reviewPdfUrl ? `
+                  <div class="review-pdf-current">
+                    <a class="file-link" href="${reviewPdfUrl}" target="_blank">
+                      <i class="fas fa-file-circle-check"></i> Download Current Review PDF
+                    </a>
+                    ${reviewPdfOriginalName ? `<div>${reviewPdfOriginalName}</div>` : ''}
+                  </div>
+                ` : `
+                  <div class="review-pdf-current empty">
+                    <i class="fas fa-circle-info"></i> No corrected review PDF uploaded yet.
+                  </div>
+                `}
+              </div>
+
+              <button 
+                class="review-btn"
+                ${!isSubmitted ? 'disabled' : ''}
+                data-id="${submission?._id || ''}"
+              >
+                <i class="fas fa-check-circle"></i> Save Review
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Attach file input change listeners for review PDF
+      document.querySelectorAll('.review-pdf-input').forEach(input => {
+        input.addEventListener('change', function(e) {
+          const card = this.closest('.submission-card');
+          const nameEl = card.querySelector('.review-pdf-name');
+          if (this.files.length > 0) {
+            const file = this.files[0];
+            if (file.type !== 'application/pdf') {
+              showError('❌ Review file must be a PDF.');
+              this.value = '';
+              nameEl.textContent = '';
+              return;
+            }
+            nameEl.textContent = `Selected: ${file.name}`;
+          } else {
+            nameEl.textContent = '';
           }
-
-          ${
-            isSubmitted && submission.textAnswer
-              ? `<p><strong>Text Answer:</strong> ${submission.textAnswer}</p>`
-              : ''
-          }
-        </div>
-
-        <div class="submission-meta">
-          <div>
-            <span class="grade-badge">
-              Grade: ${isSubmitted && submission.grade !== undefined ? submission.grade : 'Not Graded'}
-            </span>
-          </div>
-          <div style="opacity:0.7;">
-            ${isSubmitted ? `Submitted: ${new Date(submission.createdAt).toLocaleDateString()}` : 'Not Submitted'}
-          </div>
-        </div>
-
-        <div class="submission-review">
-          <div class="grade-input-container">
-            <label>Grade (0–100)</label>
-            <input 
-              type="number"
-              class="grade-input"
-              ${!isSubmitted ? 'disabled' : ''}
-              value="${isSubmitted && submission.grade !== undefined ? submission.grade : ''}"
-              data-id="${submission?._id || ''}"
-            />
-          </div>
-
-          <div class="grade-input-container">
-            <label>Feedback</label>
-            <textarea 
-              class="feedback-input"
-              ${!isSubmitted ? 'disabled' : ''}
-            >${isSubmitted ? submission.feedback || '' : ''}</textarea>
-          </div>
-
-          <button 
-            class="review-btn"
-            ${!isSubmitted ? 'disabled' : ''}
-            data-id="${submission?._id || ''}"
-          >
-            <i class="fas fa-check-circle"></i> Save Review
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
+        });
+      });
+    }
 
     async function loadQuizSubmissions() {
       try {
@@ -1686,11 +1805,7 @@
           // Fix PDF file URL
           let pdfUrl = '';
           if (submission.pdfAnswerFile) {
-            if (submission.pdfAnswerFile.startsWith('http') || submission.pdfAnswerFile.startsWith('https')) {
-              pdfUrl = submission.pdfAnswerFile;
-            } else {
-              pdfUrl = `https://cs-eslamhatem-zpihcg.fly.dev/${submission.pdfAnswerFile}`;
-            }
+            pdfUrl = buildFileHref(submission.pdfAnswerFile);
           }
           
           return `
@@ -1749,36 +1864,70 @@
       }
     }
 
-    // Handle review submission grading
+    // Handle review submission grading (both assignment and quiz)
     document.addEventListener("click", async (e) => {
-      if (e.target.classList.contains("review-btn")) {
-        const id = e.target.dataset.id;
-        const card = e.target.closest(".submission-card");
-        const gradeInput = card.querySelector(".grade-input");
-        const feedbackInput = card.querySelector(".feedback-input");
-        const grade = gradeInput.value;
-        const feedback = feedbackInput.value;
-        
-        // Determine if it's an assignment or quiz submission
-        const isQuiz = card.querySelector('.submission-details')?.textContent?.includes('Quiz') || 
-                      card.querySelector('.submission-details')?.textContent?.includes('Type:');
-        const type = isQuiz ? 'quiz' : 'assignment';
+      const btn = e.target.closest(".review-btn");
+      if (!btn) return;
 
-        // Show loading state
-        const originalText = e.target.innerHTML;
-        e.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-        e.target.disabled = true;
+      const card = btn.closest(".submission-card");
+      const gradeInput = card.querySelector(".grade-input");
+      const feedbackInput = card.querySelector(".feedback-input");
+      const grade = gradeInput.value;
+      const feedback = feedbackInput.value;
+      const submissionId = btn.dataset.id;
 
-        try {
-          const endpoint = type === 'quiz' 
-            ? `${API_BASE}/quiz-submissions/${id}/review`
-            : `${API_BASE}/submissions/${id}/review`;
-          
-          const payload = type === 'quiz' 
-            ? { score: parseFloat(grade), feedback }
-            : { grade: parseFloat(grade), feedback };
+      // Check if this is an assignment card (has review-pdf-input)
+      const pdfInput = card.querySelector(".review-pdf-input");
+      const isAssignment = !!pdfInput;
 
-          const res = await fetch(endpoint, {
+      // Show loading state
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+      btn.disabled = true;
+
+      try {
+        if (isAssignment) {
+          // Assignment grading with optional review PDF
+          const formData = new FormData();
+          formData.append("grade", grade);
+          formData.append("feedback", feedback);
+          if (pdfInput && pdfInput.files.length > 0) {
+            const file = pdfInput.files[0];
+            if (file.type !== 'application/pdf') {
+              showError("❌ Review file must be a PDF.");
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+              return;
+            }
+            formData.append("reviewPdf", file);
+          }
+
+          const res = await fetch(`https://cs-eslamhatem-zpihcg.fly.dev/api/admin/assignments/submissions/${submissionId}/grade`, {
+            method: "PUT",
+            headers: {
+              "Authorization": `Bearer ${token}`
+            },
+            body: formData
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (res.status === 401) { logout(); return; }
+
+          if (!res.ok) {
+            throw new Error(data.message || data.error || "Failed to grade assignment");
+          }
+
+          showSuccess("✅ Assignment reviewed successfully!");
+
+          // Refresh assignment submissions
+          await loadAssignmentSubmissions();
+
+        } else {
+          // Quiz grading (JSON)
+          const payload = { score: parseFloat(grade), feedback };
+
+          const res = await fetch(`${API_BASE}/quiz-submissions/${submissionId}/review`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -1787,28 +1936,26 @@
             body: JSON.stringify(payload)
           });
 
+          const data = await res.json().catch(() => ({}));
+
+          if (res.status === 401) { logout(); return; }
+
           if (!res.ok) {
-            const errorText = await res.text();
-            throw new Error(`Failed to grade submission: ${errorText}`);
+            throw new Error(data.message || data.error || "Failed to grade quiz");
           }
 
-          const data = await res.json();
-          showSuccess("✅ Submission graded successfully!");
-          
-          // Update the grade badge
-          const gradeBadge = card.querySelector('.grade-badge');
-          if (gradeBadge) {
-            const badgeText = type === 'quiz' ? 'Score' : 'Grade';
-            gradeBadge.textContent = `${badgeText}: ${grade}`;
-          }
-          
-        } catch (err) {
-          console.error("Grading error:", err);
-          showError("❌ Error grading submission: " + err.message);
-        } finally {
-          e.target.innerHTML = originalText;
-          e.target.disabled = false;
+          showSuccess("✅ Quiz reviewed successfully!");
+
+          // Refresh quiz submissions
+          await loadQuizSubmissions();
         }
+
+      } catch (err) {
+        console.error("Grading error:", err);
+        showError("❌ " + err.message);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
       }
     });
 
