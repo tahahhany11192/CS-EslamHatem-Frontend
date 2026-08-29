@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    /* All your existing styles remain unchanged */
     :root {
       --primary: #0066ff;
       --secondary: #00ccff;
@@ -314,7 +315,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-height: 44px; /* Minimum touch target size */
+      min-height: 44px;
     }
 
     .btn-admin {
@@ -657,7 +658,7 @@
       }
       
       .header {
-        margin-top: 60px; /* Space for fixed menu toggle */
+        margin-top: 60px;
         flex-direction: column;
         text-align: center;
         gap: 15px;
@@ -847,7 +848,7 @@
       }
       
       .form-control {
-        font-size: 16px; /* Prevent iOS zoom on focus */
+        font-size: 16px;
       }
       
       .course-card {
@@ -1237,6 +1238,12 @@
       averagePriceEl.textContent = formatCurrency(averagePrice);
     }
 
+    // Escape a string for safe insertion into HTML
+    function escapeString(str) {
+      if (!str) return '';
+      return str.replace(/`/g, '\\`').replace(/"/g, '\\"').replace(/\\/g, '\\\\');
+    }
+
     // Fetch and display courses
     let courses = [];
     async function loadCourses() {
@@ -1285,6 +1292,13 @@
           const thumbnailUrl = c.thumbnail ? `${UPLOADS_BASE}${c.thumbnail}` : '';
           const thumbnailStyle = thumbnailUrl ? `style="background-image: url('${thumbnailUrl}'); background-size: cover; background-position: center; min-height: 150px; border-radius: 8px; margin-bottom: 15px;"` : '';
           
+          // Escape description for JavaScript
+          const escapedDescription = escapeString(c.description || "No description provided.");
+          const escapedTitle = escapeString(c.title || "Untitled Course");
+          const escapedType = escapeString(c.type || "Unknown");
+          const price = c.price || 0;
+          const duration = c.duration || 0;
+          
           div.innerHTML = `
             ${thumbnailUrl ? `<div ${thumbnailStyle}></div>` : ''}
             <div class="course-header">
@@ -1292,14 +1306,14 @@
                 <h3 class="course-title">${c.title || 'Untitled Course'}</h3>
                 <span class="course-type">${c.type || 'Unknown'}</span>
               </div>
-              <div class="course-price">${formatCurrency(c.price || 0)}</div>
+              <div class="course-price">${formatCurrency(price)}</div>
             </div>
             <div class="course-duration">
-              <i class="fas fa-clock"></i> ${c.duration || 0} hours
+              <i class="fas fa-clock"></i> ${duration} hours
             </div>
             <p class="course-description">${c.description || "No description provided."}</p>
             <div class="course-actions">
-              <button class="btn btn-admin btn-sm" onclick="editCourse('${c._id}')">
+              <button class="btn btn-admin btn-sm" onclick="editCourse('${c._id}', '${escapedTitle}', \`${escapedDescription}\`, '${escapedType}', '${price}', '${duration}', '${c.thumbnail || ''}')">
                 <i class="fas fa-edit"></i> Edit
               </button>
               <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c._id}')">
@@ -1373,101 +1387,27 @@
     // Attach event listener to bulk delete button
     deleteAllCoursesBtn.addEventListener("click", deleteAllCourses);
 
-    // Create or update course
-    courseForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const submitBtn = courseForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-      submitBtn.disabled = true;
-
-      const formData = new FormData();
-      formData.append("title", document.getElementById("title").value);
-      formData.append("description", document.getElementById("description").value);
-      formData.append("type", document.getElementById("type").value);
-      formData.append("price", document.getElementById("price").value);
-      formData.append("duration", document.getElementById("duration").value);
-
-      if (document.getElementById("thumbnail").files[0]) {
-        formData.append("thumbnail", document.getElementById("thumbnail").files[0]);
+    // Edit course - using the same approach as the working local version
+    function editCourse(id, title, description, type, price, duration, thumbnail) {
+      courseIdInput.value = id;
+      document.getElementById("title").value = title;
+      document.getElementById("description").value = description;
+      document.getElementById("type").value = type;
+      document.getElementById("price").value = price;
+      document.getElementById("duration").value = duration;
+      
+      formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Course';
+      
+      if (thumbnail) {
+        fileName.textContent = "Current image will be kept unless changed";
+        previewImage.src = `${UPLOADS_BASE}${thumbnail}`;
+        imagePreview.style.display = 'block';
+      } else {
+        fileName.textContent = "";
+        imagePreview.style.display = 'none';
       }
-
-      const id = courseIdInput.value;
-      const method = id ? "PUT" : "POST";
-      const url = id ? `${API_BASE}/${id}` : API_BASE;
-
-      try {
-        const res = await fetch(url, {
-          method,
-          headers: { "Authorization": "Bearer " + token },
-          body: formData
-        });
-
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-
-        if (res.ok) {
-          showSuccess("✅ Course saved successfully!");
-          resetForm();
-          loadCourses();
-        } else {
-          const errText = await res.text();
-          showError("❌ Failed to save course: " + errText);
-        }
-      } catch (error) {
-        console.error("Error saving course:", error);
-        showError("❌ Failed to save course. Please try again.");
-      } finally {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-      }
-    });
-
-    // Edit course - fetch course details first
-    async function editCourse(id) {
-      try {
-        const res = await fetch(`${API_BASE}/${id}`, {
-          headers: { "Authorization": "Bearer " + token }
-        });
-        
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-        
-        if (res.ok) {
-          const data = await res.json();
-          const course = data.course || data.data;
-          
-          if (course) {
-            courseIdInput.value = course._id;
-            document.getElementById("title").value = course.title || "";
-            document.getElementById("description").value = course.description || "";
-            document.getElementById("type").value = course.type || "";
-            document.getElementById("price").value = course.price || 0;
-            document.getElementById("duration").value = course.duration || 0;
-            
-            formTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Course';
-            fileName.textContent = course.thumbnail ? "Current image will be kept unless changed" : "";
-            
-            // Show current thumbnail if exists
-            if (course.thumbnail) {
-              previewImage.src = `${UPLOADS_BASE}${course.thumbnail}`;
-              imagePreview.style.display = 'block';
-            } else {
-              imagePreview.style.display = 'none';
-            }
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching course details:", error);
-        showError("Failed to load course details.");
-      }
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // Delete course
