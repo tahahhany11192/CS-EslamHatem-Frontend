@@ -222,6 +222,7 @@
       transition: all 0.3s ease;
       font-size: clamp(0.8rem, 1.2vw, 0.9rem);
       white-space: nowrap;
+      min-height: 44px;
     }
 
     .logout-btn:hover {
@@ -422,7 +423,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-height: 44px; /* Minimum touch target size */
+      min-height: 44px;
     }
 
     .btn-admin {
@@ -483,7 +484,7 @@
     .submission-list {
       display: grid;
       gap: clamp(15px, 2vw, 20px);
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
 
     .submission-card {
@@ -716,6 +717,11 @@
       cursor: pointer;
       transition: all 0.3s ease;
       font-size: clamp(0.9rem, 1.2vw, 1rem);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     .file-input-label:hover {
@@ -866,7 +872,7 @@
       }
       
       .header {
-        margin-top: 60px; /* Space for fixed menu toggle */
+        margin-top: 60px;
         flex-direction: column;
         text-align: center;
         gap: 15px;
@@ -1006,6 +1012,14 @@
       
       .btn:hover::before, .review-btn:hover::before {
         display: none;
+      }
+      
+      .form-control, .grade-input, .feedback-input {
+        font-size: 16px;
+      }
+      
+      .file-input-label {
+        min-height: 44px;
       }
     }
 
@@ -1171,7 +1185,9 @@
   </div>
 
   <script>
-    // Mobile menu toggle
+    // ============================================================
+    // MOBILE MENU TOGGLE
+    // ============================================================
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     
@@ -1180,7 +1196,6 @@
       document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
     });
     
-    // Close sidebar when clicking outside on mobile
     document.addEventListener('click', (e) => {
       if (window.innerWidth <= 768 && 
           !sidebar.contains(e.target) && 
@@ -1191,7 +1206,6 @@
       }
     });
     
-    // Close sidebar on escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && sidebar.classList.contains('active')) {
         sidebar.classList.remove('active');
@@ -1199,7 +1213,6 @@
       }
     });
     
-    // Handle window resize
     let resizeTimer;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimer);
@@ -1211,15 +1224,15 @@
       }, 250);
     });
 
-    const API_BASE = "https://cs-eslamhatem-zpihcg.fly.dev/api/admin";
+    // ============================================================
+    // CORE CONFIGURATION
+    // ============================================================
+    const API_BASE = "https://cs-eslamhatem-0px5-q.fly.dev/api/admin";
     const token = localStorage.getItem("adminToken");
     
-    // State management
+    // State
     let currentCourse = null;
     let currentStudent = null;
-    let currentSubmissionId = null;
-    let currentSubmissionType = null; // 'assignment' or 'quiz'
-    let submissionToDelete = null;
     
     if (!token) {
       showError("⚠️ Not authorized. Please login as admin.");
@@ -1228,7 +1241,9 @@
       }, 2000);
     }
 
-    // ===== Helper Functions =====
+    // ============================================================
+    // HELPERS
+    // ============================================================
     function showSuccess(message) {
       const alertSuccess = document.getElementById("alertSuccess");
       alertSuccess.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
@@ -1269,12 +1284,14 @@
         return value;
       }
       if (value.startsWith("/")) {
-        return `https://cs-eslamhatem-zpihcg.fly.dev${value}`;
+        return `https://cs-eslamhatem-0px5-q.fly.dev${value}`;
       }
-      return `https://cs-eslamhatem-zpihcg.fly.dev/${value}`;
+      return `https://cs-eslamhatem-0px5-q.fly.dev/${value}`;
     }
 
-    // ===== Navigation Functions =====
+    // ============================================================
+    // NAVIGATION
+    // ============================================================
     function showCoursesView() {
       document.getElementById('coursesView').style.display = 'block';
       document.getElementById('studentsView').style.display = 'none';
@@ -1328,15 +1345,15 @@
       document.getElementById('submissionCrumb').style.display = 'none';
       document.getElementById('submissionCrumbSeparator').style.display = 'none';
       
-      // Hide both sections initially
       document.getElementById('assignmentSubmissionsSection').style.display = 'none';
       document.getElementById('quizSubmissionsSection').style.display = 'none';
       
-      // Load assignment submissions by default
       loadAssignmentSubmissions();
     }
 
-    // ===== Data Loading Functions =====
+    // ============================================================
+    // LOAD COURSES
+    // ============================================================
     async function loadCourses() {
       try {
         showLoading(true);
@@ -1393,11 +1410,13 @@
       }
     }
 
+    // ============================================================
+    // LOAD STUDENTS
+    // ============================================================
     async function loadStudentsInCourse(courseId) {
       try {
         showLoading(true);
         
-        // First, try the specific endpoint for course students
         try {
           const studentsRes = await fetch(`${API_BASE}/courses/${courseId}/students`, {
             headers: { 
@@ -1406,8 +1425,6 @@
             }
           });
 
-          console.log("Course students response status:", studentsRes.status);
-          
           if (studentsRes.status === 401) return logout();
           
           if (studentsRes.ok) {
@@ -1419,7 +1436,6 @@
               console.error("Failed to parse JSON:", responseText);
               throw new Error("Invalid response from server");
             }
-
             displayStudents(studentsData.data || []);
             return;
           }
@@ -1427,7 +1443,6 @@
           console.log("Course students endpoint not available, falling back...");
         }
         
-        // Fallback: Get all students and filter
         const studentsRes = await fetch(`${API_BASE}/students`, {
           headers: { 
             "Authorization": "Bearer " + token,
@@ -1447,7 +1462,6 @@
           return;
         }
 
-        // Filter students who have this course in their paidCourses
         const studentsInCourse = studentsData.data ? 
           studentsData.data.filter(student => 
             student.paidCourses && student.paidCourses.some(course => 
@@ -1512,13 +1526,15 @@
       }
     }
 
+    // ============================================================
+    // LOAD ASSIGNMENT SUBMISSIONS
+    // ============================================================
     async function loadAssignmentSubmissions() {
       try {
         showLoading(true);
         document.getElementById('quizSubmissionsSection').style.display = 'none';
         document.getElementById('assignmentSubmissionsSection').style.display = 'block';
         
-        // Try the specific endpoint first
         try {
           const submissionsRes = await fetch(`${API_BASE}/courses/${currentCourse._id}/students/${currentStudent._id}/assignments`, {
             headers: { 
@@ -1527,8 +1543,6 @@
             }
           });
 
-          console.log("Course assignments response status:", submissionsRes.status);
-          
           if (submissionsRes.status === 401) return logout();
           
           if (submissionsRes.ok) {
@@ -1540,7 +1554,6 @@
               console.error("Failed to parse JSON:", responseText);
               throw new Error("Invalid response from server");
             }
-
             displayAssignmentSubmissions(submissionsData.data || []);
             return;
           }
@@ -1548,7 +1561,6 @@
           console.log("Course assignments endpoint not available, falling back...");
         }
         
-        // Fallback: Get all submissions and filter
         const submissionsRes = await fetch(`${API_BASE}/submissions`, {
           headers: { 
             "Authorization": "Bearer " + token,
@@ -1556,8 +1568,6 @@
           }
         });
 
-        console.log("All submissions response status:", submissionsRes.status);
-        
         if (submissionsRes.status === 401) return logout();
         
         const responseText = await submissionsRes.text();
@@ -1570,7 +1580,6 @@
           return;
         }
 
-        // Filter submissions for this student
         const studentSubmissions = submissionsData.data ? 
           submissionsData.data.filter(submission => 
             submission.student && submission.student._id === currentStudent._id
@@ -1610,12 +1619,11 @@
           fileUrl = buildFileHref(submission.fileUrl);
         }
 
-        // Review PDF details
         const reviewPdfUrl = submission?.reviewPdfUrl ? buildFileHref(submission.reviewPdfUrl) : null;
         const reviewPdfOriginalName = submission?.reviewPdfOriginalName || '';
 
         return `
-          <div class="submission-card">
+          <div class="submission-card" data-type="assignment">
             <div class="submission-header">
               <div>
                 <h3 class="submission-title">${assignment.title}</h3>
@@ -1666,7 +1674,6 @@
                 >${isSubmitted ? submission.feedback || '' : ''}</textarea>
               </div>
 
-              <!-- Review PDF Upload -->
               <div class="grade-input-container">
                 <label class="grade-input-label">Review PDF / Corrected Answers PDF</label>
                 <div class="file-input">
@@ -1694,6 +1701,7 @@
                 class="review-btn"
                 ${!isSubmitted ? 'disabled' : ''}
                 data-id="${submission?._id || ''}"
+                data-type="assignment"
               >
                 <i class="fas fa-check-circle"></i> Save Review
               </button>
@@ -1702,8 +1710,7 @@
         `;
       }).join('');
 
-      // Attach file input change listeners for review PDF
-      document.querySelectorAll('.review-pdf-input').forEach(input => {
+      document.querySelectorAll('#assignmentSubmissionsList .review-pdf-input').forEach(input => {
         input.addEventListener('change', function(e) {
           const card = this.closest('.submission-card');
           const nameEl = card.querySelector('.review-pdf-name');
@@ -1723,13 +1730,15 @@
       });
     }
 
+    // ============================================================
+    // LOAD QUIZ SUBMISSIONS
+    // ============================================================
     async function loadQuizSubmissions() {
       try {
         showLoading(true);
         document.getElementById('assignmentSubmissionsSection').style.display = 'none';
         document.getElementById('quizSubmissionsSection').style.display = 'block';
         
-        // Try the specific endpoint first
         try {
           const res = await fetch(`${API_BASE}/courses/${currentCourse._id}/students/${currentStudent._id}/quizzes`, {
             headers: { 
@@ -1738,8 +1747,6 @@
             }
           });
 
-          console.log("Course quizzes response status:", res.status);
-          
           if (res.status === 401) return logout();
           
           if (res.ok) {
@@ -1751,7 +1758,6 @@
               console.error("Failed to parse JSON:", responseText);
               throw new Error("Invalid response from server");
             }
-
             displayQuizSubmissions(data.data || []);
             return;
           }
@@ -1759,7 +1765,6 @@
           console.log("Course quizzes endpoint not available, falling back...");
         }
         
-        // Fallback: Get all quiz submissions and filter
         const res = await fetch(`${API_BASE}/quiz-submissions`, {
           headers: { 
             "Authorization": "Bearer " + token,
@@ -1767,8 +1772,6 @@
           }
         });
 
-        console.log("All quiz submissions response status:", res.status);
-        
         if (res.status === 401) return logout();
         
         const responseText = await res.text();
@@ -1781,7 +1784,6 @@
           return;
         }
 
-        // Filter submissions for this student
         const studentQuizSubmissions = data.data ? 
           data.data.filter(submission => 
             submission.student && submission.student._id === currentStudent._id
@@ -1802,14 +1804,16 @@
       
       if (submissions && submissions.length > 0) {
         container.innerHTML = submissions.map(submission => {
-          // Fix PDF file URL
           let pdfUrl = '';
           if (submission.pdfAnswerFile) {
             pdfUrl = buildFileHref(submission.pdfAnswerFile);
           }
-          
+
+          const reviewPdfUrl = submission.reviewPdfUrl ? buildFileHref(submission.reviewPdfUrl) : null;
+          const reviewPdfOriginalName = submission.reviewPdfOriginalName || '';
+
           return `
-          <div class="submission-card">
+          <div class="submission-card" data-type="quiz">
             <div class="submission-actions">
               <button class="delete-submission-btn" onclick="deleteSubmission('${submission._id}', 'quiz')" title="Delete this submission">
                 <i class="fas fa-trash"></i>
@@ -1838,6 +1842,7 @@
               <div><span class="grade-badge">Score: ${submission.score !== undefined ? submission.score : 'Not Graded'}</span></div>
               <div style="color: rgba(240, 246, 255, 0.5);">Attempted: ${formatDate(submission.attemptedAt)}</div>
             </div>
+
             <div class="submission-review">
               <div class="grade-input-container">
                 <label class="grade-input-label">Score</label>
@@ -1847,7 +1852,31 @@
                 <label class="grade-input-label">Feedback</label>
                 <textarea class="feedback-input" placeholder="Enter feedback for the student..." data-submission-id="${submission._id}">${submission.feedback || ''}</textarea>
               </div>
-              <button class="review-btn" data-id="${submission._id}">
+
+              <div class="grade-input-container">
+                <label class="grade-input-label">Review PDF / Corrected Answers PDF</label>
+                <div class="file-input">
+                  <input type="file" class="review-pdf-input" accept="application/pdf">
+                  <div class="file-input-label">
+                    <i class="fas fa-file-pdf"></i> Upload corrected answers PDF
+                  </div>
+                </div>
+                <div class="file-name review-pdf-name"></div>
+                ${reviewPdfUrl ? `
+                  <div class="review-pdf-current">
+                    <a class="file-link" href="${reviewPdfUrl}" target="_blank">
+                      <i class="fas fa-file-circle-check"></i> Download Current Review PDF
+                    </a>
+                    ${reviewPdfOriginalName ? `<div>${reviewPdfOriginalName}</div>` : ''}
+                  </div>
+                ` : `
+                  <div class="review-pdf-current empty">
+                    <i class="fas fa-circle-info"></i> No corrected review PDF uploaded yet.
+                  </div>
+                `}
+              </div>
+
+              <button class="review-btn" data-id="${submission._id}" data-type="quiz">
                 <i class="fas fa-check-circle"></i> Save Review
               </button>
             </div>
@@ -1862,9 +1891,30 @@
           </div>
         `;
       }
+
+      document.querySelectorAll('#quizSubmissionsList .review-pdf-input').forEach(input => {
+        input.addEventListener('change', function(e) {
+          const card = this.closest('.submission-card');
+          const nameEl = card.querySelector('.review-pdf-name');
+          if (this.files.length > 0) {
+            const file = this.files[0];
+            if (file.type !== 'application/pdf') {
+              showError('❌ Review file must be a PDF.');
+              this.value = '';
+              nameEl.textContent = '';
+              return;
+            }
+            nameEl.textContent = `Selected: ${file.name}`;
+          } else {
+            nameEl.textContent = '';
+          }
+        });
+      });
     }
 
-    // Handle review submission grading (both assignment and quiz)
+    // ============================================================
+    // SAVE REVIEW - FIXED: Uses data-type attribute to distinguish
+    // ============================================================
     document.addEventListener("click", async (e) => {
       const btn = e.target.closest(".review-btn");
       if (!btn) return;
@@ -1875,12 +1925,13 @@
       const grade = gradeInput.value;
       const feedback = feedbackInput.value;
       const submissionId = btn.dataset.id;
+      
+      // IMPORTANT: Use data-type from the button or card
+      const submissionType = btn.dataset.type || card.dataset.type || 'assignment';
 
-      // Check if this is an assignment card (has review-pdf-input)
       const pdfInput = card.querySelector(".review-pdf-input");
-      const isAssignment = !!pdfInput;
+      const isAssignment = submissionType === 'assignment';
 
-      // Show loading state
       const originalText = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
       btn.disabled = true;
@@ -1902,54 +1953,46 @@
             formData.append("reviewPdf", file);
           }
 
-          const res = await fetch(`https://cs-eslamhatem-zpihcg.fly.dev/api/admin/assignments/submissions/${submissionId}/grade`, {
+          const res = await fetch(`https://cs-eslamhatem-0px5-q.fly.dev/api/admin/assignments/submissions/${submissionId}/grade`, {
             method: "PUT",
-            headers: {
-              "Authorization": `Bearer ${token}`
-            },
+            headers: { "Authorization": `Bearer ${token}` },
             body: formData
           });
 
           const data = await res.json().catch(() => ({}));
-
           if (res.status === 401) { logout(); return; }
-
-          if (!res.ok) {
-            throw new Error(data.message || data.error || "Failed to grade assignment");
-          }
-
+          if (!res.ok) throw new Error(data.message || "Failed to grade assignment");
           showSuccess("✅ Assignment reviewed successfully!");
-
-          // Refresh assignment submissions
           await loadAssignmentSubmissions();
 
         } else {
-          // Quiz grading (JSON)
-          const payload = { score: parseFloat(grade), feedback };
+          // Quiz grading with optional review PDF
+          const formData = new FormData();
+          formData.append("grade", grade);
+          formData.append("feedback", feedback);
+          if (pdfInput && pdfInput.files.length > 0) {
+            const file = pdfInput.files[0];
+            if (file.type !== 'application/pdf') {
+              showError("❌ Review file must be a PDF.");
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+              return;
+            }
+            formData.append("reviewPdf", file);
+          }
 
-          const res = await fetch(`${API_BASE}/quiz-submissions/${submissionId}/review`, {
+          const res = await fetch(`${API_BASE}/quiz-submissions/${submissionId}/grade`, {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(payload)
+            headers: { "Authorization": `Bearer ${token}` },
+            body: formData
           });
 
           const data = await res.json().catch(() => ({}));
-
           if (res.status === 401) { logout(); return; }
-
-          if (!res.ok) {
-            throw new Error(data.message || data.error || "Failed to grade quiz");
-          }
-
+          if (!res.ok) throw new Error(data.message || "Failed to grade quiz");
           showSuccess("✅ Quiz reviewed successfully!");
-
-          // Refresh quiz submissions
           await loadQuizSubmissions();
         }
-
       } catch (err) {
         console.error("Grading error:", err);
         showError("❌ " + err.message);
@@ -1959,7 +2002,9 @@
       }
     });
 
-    // Delete submission
+    // ============================================================
+    // DELETE SUBMISSION
+    // ============================================================
     async function deleteSubmission(id, type) {
       if (!confirm("Are you sure you want to delete this submission? This action cannot be undone.")) return;
       
@@ -1981,7 +2026,6 @@
 
         if (res.ok) {
           showSuccess("🗑 Submission deleted successfully");
-          // Refresh the current view
           if (type === 'quiz') {
             await loadQuizSubmissions();
           } else {
@@ -1999,7 +2043,9 @@
       }
     }
 
-    // ===== Initialize =====
+    // ============================================================
+    // INITIALIZE
+    // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
       showCoursesView();
     });
