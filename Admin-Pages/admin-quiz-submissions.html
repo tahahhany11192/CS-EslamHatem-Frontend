@@ -659,7 +659,7 @@
   </div>
 
  <script>
-const API_BASE = "https://cs-eslamhatem-zpihcg.fly.dev/api/admin";
+const API_BASE = "https://cs-eslamhatem-0px5-q.fly.dev/api/admin";
 const token = localStorage.getItem("adminToken");
 let currentSubmissionId = null;
 let currentSubmission = null;
@@ -760,9 +760,9 @@ async function confirmDelete() {
   try {
     // Check if the endpoint is correct
     console.log("Deleting submission:", submissionToDelete);
-    console.log("API URL:", `https://cs-eslamhatem-zpihcg.fly.dev/api/admin/delete/quiz-submissions/${submissionToDelete}`);
+    console.log("API URL:", `https://cs-eslamhatem-0px5-q.fly.dev/api/admin/delete/quiz-submissions/${submissionToDelete}`);
     
-    const res = await fetch(`https://cs-eslamhatem-zpihcg.fly.dev/api/admin/delete/quiz-submissions/${submissionToDelete}`, {
+    const res = await fetch(`https://cs-eslamhatem-0px5-q.fly.dev/api/admin/delete/quiz-submissions/${submissionToDelete}`, {
       method: "DELETE",
       headers: { 
         Authorization: `Bearer ${token}`,
@@ -858,7 +858,7 @@ async function viewSubmission(id) {
       div.className = "answer-block";
       div.innerHTML = `
         <p><strong>PDF Answer File:</strong></p>
-        <a href="https://cs-eslamhatem-zpihcg.fly.dev/${sub.pdfAnswerFile}" target="_blank" style="color: var(--admin-accent); text-decoration: underline;">
+        <a href="https://cs-eslamhatem-0px5-q.fly.dev/${sub.pdfAnswerFile}" target="_blank" style="color: var(--admin-accent); text-decoration: underline;">
           <i class="fas fa-download"></i> Download PDF
         </a>
         <div style="margin-top:15px;">
