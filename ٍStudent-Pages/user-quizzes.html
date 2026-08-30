@@ -172,18 +172,64 @@
       display: flex;
       align-items: center;
       gap: 15px;
+      position: relative;
     }
 
     .profile-img {
-      width: 45px;
-      height: 45px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       background: var(--gradient);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 26px;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .profile-img:hover {
+      transform: scale(1.1);
+    }
+
+    /* floating balls */
+    .ball {
+      position: absolute;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: #007bff;
       color: white;
-      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      text-decoration: none;
+      opacity: 0;
+      transform: translate(0, 0);
+      transition: transform 0.6s ease, opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .ball.logout {
+      background: #e74c3c;
+    }
+
+    .ball.profile {
+      background: #2ecc71;
+    }
+
+    .user-profile.active .ball.logout {
+      transform: translate(-60px, 30px);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .user-profile.active .ball.profile {
+      transform: translate(-60px, -30px);
+      opacity: 1;
+      pointer-events: auto;
     }
 
     /* Page Title */
@@ -673,7 +719,7 @@
       transform: translateY(-2px);
     }
 
-    /* Submission details */
+    /* Submission details (results) */
     .submission-details {
       margin-top: 20px;
       padding: 15px;
@@ -711,6 +757,33 @@
       background: rgba(0, 0, 0, 0.1);
       border-radius: 6px;
       font-style: italic;
+    }
+
+    /* Review PDF link */
+    .review-pdf-link {
+      margin-top: 15px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(0, 204, 255, 0.08);
+      border: 1px solid rgba(0, 204, 255, 0.22);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .review-pdf-link a {
+      color: var(--secondary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .review-pdf-link a:hover {
+      text-decoration: underline;
+    }
+
+    .review-pdf-link i {
+      font-size: 1.2rem;
+      color: var(--secondary);
     }
 
     /* Empty State */
@@ -868,105 +941,6 @@
       .timer-display {
         font-size: 1.5rem;
       }
-    }
-
-    .profile-img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--gradient);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      transition: transform 0.2s ease;
-    }
-
-    .profile-img:hover {
-      transform: scale(1.1);
-    }
-
-    /* Balls */
-    .ball {
-      position: absolute;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: #007bff;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      text-decoration: none;
-      opacity: 0;
-      transform: translate(0, 0);
-      transition: transform 0.6s ease, opacity 0.4s ease;
-      pointer-events: none;
-    }
-
-    .ball.logout {
-      background: #e74c3c;
-    }
-
-    .ball.profile {
-      background: #2ecc71;
-    }
-
-    /* Active (thrown out) state */
-    .user-profile.active .ball.logout {
-      transform: translate(-60px, 30px);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .user-profile.active .ball.profile {
-      transform: translate(-60px, -30px);
-      opacity: 1;
-      pointer-events: auto;
-    }
-    
-    /* Improved status indicators */
-    .quiz-status {
-      display: flex;
-      align-items: center;
-      margin-top: 15px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-    
-    .status-not-started {
-      background-color: rgba(251, 191, 36, 0.15);
-      color: #fbbf24;
-    }
-    
-    .status-in-progress {
-      background-color: rgba(59, 130, 246, 0.15);
-      color: #3b82f6;
-    }
-    
-    .status-submitted {
-      background-color: rgba(16, 185, 129, 0.15);
-      color: #10b981;
-    }
-    
-    .status-graded {
-      background-color: rgba(139, 92, 246, 0.15);
-      color: #8b5cf6;
-    }
-    .status-expired {
-      background-color: rgba(248, 113, 113, 0.15);
-      color: #f87171;
-    }
-
-    
-    .attempt-info {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: rgba(240, 246, 255, 0.7);
     }
   </style>
 </head>
@@ -1184,7 +1158,7 @@
           </div>
         </div>
         
-        <!-- Grade Display -->
+        <!-- Grade Display (Results) -->
         <div id="gradeDisplay" class="submission-details" style="display: none;">
           <div class="submission-header">
             <i class="fas fa-check-circle"></i>
@@ -1197,6 +1171,14 @@
             <strong>Feedback:</strong><br>
             <span id="feedbackText">No feedback available.</span>
           </div>
+          <!-- Review PDF link -->
+          <div id="reviewPdfContainer" style="display: none; margin-top: 15px;">
+            <div class="review-pdf-link">
+              <i class="fas fa-file-pdf"></i>
+              <a id="reviewPdfLink" href="#" target="_blank">Download Review PDF</a>
+              <span id="reviewPdfName" style="margin-left: 8px; font-size: 0.9rem; color: rgba(240, 246, 255, 0.6);"></span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1204,7 +1186,7 @@
 
   <script>
     // Global variables
-    const BASE_URL = "https://cs-eslamhatem-zpihcg.fly.dev/api/users";
+    const BASE_URL = "https://cs-eslamhatem-0px5-q.fly.dev/api/users";
     let currentQuizId = null;
     let currentQuiz = null;
     let currentAttempt = null;
@@ -1793,7 +1775,7 @@
         document.getElementById("uploadStatus").textContent = "";
 
         if (quiz.pdfFile) {
-          const pdfUrl = `https://cs-eslamhatem-zpihcg.fly.dev/${quiz.pdfFile.replace(/\\/g, "/")}`;
+          const pdfUrl = `https://cs-eslamhatem-0px5-q.fly.dev/${quiz.pdfFile.replace(/\\/g, "/")}`;
           const downloadLink = document.getElementById("downloadLink");
           downloadLink.href = pdfUrl;
           downloadLink.style.display = "inline-block";
@@ -1857,16 +1839,21 @@
       }
     }
 
+    // ============================
+    // UPDATED: Show Quiz Results with Review PDF
+    // ============================
     async function showQuizResults() {
       const token = localStorage.getItem("token");
 
       try {
-        const res = await fetch(`${BASE_URL}/quizzes/${currentQuizId}`, {
+        // Fetch quiz details
+        const quizRes = await fetch(`${BASE_URL}/quizzes/${currentQuizId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (!res.ok) throw new Error("Failed to fetch quiz");
-        currentQuiz = await res.json();
+        if (!quizRes.ok) throw new Error("Failed to fetch quiz");
+        currentQuiz = await quizRes.json();
 
+        // Fetch the attempt
         const attemptRes = await fetch(`${BASE_URL}/quizzes/${currentQuizId}/attempt`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -1882,6 +1869,25 @@
           document.getElementById("modalGradeValue").textContent = scoreDisplay;
           document.getElementById("modalGradeValue").className = `modal-grade-value ${gradeClass}`;
           document.getElementById("feedbackText").textContent = attempt.feedback || "No feedback provided.";
+
+          // --- Show Review PDF if available ---
+          const reviewPdfContainer = document.getElementById("reviewPdfContainer");
+          const reviewPdfLink = document.getElementById("reviewPdfLink");
+          const reviewPdfName = document.getElementById("reviewPdfName");
+
+          if (attempt.reviewPdfUrl) {
+            // Build full URL
+            let pdfUrl = attempt.reviewPdfUrl;
+            if (!pdfUrl.startsWith("http")) {
+              pdfUrl = `https://cs-eslamhatem-0px5-q.fly.dev/${pdfUrl.replace(/\\/g, "/")}`;
+            }
+            reviewPdfLink.href = pdfUrl;
+            reviewPdfName.textContent = attempt.reviewPdfOriginalName || "Review PDF";
+            reviewPdfContainer.style.display = "block";
+          } else {
+            reviewPdfContainer.style.display = "none";
+          }
+
           document.getElementById("modalStructuredQuiz").style.display = "none";
           document.getElementById("modalPdfQuiz").style.display = "none";
           document.getElementById("gradeDisplay").style.display = "block";
