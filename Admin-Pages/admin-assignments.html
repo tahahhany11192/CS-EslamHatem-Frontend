@@ -1218,7 +1218,7 @@
     // ==========================================
     // 2. AUTHENTICATION CHECK
     // ==========================================
-    const TOKEN = localStorage.getItem("adminToken");
+    const TOKEN = localStorage.getItem("Token");
     if (!TOKEN) {
       showError("⚠️ Not authorized. Please login as admin.");
       setTimeout(() => {
@@ -1433,7 +1433,7 @@
     }
     
     function logout() {
-      localStorage.removeItem("adminToken");
+      localStorage.removeItem("Token");
       localStorage.removeItem("adminInfo");
       window.location.href = "../Login-Pages/admin-login.html";
     }
@@ -1771,7 +1771,7 @@
         const res = await fetch(`https://cs-eslamhatem-zpihcg.fly.dev/api/admin/assignments/submissions/${id}/grade`, {
           method: "PUT",
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem("adminToken")}`
+            "Authorization": `Bearer ${localStorage.getItem("Token")}`
           },
           body: formData
         });
