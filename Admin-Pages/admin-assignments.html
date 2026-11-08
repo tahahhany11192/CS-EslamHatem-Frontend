@@ -1218,8 +1218,8 @@
     // ==========================================
     // 2. AUTHENTICATION CHECK
     // ==========================================
-    const TOKEN = localStorage.getItem("Token");
-    if (!TOKEN) {
+    const token = localStorage.getItem("token");
+    if (!token) {
       showError("⚠️ Not authorized. Please login as admin.");
       setTimeout(() => {
         window.location.href = "../Login-Pages/admin-login.html";
@@ -1244,13 +1244,13 @@
     // ==========================================
     function headersAuthJSON() {
       return { 
-        "Authorization": "Bearer " + TOKEN,
+        "Authorization": "Bearer " + token,
         "Content-Type": "application/json"
       };
     }
     
     function headersAuth() {
-      return { "Authorization": "Bearer " + TOKEN };
+      return { "Authorization": "Bearer " + token };
     }
     
     function fmtDate(dateStr) {
@@ -1433,7 +1433,7 @@
     }
     
     function logout() {
-      localStorage.removeItem("Token");
+      localStorage.removeItem("token");
       localStorage.removeItem("adminInfo");
       window.location.href = "../Login-Pages/admin-login.html";
     }
@@ -1771,7 +1771,7 @@
         const res = await fetch(`https://cs-eslamhatem-zpihcg.fly.dev/api/admin/assignments/submissions/${id}/grade`, {
           method: "PUT",
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem("Token")}`
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
           },
           body: formData
         });
@@ -1942,7 +1942,7 @@
         const res = await fetch(url, {
           method,
           headers: {
-            Authorization: "Bearer " + TOKEN
+            Authorization: "Bearer " + token
           },
           body: fd
         });
